@@ -5,6 +5,7 @@
 #include<vector>
 #include<string>
 #include "playerInput.h"
+#include <stdlib.h>
 
 bool jumpPossible(int playerTurn, std::vector<std::string>& A, std::vector<std::string>& B, std::vector<std::string>& C, std::vector<std::string>& D, std::vector<std::string>& E, std::vector<std::string>& F, std::vector<std::string>& G, std::vector<std::string>& H, std::vector<std::string>& playerJump) {
     int check = -1;
@@ -29,7 +30,7 @@ bool jumpPossible(int playerTurn, std::vector<std::string>& A, std::vector<std::
                     playerJump.push_back("C" + std::to_string(j-1));
                     jump = true;
                 }
-            } else if(A[j] == "RK" && playerTurn == 1){
+            } else if(A[j] == "RK" && playerTurn == 2){
                 if((j < 6) && (B[j+1] == "B " && C[j+2] == "1 ") || (j < 6 && B[j+1] == "BK" && C[j+2] == "1 ")){
                     playerJump.push_back("A" + std::to_string(j+1));
                     playerJump.push_back("C" + std::to_string(j+3));
@@ -53,7 +54,7 @@ bool jumpPossible(int playerTurn, std::vector<std::string>& A, std::vector<std::
                     playerJump.push_back("D" + std::to_string(j-1));
                     jump = true;
                 }
-            } else if(B[j] == "RK" && playerTurn == 1){
+            } else if(B[j] == "RK" && playerTurn == 2){
                 if((j < 6) && (C[j+1] == "B " && D[j+2] == "1 ") || (j < 6 && C[j+1] == "BK" && D[j+2] == "1 ")){
                     playerJump.push_back("B" + std::to_string(j+1));
                     playerJump.push_back("D" + std::to_string(j+3));
@@ -423,36 +424,35 @@ bool isValid(std::string playerStart, std::string playerMove, int playerTurn, st
     }
 
     if(playerStart[0] == 'A' || playerStart[0] == 'a'){
-        if(A[playerStart[1]-'0'-1] == "BK" || A[playerStart[1]-'0'] == "RK"){
+        if(A[playerStart[1]-'0'-1] == "BK" || A[playerStart[1]-'0'-1] == "RK"){
             king = true;
         }
     } else if(playerStart[0] == 'B' || playerStart[0] == 'b'){
-        if(B[playerStart[1]-'0'-1] == "BK" || B[playerStart[1]-'0'] == "RK"){
+        if(B[playerStart[1]-'0'-1] == "BK" || B[playerStart[1]-'0'-1] == "RK"){
             king = true;
         }
     } else if(playerStart[0] == 'C' || playerStart[0] == 'c'){
-        if(C[playerStart[1]-'0'-1] == "BK" || C[playerStart[1]-'0'] == "RK"){
+        if(C[playerStart[1]-'0'-1] == "BK" || C[playerStart[1]-'0'-1] == "RK"){
             king = true;
         }
     } else if(playerStart[0] == 'D' || playerStart[0] == 'd'){
-        if(D[playerStart[1]-'0'-1] == "BK" || D[playerStart[1]-'0'] == "RK"){
+        if(D[playerStart[1]-'0'-1] == "BK" || D[playerStart[1]-'0'-1] == "RK"){
             king = true;
-            std::cout << "Hej" << std::endl;
         }
     } else if(playerStart[0] == 'E' || playerStart[0] == 'e'){
-        if(E[playerStart[1]-'0'-1] == "BK" || E[playerStart[1]-'0'] == "RK"){
+        if(E[playerStart[1]-'0'-1] == "BK" || E[playerStart[1]-'0'-1] == "RK"){
             king = true;
         }
     } else if(playerStart[0] == 'F' || playerStart[0] == 'f'){
-        if(F[playerStart[1]-'0'-1] == "BK" || F[playerStart[1]-'0'] == "RK"){
+        if(F[playerStart[1]-'0'-1] == "BK" || F[playerStart[1]-'0'-1] == "RK"){
             king = true;
         }
     } else if(playerStart[0] == 'G' || playerStart[0] == 'g'){
-        if(G[playerStart[1]-'0'-1] == "BK" || G[playerStart[1]-'0'] == "RK"){
+        if(G[playerStart[1]-'0'-1] == "BK" || G[playerStart[1]-'0'-1] == "RK"){
             king = true;
         }
     } else if(playerStart[0] == 'H' || playerStart[0] == 'h'){
-        if(H[playerStart[1]-'0'-1] == "BK" || H[playerStart[1]-'0'] == "RK"){
+        if(H[playerStart[1]-'0'-1] == "BK" || H[playerStart[1]-'0'-1] == "RK"){
             king = true;
         }
     }
@@ -540,12 +540,14 @@ bool isValid(std::string playerStart, std::string playerMove, int playerTurn, st
     return true;
 }
 
-bool movePossible(bool jumpPossible, int playerTurn, std::vector<std::string>& A, std::vector<std::string>& B, std::vector<std::string>& C, std::vector<std::string>& D, std::vector<std::string>& E, std::vector<std::string>& F, std::vector<std::string>& G, std::vector<std::string>& H){
+bool movePossible(bool jumpPossible, int playerTurn, std::vector<std::string>& A, std::vector<std::string>& B, std::vector<std::string>& C, std::vector<std::string>& D, std::vector<std::string>& E, std::vector<std::string>& F, std::vector<std::string>& G, std::vector<std::string>& H, std::vector<std::string>& posMove){
     int check = 0;
     int j = 0;
+    bool move = false;
+    posMove = {};
 
     if(jumpPossible){
-        return true;
+        move = true;
     }
 
     for(int i = 0; i < 64; i++){
@@ -553,85 +555,329 @@ bool movePossible(bool jumpPossible, int playerTurn, std::vector<std::string>& A
             check++;
             j = 0;
         }
-        if(j > 0 && j < 7){
             if(check == 0){
-                if(A[j] == "B " && playerTurn == 1){
-                    if((B[j+1] == "1 " || B[j-1] == "1 ")){
-                        return true;
+                if(A[j] == "B " && playerTurn == 1 || A[j] == "BK" && playerTurn == 1){
+                    if(j < 7 && B[j+1] == "1 "){
+                        posMove.push_back("A" + std::to_string(j+1));
+                        posMove.push_back("B" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && B[j-1] == "1 "){
+                        posMove.push_back("A" + std::to_string(j+1));
+                        posMove.push_back("B" + std::to_string(j));
+                        move = true;
+                    }
+                } else if(A[j] == "RK" && playerTurn == 2){
+                    if(j < 7 && B[j+1] == "1 "){
+                        posMove.push_back("A" + std::to_string(j+1));
+                        posMove.push_back("B" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && B[j-1] == "1 "){
+                        posMove.push_back("A" + std::to_string(j+1));
+                        posMove.push_back("B" + std::to_string(j));
+                        move = true;
                     }
                 }
             } else if(check == 1){
-                if(B[j] == "B " && playerTurn == 1){
-                    if(C[j+1] == "1 " || C[j-1] == "1 "){
-                        return true;
+                if(B[j] == "B " && playerTurn == 1 || B[j] == "BK" && playerTurn == 1){
+                    if(j < 7 && C[j+1] == "1 "){
+                        posMove.push_back("B" + std::to_string(j+1));
+                        posMove.push_back("C" + std::to_string(j+2));
+                        move = true;
                     }
-                } else if(B[j] == "R " && playerTurn == 2){
-                    if(A[j+1] == "1 " || A[j-1] == "1 "){
-                        return true;
+                    if(j > 0 && C[j-1] == "1 "){
+                        posMove.push_back("B" + std::to_string(j+1));
+                        posMove.push_back("C" + std::to_string(j));
+                        move = true;
+                    }
+                    if(j < 7 && A[j+1] == "1 " && B[j] == "BK"){
+                        posMove.push_back("B" + std::to_string(j+1));
+                        posMove.push_back("A" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && A[j-1] == "1 " && B[j] == "BK"){
+                        posMove.push_back("B" + std::to_string(j+1));
+                        posMove.push_back("A" + std::to_string(j));
+                        move = true;
+                    }
+                } else if(B[j] == "R " && playerTurn == 2 || B[j] == "RK" && playerTurn == 2){
+                    if(j < 7 && A[j+1] == "1 "){
+                        posMove.push_back("B" + std::to_string(j+1));
+                        posMove.push_back("A" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && A[j-1] == "1 "){
+                        posMove.push_back("B" + std::to_string(j+1));
+                        posMove.push_back("A" + std::to_string(j));
+                        move = true;
+                    }
+                    if(j < 7 && C[j+1] == "1 " && B[j] == "RK"){
+                        posMove.push_back("B" + std::to_string(j+1));
+                        posMove.push_back("C" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && C[j-1] == "1 " && B[j] == "RK"){
+                        posMove.push_back("B" + std::to_string(j+1));
+                        posMove.push_back("C" + std::to_string(j));
+                        move = true;
                     }
                 }
             } else if(check == 2){
-                if(C[j] == "B " && playerTurn == 1){
-                    if(D[j+1] == "1 " || D[j-1] == "1 "){
-                        return true;
+                if(C[j] == "B " && playerTurn == 1 || C[j] == "BK" && playerTurn == 1){
+                    if(j < 7 && D[j+1] == "1 "){
+                        posMove.push_back("C" + std::to_string(j+1));
+                        posMove.push_back("D" + std::to_string(j+2));
+                        move = true;
                     }
-                } else if(C[j] == "R " && playerTurn == 2){
-                    if(B[j+1] == "1 " || B[j-1] == "1 "){
-                        return true;
+                    if(j > 0 && D[j-1] == "1 "){
+                        posMove.push_back("C" + std::to_string(j+1));
+                        posMove.push_back("D" + std::to_string(j));
+                        move = true;
+                    }
+                    if(j < 7 && B[j+1] == "1 " && C[j] == "BK"){
+                        posMove.push_back("C" + std::to_string(j+1));
+                        posMove.push_back("B" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && B[j-1] == "1 " && C[j] == "BK"){
+                        posMove.push_back("C" + std::to_string(j+1));
+                        posMove.push_back("B" + std::to_string(j));
+                        move = true;
+                    }
+                } else if(C[j] == "R " && playerTurn == 2 || C[j] == "RK" && playerTurn == 2){
+                    if(j < 7 && B[j+1] == "1 "){
+                        posMove.push_back("C" + std::to_string(j+1));
+                        posMove.push_back("B" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && B[j-1] == "1 "){
+                        posMove.push_back("C" + std::to_string(j+1));
+                        posMove.push_back("B" + std::to_string(j));
+                        move = true;
+                    }
+                    if(j < 7 && D[j+1] == "1 " && C[j] == "RK"){
+                        posMove.push_back("C" + std::to_string(j+1));
+                        posMove.push_back("D" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && D[j-1] == "1 " && C[j] == "RK"){
+                        posMove.push_back("C" + std::to_string(j+1));
+                        posMove.push_back("D" + std::to_string(j));
+                        move = true;
                     }
                 }
             } else if(check == 3){
-                if(D[j] == "B " && playerTurn == 1){
-                    if(E[j+1] == "1 " || E[j-1] == "1 "){
-                        return true;
+                if(D[j] == "B " && playerTurn == 1 || D[j] == "BK" && playerTurn == 1){
+                    if(j < 7 && E[j+1] == "1 "){
+                        posMove.push_back("D" + std::to_string(j+1));
+                        posMove.push_back("E" + std::to_string(j+2));
+                        move = true;
                     }
-                } else if(D[j] == "R " && playerTurn == 2){
-                    if(C[j+1] == "1 " || C[j-1] == "1 "){
-                        return true;
+                    if(j > 0 && E[j-1] == "1 "){
+                        posMove.push_back("D" + std::to_string(j+1));
+                        posMove.push_back("E" + std::to_string(j));
+                        move = true;
+                    }
+                    if(j < 7 && C[j+1] == "1 " && D[j] == "BK"){
+                        posMove.push_back("D" + std::to_string(j+1));
+                        posMove.push_back("C" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && C[j-1] == "1 " && D[j] == "BK"){
+                        posMove.push_back("D" + std::to_string(j+1));
+                        posMove.push_back("C" + std::to_string(j));
+                        move = true;
+                    }
+                } else if(D[j] == "R " && playerTurn == 2 || D[j] == "RK" && playerTurn == 2){
+                    if(j < 7 && C[j+1] == "1 "){
+                        posMove.push_back("D" + std::to_string(j+1));
+                        posMove.push_back("C" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && C[j-1] == "1 "){
+                        posMove.push_back("D" + std::to_string(j+1));
+                        posMove.push_back("C" + std::to_string(j));
+                        move = true;
+                    }
+                    if(j < 7 && E[j+1] == "1 " && D[j] == "RK"){
+                        posMove.push_back("D" + std::to_string(j+1));
+                        posMove.push_back("E" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && E[j-1] == "1 " && D[j] == "RK"){
+                        posMove.push_back("D" + std::to_string(j+1));
+                        posMove.push_back("E" + std::to_string(j));
+                        move = true;
                     }
                 }
             } else if(check == 4){
-                if(E[j] == "B " && playerTurn == 1){
-                    if(F[j+1] == "1 " || F[j-1] == "1 "){
-                        return true;
+                if(E[j] == "B " && playerTurn == 1 || E[j] == "BK" && playerTurn == 1){
+                    if(j < 7 && F[j+1] == "1 "){
+                        posMove.push_back("E" + std::to_string(j+1));
+                        posMove.push_back("F" + std::to_string(j+2));
+                        move = true;
                     }
-                } else if(E[j] == "R " && playerTurn == 2){
-                    if(D[j+1] == "1 " || D[j-1] == "1 "){
-                        return true;
+                    if(j > 0 && F[j-1] == "1 "){
+                        posMove.push_back("E" + std::to_string(j+1));
+                        posMove.push_back("F" + std::to_string(j));
+                        move = true;
+                    }
+                    if(j < 7 && D[j+1] == "1 " && E[j] == "BK"){
+                        posMove.push_back("E" + std::to_string(j+1));
+                        posMove.push_back("D" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && D[j-1] == "1 " && E[j] == "BK"){
+                        posMove.push_back("E" + std::to_string(j+1));
+                        posMove.push_back("D" + std::to_string(j));
+                        move = true;
+                    }
+                } else if(E[j] == "R " && playerTurn == 2 || E[j] == "RK" && playerTurn == 2){
+                    if(j < 7 && D[j+1] == "1 "){
+                        posMove.push_back("E" + std::to_string(j+1));
+                        posMove.push_back("D" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && D[j-1] == "1 "){
+                        posMove.push_back("E" + std::to_string(j+1));
+                        posMove.push_back("D" + std::to_string(j));
+                        move = true;
+                    }
+                    if(j < 7 && F[j+1] == "1 " && E[j] == "RK"){
+                        posMove.push_back("E" + std::to_string(j+1));
+                        posMove.push_back("F" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && F[j-1] == "1 " && E[j] == "RK"){
+                        posMove.push_back("E" + std::to_string(j+1));
+                        posMove.push_back("F" + std::to_string(j));
+                        move = true;
                     }
                 }
             } else if(check == 5){
-                if(F[j] == "B " && playerTurn == 1){
-                    if(G[j+1] == "1 " || G[j-1] == "1 "){
-                        return true;
+                if(F[j] == "B " && playerTurn == 1 || F[j] == "BK" && playerTurn == 1){
+                    if(j < 7 && G[j+1] == "1 "){
+                        posMove.push_back("F" + std::to_string(j+1));
+                        posMove.push_back("G" + std::to_string(j+2));
+                        move = true;
                     }
-                } else if(F[j] == "R " && playerTurn == 2){
-                    if(E[j+1] == "1 " || E[j-1] == "1 "){
-                        return true;
+                    if(j > 0 && G[j-1] == "1 "){
+                        posMove.push_back("F" + std::to_string(j+1));
+                        posMove.push_back("G" + std::to_string(j));
+                        move = true;
+                    }
+                    if(j < 7 && E[j+1] == "1 " && F[j] == "BK"){
+                        posMove.push_back("F" + std::to_string(j+1));
+                        posMove.push_back("E" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && E[j-1] == "1 " && F[j] == "BK"){
+                        posMove.push_back("F" + std::to_string(j+1));
+                        posMove.push_back("E" + std::to_string(j));
+                        move = true;
+                    }
+                } else if(F[j] == "R " && playerTurn == 2 || F[j] == "RK" && playerTurn == 2){
+                    if(j < 7 && E[j+1] == "1 "){
+                        posMove.push_back("F" + std::to_string(j+1));
+                        posMove.push_back("E" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && E[j-1] == "1 "){
+                        posMove.push_back("F" + std::to_string(j+1));
+                        posMove.push_back("E" + std::to_string(j));
+                        move = true;
+                    }
+                    if(j < 7 && G[j+1] == "1 " && F[j] == "RK" ){
+                        posMove.push_back("F" + std::to_string(j+1));
+                        posMove.push_back("G" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && G[j-1] == "1 " && F[j] == "RK"){
+                        posMove.push_back("F" + std::to_string(j+1));
+                        posMove.push_back("G" + std::to_string(j));
+                        move = true;
                     }
                 }
             } else if(check == 6){
-                if(G[j] == "B " && playerTurn == 1){
-                    if(H[j+1] == "1 " || H[j-1] == "1 "){
-                        return true;
+                if(G[j] == "B " && playerTurn == 1 || G[j] == "BK" && playerTurn == 1){
+                    if(j < 7 && H[j+1] == "1 "){
+                        posMove.push_back("G" + std::to_string(j+1));
+                        posMove.push_back("H" + std::to_string(j+2));
+                        move = true;
                     }
-                } else if(G[j] == "R " && playerTurn == 2){
-                    if(F[j+1] == "1 " || F[j-1] == "1 "){
-                        return true;
+                    if(j > 0 && H[j-1] == "1 "){
+                        posMove.push_back("G" + std::to_string(j+1));
+                        posMove.push_back("H" + std::to_string(j));
+                        move = true;
+                    }
+                    if(j < 7 && F[j+1] == "1 " && G[j] == "BK"){
+                        posMove.push_back("G" + std::to_string(j+1));
+                        posMove.push_back("F" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && F[j-1] == "1 " && G[j] == "BK"){
+                        posMove.push_back("G" + std::to_string(j+1));
+                        posMove.push_back("F" + std::to_string(j));
+                        move = true;
+                    }
+                } else if(G[j] == "R " && playerTurn == 2 || G[j] == "RK" && playerTurn == 2){
+                    if(j < 7 && F[j+1] == "1 "){
+                        posMove.push_back("G" + std::to_string(j+1));
+                        posMove.push_back("F" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && F[j-1] == "1 "){
+                        posMove.push_back("G" + std::to_string(j+1));
+                        posMove.push_back("F" + std::to_string(j));
+                        move = true;
+                    }
+                    if(j < 7 && H[j+1] == "1 " && G[j] == "RK"){
+                        posMove.push_back("G" + std::to_string(j+1));
+                        posMove.push_back("H" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && H[j-1] == "1 " && G[j] == "RK"){
+                        posMove.push_back("G" + std::to_string(j+1));
+                        posMove.push_back("H" + std::to_string(j));
+                        move = true;
                     }
                 }
             } else if(check == 7){
-                if(H[j] == "R " && playerTurn == 2){
-                    if(G[j+1] == "1 " || G[j-1] == "1 "){
-                        return true;
+                if(H[j] == "R " && playerTurn == 2 || H[j] == "RK" && playerTurn == 2){
+                    if(j < 7 && G[j+1] == "1 "){
+                        posMove.push_back("H" + std::to_string(j+1));
+                        posMove.push_back("G" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && G[j-1] == "1 "){
+                        posMove.push_back("H" + std::to_string(j+1));
+                        posMove.push_back("G" + std::to_string(j));
+                        move = true;
+                    }
+                } else if(H[j] == "BK" && playerTurn == 1){
+                    if(j < 7 && G[j+1] == "1 "){
+                        posMove.push_back("H" + std::to_string(j+1));
+                        posMove.push_back("G" + std::to_string(j+2));
+                        move = true;
+                    }
+                    if(j > 0 && G[j-1] == "1 "){
+                        posMove.push_back("H" + std::to_string(j+1));
+                        posMove.push_back("G" + std::to_string(j));
+                        move = true;
                     }
                 }
             }
-        }
-        j++;
 
+        j++;
     }
-    return false;
+
+    if(move){
+        return true;
+    } else {
+        gameEnd = true;
+        return false;
+    }
 }
 
 bool promotion(std::vector<std::string>& A, std::vector<std::string>& H, int playerTurn){
@@ -639,19 +885,65 @@ bool promotion(std::vector<std::string>& A, std::vector<std::string>& H, int pla
         for(int i = 0; i < 8; i++){
             if(H[i] == "B "){
                 H[i] = "BK";
+                return true;
             }
         }
     } else {
         for(int i = 0; i < 8; i++){
             if(A[i] == "R "){
                 A[i] = "RK";
+                return true;
             }
         }
     }
-    ;
+    return false;
 }
 
-bool playerMover(std::string& playerStart, std::string& playerMove, std::vector<std::string>& A, std::vector<std::string>& B, std::vector<std::string>& C, std::vector<std::string>& D, std::vector<std::string>& E, std::vector<std::string>& F, std::vector<std::string>& G, std::vector<std::string>& H, int playerTurn, int& redPieces, int& blackPieces, std::vector<std::string>& playerJump, int tries) {
+void aiMover(std::vector<std::string> posMove, bool jump, std::vector<std::string> playerJump, std::string& playerMove, std::string& playerStart){
+    int random;
+    std::vector<std::string> actualJump;
+
+    if(jump){
+        if(moreMove){
+            for (int i = 0; i < playerJump.size(); i += 2) {
+                if(playerJump[i] == playerMove){
+                    actualJump.push_back(playerJump[i]);
+                    actualJump.push_back(playerJump[i+1]);
+                }
+            }
+            random = rand() % actualJump.size();
+            if(random % 2 != 0){
+                random--;
+            }
+            std::cout << "AI moves from1 " << actualJump[random] << " to " << actualJump[random+1] << std::endl;
+            playerStart = actualJump[random];
+            playerMove = actualJump[random+1];
+
+        } else {
+            random = rand() % playerJump.size();
+            if(random % 2 != 0){
+                random--;
+            }
+        std::cout << "AI moves from2 " << playerJump[random] << " to " << playerJump[random+1] << std::endl;
+        playerStart = playerJump[random];
+        playerMove = playerJump[random+1];
+        return;
+
+        }
+
+    } else {
+        random = rand() % posMove.size();
+        if(random % 2 != 0){
+            random--;
+        }
+        std::cout << "AI moves from3 " << posMove[random] << " to " << posMove[random+1] << std::endl;
+        playerStart = posMove[random];
+        playerMove = posMove[random+1];
+        return;
+        }
+}
+
+bool playerMover(std::string& playerStart, std::string& playerMove, std::vector<std::string>& A, std::vector<std::string>& B, std::vector<std::string>& C, std::vector<std::string>& D, std::vector<std::string>& E, std::vector<std::string>& F, std::vector<std::string>& G, std::vector<std::string>& H, int playerTurn, int& redPieces, int& blackPieces, std::vector<std::string>& playerJump, int tries, std::vector<std::string>& posMove) {
     bool validMove1 = false;
     bool validMove2 = false;
     int row;
@@ -660,6 +952,7 @@ bool playerMover(std::string& playerStart, std::string& playerMove, std::vector<
     bool jump;
     bool move;
     bool check = false;
+    int count = 0;
 
 
 
@@ -671,13 +964,29 @@ bool playerMover(std::string& playerStart, std::string& playerMove, std::vector<
 
     while(!check) {
         jump = jumpPossible(playerTurn, A, B, C, D, E, F, G, H, playerJump);
-        move = movePossible(jump, playerTurn, A, B, C, D, E, F, G, H);
-        check = playerInput(jump, playerStart, playerMove, playerJump, playerTurn, move, tries);
-        tries++;
-    }
+        move = movePossible(jump, playerTurn, A, B, C, D, E, F, G, H, posMove);
 
-    if(gameEnd){
-        ;
+        for(int i = 0; i < posMove.size(); i += 2){
+            std::cout << "Move possible from " << posMove[i] << " to " << posMove[i+1] << std::endl;
+        }
+
+        if(playerTurn == 1){
+            std::cout << "Player 1's turn." << std::endl;
+            aiMover(posMove, jump, playerJump, playerMove, playerStart);
+            moreMove = false;
+            check = true;
+            //check = playerInput(jump, playerStart, playerMove, playerJump, playerTurn, move, tries);
+
+        } else {
+            std::cout << "Player 2's turn." << std::endl;
+            aiMover(posMove, jump, playerJump, playerMove, playerStart);
+            moreMove = false;
+            check = true;
+        }
+
+
+        tries++;
+
     }
 
     if(!isValid(playerStart, playerMove, playerTurn, A, B, C, D, E, F, G, H, redPieces, blackPieces, playerJump)){
@@ -838,10 +1147,12 @@ bool playerMover(std::string& playerStart, std::string& playerMove, std::vector<
 
     jumpPossible(playerTurn, A, B, C, D, E, F, G, H, playerJump);
 
-    if(moreMoveCheck(playerJump, playerMove)){
-        moreMove = true;
-    } else {
-        moreMove = false;
+    if(jump){
+        if(moreMoveCheck(playerJump, playerMove)){
+            moreMove = true;
+        } else {
+            moreMove = false;
+        }
     }
 
     return true;

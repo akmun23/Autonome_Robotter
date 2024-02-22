@@ -3,6 +3,7 @@
 #include<string>
 #include "boardUpdate.h"
 #include "validMoves.h"
+#include <unistd.h>>
 
 std::vector<std::string> A = {"0 ", "B ", "0 ", "B ", "0 ", "B ", "0 ", "B "};
 std::vector<std::string> B = {"B ", "0 ", "B ", "0 ", "B ", "0 ", "B ", "0 "};
@@ -19,8 +20,10 @@ int main() {
     int redPieces = 12;
     bool check = false;
     int tries;
+    int i = 0;
     std::string lowerCase;
     std::vector<std::string> playerJump = {};
+    std::vector<std::string> posMove = {};
 
     std::cout << "Welcome to Checkers!" << std::endl;
     std::cout << "Here is the board:" << std::endl;
@@ -30,7 +33,7 @@ int main() {
     std::string playerStart;
     std::string playerMove;
 
-    for (int i = 0; i < 10; ++i) {
+    while(true) {
         if(i%2 == 0){
             playerTurn = 1;
         } else {
@@ -59,10 +62,10 @@ int main() {
             std::cout << std::endl;
 
             while(!check){
-                check = playerMover(playerStart, playerMove, A, B, C, D, E, F, G, H, playerTurn, redPieces, blackPieces, playerJump, tries);
-
+                check = playerMover(playerStart, playerMove, A, B, C, D, E, F, G, H, playerTurn, redPieces, blackPieces, playerJump, tries, posMove);
                 if(check){
                     checkerBoard(A, B, C, D, E, F, G, H);
+                    sleep(1);
                 }
             }
             if(gameEnd){
@@ -73,13 +76,13 @@ int main() {
 
         if(gameEnd){
             if(playerTurn == 1 && redPieces == 0){
-                std::cout << "Player 1 wins!" << std::endl;
+                std::cout << "Player 1 wins! No more red pieces" << std::endl;
             } else if(playerTurn == 1){
-                std::cout << "Player 2 wins!" << std::endl;
+                std::cout << "Player 2 wins! No more moves" << std::endl;
             } else if(playerTurn == 2 && blackPieces == 0){
-                std::cout << "Player 2 wins!" << std::endl;
+                std::cout << "Player 2 wins! No more black pieces" << std::endl;
             } else if(playerTurn == 2){
-                std::cout << "Player 1 wins!" << std::endl;
+                std::cout << "Player 1 wins! No more moves" << std::endl;
             }
             break;
         }
@@ -87,6 +90,8 @@ int main() {
         std::cout << "There are " << redPieces << " red pieces left." << std::endl;
         std::cout << "There are " << blackPieces << " black pieces left." << std::endl;
         std::cout << std::endl;
+
+        i++;
     }
 
     return 0;
