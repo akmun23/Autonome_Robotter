@@ -3,7 +3,7 @@
 #include<string>
 #include "boardUpdate.h"
 #include "validMoves.h"
-#include <unistd.h>>
+#include <unistd.h>
 
 std::vector<std::string> A = {"0 ", "B ", "0 ", "B ", "0 ", "B ", "0 ", "B "};
 std::vector<std::string> B = {"B ", "0 ", "B ", "0 ", "B ", "0 ", "B ", "0 "};

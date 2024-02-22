@@ -6,6 +6,7 @@
 #include<string>
 #include "playerInput.h"
 #include <stdlib.h>
+#include <random>
 
 bool jumpPossible(int playerTurn, std::vector<std::string>& A, std::vector<std::string>& B, std::vector<std::string>& C, std::vector<std::string>& D, std::vector<std::string>& E, std::vector<std::string>& F, std::vector<std::string>& G, std::vector<std::string>& H, std::vector<std::string>& playerJump) {
     int check = -1;
@@ -911,7 +912,14 @@ void aiMover(std::vector<std::string> posMove, bool jump, std::vector<std::strin
                     actualJump.push_back(playerJump[i+1]);
                 }
             }
-            random = rand() % actualJump.size();
+            std::random_device rd;  // Obtain a random number from hardware
+            std::mt19937 eng(rd()); // Seed the generator
+
+            // Define the range for the random number
+            std::uniform_int_distribution<> distr(0, actualJump.size()-1);
+
+            random = distr(eng); // Generate a random number
+
             if(random % 2 != 0){
                 random--;
             }
@@ -920,7 +928,14 @@ void aiMover(std::vector<std::string> posMove, bool jump, std::vector<std::strin
             playerMove = actualJump[random+1];
 
         } else {
-            random = rand() % playerJump.size();
+
+            std::random_device rd;  // Obtain a random number from hardware
+            std::mt19937 eng(rd()); // Seed the generator
+            // Define the range for the random number
+            std::uniform_int_distribution<> distr(0, playerJump.size()-1);
+
+            random = distr(eng);
+
             if(random % 2 != 0){
                 random--;
             }
@@ -932,7 +947,14 @@ void aiMover(std::vector<std::string> posMove, bool jump, std::vector<std::strin
         }
 
     } else {
-        random = rand() % posMove.size();
+
+        std::random_device rd;  // Obtain a random number from hardware
+        std::mt19937 eng(rd()); // Seed the generator
+        // Define the range for the random number
+        std::uniform_int_distribution<> distr(0, posMove.size()-1);
+
+        random = distr(eng);
+
         if(random % 2 != 0){
             random--;
         }
