@@ -5,17 +5,16 @@
 #include <vector>
 #include <string>
 
-void checkerBoard(std::vector<std::string>& A, std::vector<std::string>& B, std::vector<std::string>& C, std::vector<std::string>& D, std::vector<std::string>& E, std::vector<std::string>& F, std::vector<std::string>& G, std::vector<std::string>& H){
-    std::cout << " " << " "  << "1"  << "  "<< "2"  << "  "<< "3"  << "  "<< "4"  << "  "<< "5"  << "  "<< "6"  << "  "<< "7"  << "  "<< "8" << std::endl;
-    std::cout << "A" << " "  << A[0] << " " << A[1] << " " << A[2] << " " << A[3] << " " << A[4] << " " << A[5] << " " << A[6] << " " << A[7] << std::endl;
-    std::cout << "B" << " "  << B[0] << " " << B[1] << " " << B[2] << " " << B[3] << " " << B[4] << " " << B[5] << " " << B[6] << " " << B[7] << std::endl;
-    std::cout << "C" << " "  << C[0] << " " << C[1] << " " << C[2] << " " << C[3] << " " << C[4] << " " << C[5] << " " << C[6] << " " << C[7] << std::endl;
-    std::cout << "D" << " "  << D[0] << " " << D[1] << " " << D[2] << " " << D[3] << " " << D[4] << " " << D[5] << " " << D[6] << " " << D[7] << std::endl;
-    std::cout << "E" << " "  << E[0] << " " << E[1] << " " << E[2] << " " << E[3] << " " << E[4] << " " << E[5] << " " << E[6] << " " << E[7] << std::endl;
-    std::cout << "F" << " "  << F[0] << " " << F[1] << " " << F[2] << " " << F[3] << " " << F[4] << " " << F[5] << " " << F[6] << " " << F[7] << std::endl;
-    std::cout << "G" << " "  << G[0] << " " << G[1] << " " << G[2] << " " << G[3] << " " << G[4] << " " << G[5] << " " << G[6] << " " << G[7] << std::endl;
-    std::cout << "H" << " "  << H[0] << " " << H[1] << " " << H[2] << " " << H[3] << " " << H[4] << " " << H[5] << " " << H[6] << " " << H[7] << std::endl;
-    std::cout << std::endl;
+void checkerBoard(std::vector<std::vector<std::string>> boards){
+    std::cout << " " << " "  << "1"  << "  "        << "2" << "  "         << "3"  << "  "        << "4"  << "  "        << "5"  << "  "        << "6"  << "  "        << "7"  << "  "        << "8"          << std::endl;
+    std::cout << "A" << " "  << boards[0][0] << " " << boards[0][1] << " " << boards[0][2] << " " << boards[0][3] << " " << boards[0][4] << " " << boards[0][5] << " " << boards[0][6] << " " << boards[0][7] << std::endl;
+    std::cout << "B" << " "  << boards[1][0] << " " << boards[1][1] << " " << boards[1][2] << " " << boards[1][3] << " " << boards[1][4] << " " << boards[1][5] << " " << boards[1][6] << " " << boards[1][7] << std::endl;
+    std::cout << "C" << " "  << boards[2][0] << " " << boards[2][1] << " " << boards[2][2] << " " << boards[2][3] << " " << boards[2][4] << " " << boards[2][5] << " " << boards[2][6] << " " << boards[2][7] << std::endl;
+    std::cout << "D" << " "  << boards[3][0] << " " << boards[3][1] << " " << boards[3][2] << " " << boards[3][3] << " " << boards[3][4] << " " << boards[3][5] << " " << boards[3][6] << " " << boards[3][7] << std::endl;
+    std::cout << "E" << " "  << boards[4][0] << " " << boards[4][1] << " " << boards[4][2] << " " << boards[4][3] << " " << boards[4][4] << " " << boards[4][5] << " " << boards[4][6] << " " << boards[4][7] << std::endl;
+    std::cout << "F" << " "  << boards[5][0] << " " << boards[5][1] << " " << boards[5][2] << " " << boards[5][3] << " " << boards[5][4] << " " << boards[5][5] << " " << boards[5][6] << " " << boards[5][7] << std::endl;
+    std::cout << "G" << " "  << boards[6][0] << " " << boards[6][1] << " " << boards[6][2] << " " << boards[6][3] << " " << boards[6][4] << " " << boards[6][5] << " " << boards[6][6] << " " << boards[6][7] << std::endl;
+    std::cout << "H" << " "  << boards[7][0] << " " << boards[7][1] << " " << boards[7][2] << " " << boards[7][3] << " " << boards[7][4] << " " << boards[7][5] << " " << boards[7][6] << " " << boards[7][7] << std::endl;
 }
 
 #endif // BOARDUPDATE_H
