@@ -3,52 +3,67 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "validMoves.h"
 
-bool playerInput(std::string& playerStart, std::string& playerMove, std::vector<std::string>& playerJump, int playerTurn) {
-    bool valid = false;
-    bool check;
-    bool moreMoveCheck = false;
-    bool jumpPossible = false;
+//Function to get the player's input
+bool playerInput(std::string& playerStart, std::string& playerMove, std::vector<std::string>& playerJump, int playerTurn, std::vector<std::vector<std::string>>& boards) {
+    bool valid = false; //If the move is valid
+    bool check = false; //If the move is a jump
+    bool jumpPossible = false; //If a jump is possible
+
     if(playerJump.size() > 0){
         jumpPossible = true;
     }
 
-    std::string lowerCase;
-    std::string lowerCase2;
+    std::string lowerCase; //Variable used to convert the player's input to lowercase
+    std::string lowerCase2; //Variable used to convert the player's input to lowercase
 
-    std::cout << "Player " << playerTurn << ", please enter the coordinates of the piece you would like to move (e.g. A3): ";
-    std::cin >> playerStart;
-    std::cout << "Player " << playerTurn << ", please enter the coordinates of the square you would like to move to (e.g. B4): ";
-    std::cin >> playerMove;
-    std::cout << std::endl;
+    //Loop to get the player's input until a valid one is given
+    while(!valid){
+        std::cout << "Player " << playerTurn << ", please enter the coordinates of the piece you would like to move (e.g. A3): ";
+        std::cin >> playerStart;
+        std::cout << "Player " << playerTurn << ", please enter the coordinates of the square you would like to move to (e.g. B4): ";
+        std::cin >> playerMove;
+        std::cout << std::endl;
 
-    if(playerStart.length() != 2 || playerMove.length() != 2) {
-        std::cout << "Invalid move. Please enter a move in the format A3." << std::endl;
-        valid = false;
-    } else {
-        valid = true;
-    }
+        //Checks if the input has the correct number of characters
+        if(playerStart.length() != 2 || playerMove.length() != 2) {
+            std::cout << "Invalid move. Please enter a move in the format A3." << std::endl;
+            valid = false;
+        } else {
+            //Checks if the input is a jump while a jump is possible
+            if(jumpPossible && valid){
+                for (int i = 0; i < playerJump.size(); i+=2) {
+                    //Makes it possible to write in both upper and lowerCase
+                    lowerCase = playerJump[i];
+                    lowerCase[0] = tolower(lowerCase[0]);
+                    lowerCase2 = playerJump[i+1];
+                    lowerCase2[0] = tolower(lowerCase2[0]);
 
-    if(jumpPossible && valid){
-        for (int i = 0; i < playerJump.size(); i+=2) {
-            lowerCase = playerJump[i];
-            lowerCase[0] = tolower(lowerCase[0]);
-            lowerCase2 = playerJump[i+1];
-            lowerCase2[0] = tolower(lowerCase2[0]);
-            if(check){
-                if((playerStart == playerJump[i] || playerStart == lowerCase) && (playerMove == playerJump[i+1] || playerMove == lowerCase2)){
-                    check = false;
-                    valid = true;
-                } else {
-                    valid = false;
+                    //Checks if the input is a jump
+                    if(!check){
+                        if((playerStart == playerJump[i] || playerStart == lowerCase) && (playerMove == playerJump[i+1] || playerMove == lowerCase2)){
+                            check = true;
+                            valid = true;
+                        } else {
+                            valid = false;
+                        }
+                    }
                 }
+                if(!valid){
+                    std::cout << "Invalid move. You must jump." << std::endl;
+                } else {
+                    // If the input was a jump, it goes on to check if the move is valid
+                    valid = playerMover(playerStart, playerMove, playerTurn, boards);
+                }
+            } else {
+                //If there were no jumps possible, it checks if the move is valid
+                valid = playerMover(playerStart, playerMove, playerTurn, boards);
             }
-        }
-        if(!valid){
-            std::cout << "Invalid move. You must jump." << std::endl;
-            return false;
+
         }
     }
+    //Returns true if the move is valid, which it must be to break out of the while-loop
     return true;
 }
 
