@@ -1,0 +1,875 @@
+
+GccApplication1.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000004c6  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000028  00800060  000004c6  0000053a  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  00000562  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000594  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000090  00000000  00000000  000005d0  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000d2a  00000000  00000000  00000660  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 00000668  00000000  00000000  0000138a  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   00000702  00000000  00000000  000019f2  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000128  00000000  00000000  000020f4  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    000003de  00000000  00000000  0000221c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    000003ba  00000000  00000000  000025fa  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000080  00000000  00000000  000029b4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+   8:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+   c:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  10:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  14:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  18:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  1c:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  20:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  24:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  28:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  2c:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  30:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  34:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  38:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  3c:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  40:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  44:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  48:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  4c:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+  50:	0c 94 3f 00 	jmp	0x7e	; 0x7e <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d8 e0       	ldi	r29, 0x08	; 8
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+
+00000060 <__do_copy_data>:
+  60:	10 e0       	ldi	r17, 0x00	; 0
+  62:	a0 e6       	ldi	r26, 0x60	; 96
+  64:	b0 e0       	ldi	r27, 0x00	; 0
+  66:	e6 ec       	ldi	r30, 0xC6	; 198
+  68:	f4 e0       	ldi	r31, 0x04	; 4
+  6a:	02 c0       	rjmp	.+4      	; 0x70 <__do_copy_data+0x10>
+  6c:	05 90       	lpm	r0, Z+
+  6e:	0d 92       	st	X+, r0
+  70:	a8 38       	cpi	r26, 0x88	; 136
+  72:	b1 07       	cpc	r27, r17
+  74:	d9 f7       	brne	.-10     	; 0x6c <__do_copy_data+0xc>
+  76:	0e 94 23 01 	call	0x246	; 0x246 <main>
+  7a:	0c 94 61 02 	jmp	0x4c2	; 0x4c2 <_exit>
+
+0000007e <__bad_interrupt>:
+  7e:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+00000082 <swrite>:
+
+
+
+
+void swrite(uint8_t byte) {
+	while (!( UCSRA & (1<<UDRE) ));
+  82:	5d 9b       	sbis	0x0b, 5	; 11
+  84:	fe cf       	rjmp	.-4      	; 0x82 <swrite>
+	UDR = byte;
+  86:	8c b9       	out	0x0c, r24	; 12
+  88:	08 95       	ret
+
+0000008a <sread>:
+}
+
+uint8_t sread(){
+	while (!( UCSRA & (1<<RXC) ));
+  8a:	5f 9b       	sbis	0x0b, 7	; 11
+  8c:	fe cf       	rjmp	.-4      	; 0x8a <sread>
+	return UDR;
+  8e:	8c b1       	in	r24, 0x0c	; 12
+}
+  90:	08 95       	ret
+
+00000092 <WriteMessage>:
+		
+		
+	}
+}
+
+void WriteMessage(char* sendthis){
+  92:	0f 93       	push	r16
+  94:	1f 93       	push	r17
+  96:	cf 93       	push	r28
+  98:	df 93       	push	r29
+  9a:	8c 01       	movw	r16, r24
+	
+	for (int i = 0; i < strlen(sendthis); i++){
+  9c:	c0 e0       	ldi	r28, 0x00	; 0
+  9e:	d0 e0       	ldi	r29, 0x00	; 0
+  a0:	07 c0       	rjmp	.+14     	; 0xb0 <WriteMessage+0x1e>
+	swrite(sendthis[i]);
+  a2:	f8 01       	movw	r30, r16
+  a4:	ec 0f       	add	r30, r28
+  a6:	fd 1f       	adc	r31, r29
+  a8:	80 81       	ld	r24, Z
+  aa:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+	}
+}
+
+void WriteMessage(char* sendthis){
+	
+	for (int i = 0; i < strlen(sendthis); i++){
+  ae:	21 96       	adiw	r28, 0x01	; 1
+  b0:	f8 01       	movw	r30, r16
+  b2:	01 90       	ld	r0, Z+
+  b4:	00 20       	and	r0, r0
+  b6:	e9 f7       	brne	.-6      	; 0xb2 <WriteMessage+0x20>
+  b8:	31 97       	sbiw	r30, 0x01	; 1
+  ba:	e0 1b       	sub	r30, r16
+  bc:	f1 0b       	sbc	r31, r17
+  be:	ce 17       	cp	r28, r30
+  c0:	df 07       	cpc	r29, r31
+  c2:	78 f3       	brcs	.-34     	; 0xa2 <WriteMessage+0x10>
+	swrite(sendthis[i]);
+	}
+}
+  c4:	df 91       	pop	r29
+  c6:	cf 91       	pop	r28
+  c8:	1f 91       	pop	r17
+  ca:	0f 91       	pop	r16
+  cc:	08 95       	ret
+
+000000ce <Blank>:
+
+void Blank(){
+	
+	led_off0();
+  ce:	88 b3       	in	r24, 0x18	; 24
+  d0:	81 60       	ori	r24, 0x01	; 1
+  d2:	88 bb       	out	0x18, r24	; 24
+	led_off1();
+  d4:	88 b3       	in	r24, 0x18	; 24
+  d6:	82 60       	ori	r24, 0x02	; 2
+  d8:	88 bb       	out	0x18, r24	; 24
+	led_off2();
+  da:	88 b3       	in	r24, 0x18	; 24
+  dc:	84 60       	ori	r24, 0x04	; 4
+  de:	88 bb       	out	0x18, r24	; 24
+	led_off3();
+  e0:	88 b3       	in	r24, 0x18	; 24
+  e2:	88 60       	ori	r24, 0x08	; 8
+  e4:	88 bb       	out	0x18, r24	; 24
+	led_off4();
+  e6:	88 b3       	in	r24, 0x18	; 24
+  e8:	80 61       	ori	r24, 0x10	; 16
+  ea:	88 bb       	out	0x18, r24	; 24
+	led_off5();
+  ec:	88 b3       	in	r24, 0x18	; 24
+  ee:	80 62       	ori	r24, 0x20	; 32
+  f0:	88 bb       	out	0x18, r24	; 24
+	led_off6();
+  f2:	88 b3       	in	r24, 0x18	; 24
+  f4:	80 64       	ori	r24, 0x40	; 64
+  f6:	88 bb       	out	0x18, r24	; 24
+	led_off7();
+  f8:	88 b3       	in	r24, 0x18	; 24
+  fa:	80 68       	ori	r24, 0x80	; 128
+  fc:	88 bb       	out	0x18, r24	; 24
+  fe:	08 95       	ret
+
+00000100 <Number0>:
+	
+}
+void Number0(){
+	led_on0();
+ 100:	88 b3       	in	r24, 0x18	; 24
+ 102:	8e 7f       	andi	r24, 0xFE	; 254
+ 104:	88 bb       	out	0x18, r24	; 24
+	led_on1();
+ 106:	88 b3       	in	r24, 0x18	; 24
+ 108:	8d 7f       	andi	r24, 0xFD	; 253
+ 10a:	88 bb       	out	0x18, r24	; 24
+	led_on2();
+ 10c:	88 b3       	in	r24, 0x18	; 24
+ 10e:	8b 7f       	andi	r24, 0xFB	; 251
+ 110:	88 bb       	out	0x18, r24	; 24
+	led_on3();
+ 112:	88 b3       	in	r24, 0x18	; 24
+ 114:	87 7f       	andi	r24, 0xF7	; 247
+ 116:	88 bb       	out	0x18, r24	; 24
+	led_on4();
+ 118:	88 b3       	in	r24, 0x18	; 24
+ 11a:	8f 7e       	andi	r24, 0xEF	; 239
+ 11c:	88 bb       	out	0x18, r24	; 24
+	led_on6();
+ 11e:	88 b3       	in	r24, 0x18	; 24
+ 120:	8f 7b       	andi	r24, 0xBF	; 191
+ 122:	88 bb       	out	0x18, r24	; 24
+ 124:	08 95       	ret
+
+00000126 <Number1>:
+	
+	
+}
+void Number1(){
+
+	led_on2();
+ 126:	88 b3       	in	r24, 0x18	; 24
+ 128:	8b 7f       	andi	r24, 0xFB	; 251
+ 12a:	88 bb       	out	0x18, r24	; 24
+	led_on3();
+ 12c:	88 b3       	in	r24, 0x18	; 24
+ 12e:	87 7f       	andi	r24, 0xF7	; 247
+ 130:	88 bb       	out	0x18, r24	; 24
+ 132:	08 95       	ret
+
+00000134 <Number2>:
+	
+	
+}
+
+void Number2(){
+	led_on0();
+ 134:	88 b3       	in	r24, 0x18	; 24
+ 136:	8e 7f       	andi	r24, 0xFE	; 254
+ 138:	88 bb       	out	0x18, r24	; 24
+	led_on1();
+ 13a:	88 b3       	in	r24, 0x18	; 24
+ 13c:	8d 7f       	andi	r24, 0xFD	; 253
+ 13e:	88 bb       	out	0x18, r24	; 24
+	led_on3();
+ 140:	88 b3       	in	r24, 0x18	; 24
+ 142:	87 7f       	andi	r24, 0xF7	; 247
+ 144:	88 bb       	out	0x18, r24	; 24
+	led_on5();
+ 146:	88 b3       	in	r24, 0x18	; 24
+ 148:	8f 7d       	andi	r24, 0xDF	; 223
+ 14a:	88 bb       	out	0x18, r24	; 24
+	led_on6();
+ 14c:	88 b3       	in	r24, 0x18	; 24
+ 14e:	8f 7b       	andi	r24, 0xBF	; 191
+ 150:	88 bb       	out	0x18, r24	; 24
+ 152:	08 95       	ret
+
+00000154 <Number3>:
+	
+	
+}
+void Number3(){
+	led_on1();
+ 154:	88 b3       	in	r24, 0x18	; 24
+ 156:	8d 7f       	andi	r24, 0xFD	; 253
+ 158:	88 bb       	out	0x18, r24	; 24
+	led_on2();
+ 15a:	88 b3       	in	r24, 0x18	; 24
+ 15c:	8b 7f       	andi	r24, 0xFB	; 251
+ 15e:	88 bb       	out	0x18, r24	; 24
+	led_on3();
+ 160:	88 b3       	in	r24, 0x18	; 24
+ 162:	87 7f       	andi	r24, 0xF7	; 247
+ 164:	88 bb       	out	0x18, r24	; 24
+	led_on5();
+ 166:	88 b3       	in	r24, 0x18	; 24
+ 168:	8f 7d       	andi	r24, 0xDF	; 223
+ 16a:	88 bb       	out	0x18, r24	; 24
+	led_on6();
+ 16c:	88 b3       	in	r24, 0x18	; 24
+ 16e:	8f 7b       	andi	r24, 0xBF	; 191
+ 170:	88 bb       	out	0x18, r24	; 24
+ 172:	08 95       	ret
+
+00000174 <Number4>:
+	
+	
+}
+void Number4(){
+	led_on2();
+ 174:	88 b3       	in	r24, 0x18	; 24
+ 176:	8b 7f       	andi	r24, 0xFB	; 251
+ 178:	88 bb       	out	0x18, r24	; 24
+	led_on3();
+ 17a:	88 b3       	in	r24, 0x18	; 24
+ 17c:	87 7f       	andi	r24, 0xF7	; 247
+ 17e:	88 bb       	out	0x18, r24	; 24
+	led_on4();
+ 180:	88 b3       	in	r24, 0x18	; 24
+ 182:	8f 7e       	andi	r24, 0xEF	; 239
+ 184:	88 bb       	out	0x18, r24	; 24
+	led_on5();
+ 186:	88 b3       	in	r24, 0x18	; 24
+ 188:	8f 7d       	andi	r24, 0xDF	; 223
+ 18a:	88 bb       	out	0x18, r24	; 24
+ 18c:	08 95       	ret
+
+0000018e <Number5>:
+	
+	
+}
+void Number5(){
+	led_on1();
+ 18e:	88 b3       	in	r24, 0x18	; 24
+ 190:	8d 7f       	andi	r24, 0xFD	; 253
+ 192:	88 bb       	out	0x18, r24	; 24
+	led_on2();
+ 194:	88 b3       	in	r24, 0x18	; 24
+ 196:	8b 7f       	andi	r24, 0xFB	; 251
+ 198:	88 bb       	out	0x18, r24	; 24
+	led_on4();
+ 19a:	88 b3       	in	r24, 0x18	; 24
+ 19c:	8f 7e       	andi	r24, 0xEF	; 239
+ 19e:	88 bb       	out	0x18, r24	; 24
+	led_on5();
+ 1a0:	88 b3       	in	r24, 0x18	; 24
+ 1a2:	8f 7d       	andi	r24, 0xDF	; 223
+ 1a4:	88 bb       	out	0x18, r24	; 24
+	led_on6();
+ 1a6:	88 b3       	in	r24, 0x18	; 24
+ 1a8:	8f 7b       	andi	r24, 0xBF	; 191
+ 1aa:	88 bb       	out	0x18, r24	; 24
+ 1ac:	08 95       	ret
+
+000001ae <Number6>:
+	
+	
+}
+void Number6(){
+	led_on0();
+ 1ae:	88 b3       	in	r24, 0x18	; 24
+ 1b0:	8e 7f       	andi	r24, 0xFE	; 254
+ 1b2:	88 bb       	out	0x18, r24	; 24
+	led_on1();
+ 1b4:	88 b3       	in	r24, 0x18	; 24
+ 1b6:	8d 7f       	andi	r24, 0xFD	; 253
+ 1b8:	88 bb       	out	0x18, r24	; 24
+	led_on2();
+ 1ba:	88 b3       	in	r24, 0x18	; 24
+ 1bc:	8b 7f       	andi	r24, 0xFB	; 251
+ 1be:	88 bb       	out	0x18, r24	; 24
+	led_on4();
+ 1c0:	88 b3       	in	r24, 0x18	; 24
+ 1c2:	8f 7e       	andi	r24, 0xEF	; 239
+ 1c4:	88 bb       	out	0x18, r24	; 24
+	led_on5();
+ 1c6:	88 b3       	in	r24, 0x18	; 24
+ 1c8:	8f 7d       	andi	r24, 0xDF	; 223
+ 1ca:	88 bb       	out	0x18, r24	; 24
+	led_on6();
+ 1cc:	88 b3       	in	r24, 0x18	; 24
+ 1ce:	8f 7b       	andi	r24, 0xBF	; 191
+ 1d0:	88 bb       	out	0x18, r24	; 24
+	led_on7();
+ 1d2:	88 b3       	in	r24, 0x18	; 24
+ 1d4:	8f 77       	andi	r24, 0x7F	; 127
+ 1d6:	88 bb       	out	0x18, r24	; 24
+ 1d8:	08 95       	ret
+
+000001da <Number7>:
+	
+	
+}
+void Number7(){
+	led_on2();
+ 1da:	88 b3       	in	r24, 0x18	; 24
+ 1dc:	8b 7f       	andi	r24, 0xFB	; 251
+ 1de:	88 bb       	out	0x18, r24	; 24
+	led_on3();
+ 1e0:	88 b3       	in	r24, 0x18	; 24
+ 1e2:	87 7f       	andi	r24, 0xF7	; 247
+ 1e4:	88 bb       	out	0x18, r24	; 24
+	led_on6();
+ 1e6:	88 b3       	in	r24, 0x18	; 24
+ 1e8:	8f 7b       	andi	r24, 0xBF	; 191
+ 1ea:	88 bb       	out	0x18, r24	; 24
+ 1ec:	08 95       	ret
+
+000001ee <Number8>:
+	
+	
+}
+void Number8(){
+	led_on0();
+ 1ee:	88 b3       	in	r24, 0x18	; 24
+ 1f0:	8e 7f       	andi	r24, 0xFE	; 254
+ 1f2:	88 bb       	out	0x18, r24	; 24
+	led_on1();
+ 1f4:	88 b3       	in	r24, 0x18	; 24
+ 1f6:	8d 7f       	andi	r24, 0xFD	; 253
+ 1f8:	88 bb       	out	0x18, r24	; 24
+	led_on2();
+ 1fa:	88 b3       	in	r24, 0x18	; 24
+ 1fc:	8b 7f       	andi	r24, 0xFB	; 251
+ 1fe:	88 bb       	out	0x18, r24	; 24
+	led_on3();
+ 200:	88 b3       	in	r24, 0x18	; 24
+ 202:	87 7f       	andi	r24, 0xF7	; 247
+ 204:	88 bb       	out	0x18, r24	; 24
+	led_on4();
+ 206:	88 b3       	in	r24, 0x18	; 24
+ 208:	8f 7e       	andi	r24, 0xEF	; 239
+ 20a:	88 bb       	out	0x18, r24	; 24
+	led_on5();
+ 20c:	88 b3       	in	r24, 0x18	; 24
+ 20e:	8f 7d       	andi	r24, 0xDF	; 223
+ 210:	88 bb       	out	0x18, r24	; 24
+	led_on6();
+ 212:	88 b3       	in	r24, 0x18	; 24
+ 214:	8f 7b       	andi	r24, 0xBF	; 191
+ 216:	88 bb       	out	0x18, r24	; 24
+ 218:	08 95       	ret
+
+0000021a <Number9>:
+	
+	
+}
+void Number9(){
+	led_on1();
+ 21a:	88 b3       	in	r24, 0x18	; 24
+ 21c:	8d 7f       	andi	r24, 0xFD	; 253
+ 21e:	88 bb       	out	0x18, r24	; 24
+	led_on2();
+ 220:	88 b3       	in	r24, 0x18	; 24
+ 222:	8b 7f       	andi	r24, 0xFB	; 251
+ 224:	88 bb       	out	0x18, r24	; 24
+	led_on3();
+ 226:	88 b3       	in	r24, 0x18	; 24
+ 228:	87 7f       	andi	r24, 0xF7	; 247
+ 22a:	88 bb       	out	0x18, r24	; 24
+	led_on4();
+ 22c:	88 b3       	in	r24, 0x18	; 24
+ 22e:	8f 7e       	andi	r24, 0xEF	; 239
+ 230:	88 bb       	out	0x18, r24	; 24
+	led_on5();
+ 232:	88 b3       	in	r24, 0x18	; 24
+ 234:	8f 7d       	andi	r24, 0xDF	; 223
+ 236:	88 bb       	out	0x18, r24	; 24
+	led_on6();
+ 238:	88 b3       	in	r24, 0x18	; 24
+ 23a:	8f 7b       	andi	r24, 0xBF	; 191
+ 23c:	88 bb       	out	0x18, r24	; 24
+	led_on7();
+ 23e:	88 b3       	in	r24, 0x18	; 24
+ 240:	8f 77       	andi	r24, 0x7F	; 127
+ 242:	88 bb       	out	0x18, r24	; 24
+ 244:	08 95       	ret
+
+00000246 <main>:
+	while (!( UCSRA & (1<<RXC) ));
+	return UDR;
+}
+
+int main(void)
+{
+ 246:	cf 93       	push	r28
+ 248:	df 93       	push	r29
+ 24a:	cd b7       	in	r28, 0x3d	; 61
+ 24c:	de b7       	in	r29, 0x3e	; 62
+ 24e:	a8 97       	sbiw	r28, 0x28	; 40
+ 250:	0f b6       	in	r0, 0x3f	; 63
+ 252:	f8 94       	cli
+ 254:	de bf       	out	0x3e, r29	; 62
+ 256:	0f be       	out	0x3f, r0	; 63
+ 258:	cd bf       	out	0x3d, r28	; 61
+	UBRRL = 51;                         // UBBR = Freq / (16 * (BaudRate)) – 1
+ 25a:	83 e3       	ldi	r24, 0x33	; 51
+ 25c:	89 b9       	out	0x09, r24	; 9
+	UCSRB = (1 << RXEN) | (1 << TXEN);  // Enable reading and writing
+ 25e:	98 e1       	ldi	r25, 0x18	; 24
+ 260:	9a b9       	out	0x0a, r25	; 10
+
+	DDRB = 0xFF;
+ 262:	8f ef       	ldi	r24, 0xFF	; 255
+ 264:	87 bb       	out	0x17, r24	; 23
+	led_off0();
+ 266:	88 b3       	in	r24, 0x18	; 24
+ 268:	81 60       	ori	r24, 0x01	; 1
+ 26a:	88 bb       	out	0x18, r24	; 24
+	led_off1();
+ 26c:	88 b3       	in	r24, 0x18	; 24
+ 26e:	82 60       	ori	r24, 0x02	; 2
+ 270:	88 bb       	out	0x18, r24	; 24
+	led_off2();
+ 272:	88 b3       	in	r24, 0x18	; 24
+ 274:	84 60       	ori	r24, 0x04	; 4
+ 276:	88 bb       	out	0x18, r24	; 24
+	led_off3();
+ 278:	88 b3       	in	r24, 0x18	; 24
+ 27a:	88 60       	ori	r24, 0x08	; 8
+ 27c:	88 bb       	out	0x18, r24	; 24
+	led_off4();
+ 27e:	88 b3       	in	r24, 0x18	; 24
+ 280:	80 61       	ori	r24, 0x10	; 16
+ 282:	88 bb       	out	0x18, r24	; 24
+	led_off5();
+ 284:	88 b3       	in	r24, 0x18	; 24
+ 286:	80 62       	ori	r24, 0x20	; 32
+ 288:	88 bb       	out	0x18, r24	; 24
+	led_off6();
+ 28a:	88 b3       	in	r24, 0x18	; 24
+ 28c:	80 64       	ori	r24, 0x40	; 64
+ 28e:	88 bb       	out	0x18, r24	; 24
+	led_off7();
+ 290:	88 b3       	in	r24, 0x18	; 24
+ 292:	80 68       	ori	r24, 0x80	; 128
+ 294:	88 bb       	out	0x18, r24	; 24
+	char Besked[40] = "Aksel er Stalin";
+ 296:	80 e1       	ldi	r24, 0x10	; 16
+ 298:	e0 e6       	ldi	r30, 0x60	; 96
+ 29a:	f0 e0       	ldi	r31, 0x00	; 0
+ 29c:	de 01       	movw	r26, r28
+ 29e:	11 96       	adiw	r26, 0x01	; 1
+ 2a0:	01 90       	ld	r0, Z+
+ 2a2:	0d 92       	st	X+, r0
+ 2a4:	8a 95       	dec	r24
+ 2a6:	e1 f7       	brne	.-8      	; 0x2a0 <main+0x5a>
+ 2a8:	fe 01       	movw	r30, r28
+ 2aa:	71 96       	adiw	r30, 0x11	; 17
+ 2ac:	df 01       	movw	r26, r30
+ 2ae:	1d 92       	st	X+, r1
+ 2b0:	9a 95       	dec	r25
+ 2b2:	e9 f7       	brne	.-6      	; 0x2ae <main+0x68>
+
+	while (1) {
+		
+		
+		char ReceivedMessage[1];
+		ReceivedMessage[0] = sread();
+ 2b4:	0e 94 45 00 	call	0x8a	; 0x8a <sread>
+ 2b8:	18 2f       	mov	r17, r24
+		
+		if (ReceivedMessage[0] == 's')
+ 2ba:	83 37       	cpi	r24, 0x73	; 115
+ 2bc:	41 f4       	brne	.+16     	; 0x2ce <main+0x88>
+		{
+			Blank();
+ 2be:	0e 94 67 00 	call	0xce	; 0xce <Blank>
+			swrite(ReceivedMessage[0]);
+ 2c2:	81 2f       	mov	r24, r17
+ 2c4:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite('\n');
+ 2c8:	8a e0       	ldi	r24, 0x0A	; 10
+ 2ca:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+
+		}
+		
+		if (ReceivedMessage[0] == '0')
+ 2ce:	10 33       	cpi	r17, 0x30	; 48
+ 2d0:	b1 f4       	brne	.+44     	; 0x2fe <main+0xb8>
+		{
+			Blank();
+ 2d2:	0e 94 67 00 	call	0xce	; 0xce <Blank>
+			Number0();
+ 2d6:	0e 94 80 00 	call	0x100	; 0x100 <Number0>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 2da:	bf ef       	ldi	r27, 0xFF	; 255
+ 2dc:	29 e6       	ldi	r18, 0x69	; 105
+ 2de:	88 e1       	ldi	r24, 0x18	; 24
+ 2e0:	b1 50       	subi	r27, 0x01	; 1
+ 2e2:	20 40       	sbci	r18, 0x00	; 0
+ 2e4:	80 40       	sbci	r24, 0x00	; 0
+ 2e6:	e1 f7       	brne	.-8      	; 0x2e0 <main+0x9a>
+ 2e8:	00 c0       	rjmp	.+0      	; 0x2ea <main+0xa4>
+ 2ea:	00 00       	nop
+			_delay_ms(1000);
+			swrite('p');
+ 2ec:	80 e7       	ldi	r24, 0x70	; 112
+ 2ee:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite(ReceivedMessage[0]);
+ 2f2:	81 2f       	mov	r24, r17
+ 2f4:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite('\n');
+ 2f8:	8a e0       	ldi	r24, 0x0A	; 10
+ 2fa:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+		}
+		if (ReceivedMessage[0] == '1')
+ 2fe:	11 33       	cpi	r17, 0x31	; 49
+ 300:	b1 f4       	brne	.+44     	; 0x32e <main+0xe8>
+		{
+			Blank();
+ 302:	0e 94 67 00 	call	0xce	; 0xce <Blank>
+			Number1();
+ 306:	0e 94 93 00 	call	0x126	; 0x126 <Number1>
+ 30a:	9f ef       	ldi	r25, 0xFF	; 255
+ 30c:	a9 e6       	ldi	r26, 0x69	; 105
+ 30e:	b8 e1       	ldi	r27, 0x18	; 24
+ 310:	91 50       	subi	r25, 0x01	; 1
+ 312:	a0 40       	sbci	r26, 0x00	; 0
+ 314:	b0 40       	sbci	r27, 0x00	; 0
+ 316:	e1 f7       	brne	.-8      	; 0x310 <main+0xca>
+ 318:	00 c0       	rjmp	.+0      	; 0x31a <main+0xd4>
+ 31a:	00 00       	nop
+			_delay_ms(1000);
+			swrite('p');
+ 31c:	80 e7       	ldi	r24, 0x70	; 112
+ 31e:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite(ReceivedMessage[0]);
+ 322:	81 2f       	mov	r24, r17
+ 324:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite('\n');
+ 328:	8a e0       	ldi	r24, 0x0A	; 10
+ 32a:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+
+		}
+		if (ReceivedMessage[0] == '2')
+ 32e:	12 33       	cpi	r17, 0x32	; 50
+ 330:	b1 f4       	brne	.+44     	; 0x35e <main+0x118>
+		{
+			Blank();
+ 332:	0e 94 67 00 	call	0xce	; 0xce <Blank>
+			Number2();
+ 336:	0e 94 9a 00 	call	0x134	; 0x134 <Number2>
+ 33a:	2f ef       	ldi	r18, 0xFF	; 255
+ 33c:	89 e6       	ldi	r24, 0x69	; 105
+ 33e:	98 e1       	ldi	r25, 0x18	; 24
+ 340:	21 50       	subi	r18, 0x01	; 1
+ 342:	80 40       	sbci	r24, 0x00	; 0
+ 344:	90 40       	sbci	r25, 0x00	; 0
+ 346:	e1 f7       	brne	.-8      	; 0x340 <main+0xfa>
+ 348:	00 c0       	rjmp	.+0      	; 0x34a <main+0x104>
+ 34a:	00 00       	nop
+			_delay_ms(1000);
+			swrite('p');
+ 34c:	80 e7       	ldi	r24, 0x70	; 112
+ 34e:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite(ReceivedMessage[0]);
+ 352:	81 2f       	mov	r24, r17
+ 354:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite('\n');
+ 358:	8a e0       	ldi	r24, 0x0A	; 10
+ 35a:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			
+		}
+		if (ReceivedMessage[0] == '3')
+ 35e:	13 33       	cpi	r17, 0x33	; 51
+ 360:	f1 f4       	brne	.+60     	; 0x39e <main+0x158>
+		{
+			Blank();
+ 362:	0e 94 67 00 	call	0xce	; 0xce <Blank>
+			Number3();
+ 366:	0e 94 aa 00 	call	0x154	; 0x154 <Number3>
+ 36a:	af ef       	ldi	r26, 0xFF	; 255
+ 36c:	b9 e6       	ldi	r27, 0x69	; 105
+ 36e:	28 e1       	ldi	r18, 0x18	; 24
+ 370:	a1 50       	subi	r26, 0x01	; 1
+ 372:	b0 40       	sbci	r27, 0x00	; 0
+ 374:	20 40       	sbci	r18, 0x00	; 0
+ 376:	e1 f7       	brne	.-8      	; 0x370 <main+0x12a>
+ 378:	00 c0       	rjmp	.+0      	; 0x37a <main+0x134>
+ 37a:	00 00       	nop
+			_delay_ms(1000);
+			swrite('p');
+ 37c:	80 e7       	ldi	r24, 0x70	; 112
+ 37e:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			WriteMessage(Besked);
+ 382:	ce 01       	movw	r24, r28
+ 384:	01 96       	adiw	r24, 0x01	; 1
+ 386:	0e 94 49 00 	call	0x92	; 0x92 <WriteMessage>
+			WriteMessage(' ');
+ 38a:	80 e2       	ldi	r24, 0x20	; 32
+ 38c:	90 e0       	ldi	r25, 0x00	; 0
+ 38e:	0e 94 49 00 	call	0x92	; 0x92 <WriteMessage>
+			swrite(ReceivedMessage[0]);
+ 392:	81 2f       	mov	r24, r17
+ 394:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite('\n');
+ 398:	8a e0       	ldi	r24, 0x0A	; 10
+ 39a:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+
+		}
+		if (ReceivedMessage[0] == '4')
+ 39e:	14 33       	cpi	r17, 0x34	; 52
+ 3a0:	b1 f4       	brne	.+44     	; 0x3ce <main+0x188>
+		{
+			Blank();
+ 3a2:	0e 94 67 00 	call	0xce	; 0xce <Blank>
+			Number4();
+ 3a6:	0e 94 ba 00 	call	0x174	; 0x174 <Number4>
+ 3aa:	8f ef       	ldi	r24, 0xFF	; 255
+ 3ac:	99 e6       	ldi	r25, 0x69	; 105
+ 3ae:	a8 e1       	ldi	r26, 0x18	; 24
+ 3b0:	81 50       	subi	r24, 0x01	; 1
+ 3b2:	90 40       	sbci	r25, 0x00	; 0
+ 3b4:	a0 40       	sbci	r26, 0x00	; 0
+ 3b6:	e1 f7       	brne	.-8      	; 0x3b0 <main+0x16a>
+ 3b8:	00 c0       	rjmp	.+0      	; 0x3ba <main+0x174>
+ 3ba:	00 00       	nop
+			_delay_ms(1000);
+			swrite('p');
+ 3bc:	80 e7       	ldi	r24, 0x70	; 112
+ 3be:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite(ReceivedMessage[0]);
+ 3c2:	81 2f       	mov	r24, r17
+ 3c4:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite('\n');
+ 3c8:	8a e0       	ldi	r24, 0x0A	; 10
+ 3ca:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+		}
+		if (ReceivedMessage[0] == '5')
+ 3ce:	15 33       	cpi	r17, 0x35	; 53
+ 3d0:	b1 f4       	brne	.+44     	; 0x3fe <main+0x1b8>
+		{
+			Blank();
+ 3d2:	0e 94 67 00 	call	0xce	; 0xce <Blank>
+			Number5();
+ 3d6:	0e 94 c7 00 	call	0x18e	; 0x18e <Number5>
+ 3da:	bf ef       	ldi	r27, 0xFF	; 255
+ 3dc:	29 e6       	ldi	r18, 0x69	; 105
+ 3de:	88 e1       	ldi	r24, 0x18	; 24
+ 3e0:	b1 50       	subi	r27, 0x01	; 1
+ 3e2:	20 40       	sbci	r18, 0x00	; 0
+ 3e4:	80 40       	sbci	r24, 0x00	; 0
+ 3e6:	e1 f7       	brne	.-8      	; 0x3e0 <main+0x19a>
+ 3e8:	00 c0       	rjmp	.+0      	; 0x3ea <main+0x1a4>
+ 3ea:	00 00       	nop
+			_delay_ms(1000);
+			swrite('p');
+ 3ec:	80 e7       	ldi	r24, 0x70	; 112
+ 3ee:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite(ReceivedMessage[0]);
+ 3f2:	81 2f       	mov	r24, r17
+ 3f4:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite('\n');
+ 3f8:	8a e0       	ldi	r24, 0x0A	; 10
+ 3fa:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+		}
+		if (ReceivedMessage[0] == '6')
+ 3fe:	16 33       	cpi	r17, 0x36	; 54
+ 400:	b1 f4       	brne	.+44     	; 0x42e <__EEPROM_REGION_LENGTH__+0x2e>
+		{
+			Blank();
+ 402:	0e 94 67 00 	call	0xce	; 0xce <Blank>
+			Number6();
+ 406:	0e 94 d7 00 	call	0x1ae	; 0x1ae <Number6>
+ 40a:	9f ef       	ldi	r25, 0xFF	; 255
+ 40c:	a9 e6       	ldi	r26, 0x69	; 105
+ 40e:	b8 e1       	ldi	r27, 0x18	; 24
+ 410:	91 50       	subi	r25, 0x01	; 1
+ 412:	a0 40       	sbci	r26, 0x00	; 0
+ 414:	b0 40       	sbci	r27, 0x00	; 0
+ 416:	e1 f7       	brne	.-8      	; 0x410 <__EEPROM_REGION_LENGTH__+0x10>
+ 418:	00 c0       	rjmp	.+0      	; 0x41a <__EEPROM_REGION_LENGTH__+0x1a>
+ 41a:	00 00       	nop
+			_delay_ms(1000);
+			swrite('p');
+ 41c:	80 e7       	ldi	r24, 0x70	; 112
+ 41e:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite(ReceivedMessage[0]);
+ 422:	81 2f       	mov	r24, r17
+ 424:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite('\n');
+ 428:	8a e0       	ldi	r24, 0x0A	; 10
+ 42a:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+		}
+		if (ReceivedMessage[0] == '7')
+ 42e:	17 33       	cpi	r17, 0x37	; 55
+ 430:	b1 f4       	brne	.+44     	; 0x45e <__EEPROM_REGION_LENGTH__+0x5e>
+		{
+			Blank();
+ 432:	0e 94 67 00 	call	0xce	; 0xce <Blank>
+			Number7();
+ 436:	0e 94 ed 00 	call	0x1da	; 0x1da <Number7>
+ 43a:	2f ef       	ldi	r18, 0xFF	; 255
+ 43c:	89 e6       	ldi	r24, 0x69	; 105
+ 43e:	98 e1       	ldi	r25, 0x18	; 24
+ 440:	21 50       	subi	r18, 0x01	; 1
+ 442:	80 40       	sbci	r24, 0x00	; 0
+ 444:	90 40       	sbci	r25, 0x00	; 0
+ 446:	e1 f7       	brne	.-8      	; 0x440 <__EEPROM_REGION_LENGTH__+0x40>
+ 448:	00 c0       	rjmp	.+0      	; 0x44a <__EEPROM_REGION_LENGTH__+0x4a>
+ 44a:	00 00       	nop
+			_delay_ms(1000);
+			swrite('p');
+ 44c:	80 e7       	ldi	r24, 0x70	; 112
+ 44e:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite(ReceivedMessage[0]);
+ 452:	81 2f       	mov	r24, r17
+ 454:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite('\n');
+ 458:	8a e0       	ldi	r24, 0x0A	; 10
+ 45a:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+		}
+		if (ReceivedMessage[0] == '8')
+ 45e:	18 33       	cpi	r17, 0x38	; 56
+ 460:	b1 f4       	brne	.+44     	; 0x48e <__EEPROM_REGION_LENGTH__+0x8e>
+		{
+			Blank();
+ 462:	0e 94 67 00 	call	0xce	; 0xce <Blank>
+			Number8();
+ 466:	0e 94 f7 00 	call	0x1ee	; 0x1ee <Number8>
+ 46a:	af ef       	ldi	r26, 0xFF	; 255
+ 46c:	b9 e6       	ldi	r27, 0x69	; 105
+ 46e:	28 e1       	ldi	r18, 0x18	; 24
+ 470:	a1 50       	subi	r26, 0x01	; 1
+ 472:	b0 40       	sbci	r27, 0x00	; 0
+ 474:	20 40       	sbci	r18, 0x00	; 0
+ 476:	e1 f7       	brne	.-8      	; 0x470 <__EEPROM_REGION_LENGTH__+0x70>
+ 478:	00 c0       	rjmp	.+0      	; 0x47a <__EEPROM_REGION_LENGTH__+0x7a>
+ 47a:	00 00       	nop
+			_delay_ms(1000);
+			swrite('p');
+ 47c:	80 e7       	ldi	r24, 0x70	; 112
+ 47e:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite(ReceivedMessage[0]);
+ 482:	81 2f       	mov	r24, r17
+ 484:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite('\n');
+ 488:	8a e0       	ldi	r24, 0x0A	; 10
+ 48a:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+		}
+		if (ReceivedMessage[0] == '9')
+ 48e:	19 33       	cpi	r17, 0x39	; 57
+ 490:	09 f0       	breq	.+2      	; 0x494 <__EEPROM_REGION_LENGTH__+0x94>
+ 492:	10 cf       	rjmp	.-480    	; 0x2b4 <main+0x6e>
+		{
+			Blank();
+ 494:	0e 94 67 00 	call	0xce	; 0xce <Blank>
+			Number9();
+ 498:	0e 94 0d 01 	call	0x21a	; 0x21a <Number9>
+ 49c:	8f ef       	ldi	r24, 0xFF	; 255
+ 49e:	99 e6       	ldi	r25, 0x69	; 105
+ 4a0:	a8 e1       	ldi	r26, 0x18	; 24
+ 4a2:	81 50       	subi	r24, 0x01	; 1
+ 4a4:	90 40       	sbci	r25, 0x00	; 0
+ 4a6:	a0 40       	sbci	r26, 0x00	; 0
+ 4a8:	e1 f7       	brne	.-8      	; 0x4a2 <__EEPROM_REGION_LENGTH__+0xa2>
+ 4aa:	00 c0       	rjmp	.+0      	; 0x4ac <__EEPROM_REGION_LENGTH__+0xac>
+ 4ac:	00 00       	nop
+			_delay_ms(1000);
+			swrite('p');
+ 4ae:	80 e7       	ldi	r24, 0x70	; 112
+ 4b0:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite(ReceivedMessage[0]);
+ 4b4:	81 2f       	mov	r24, r17
+ 4b6:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+			swrite('\n');
+ 4ba:	8a e0       	ldi	r24, 0x0A	; 10
+ 4bc:	0e 94 41 00 	call	0x82	; 0x82 <swrite>
+		}
+		
+		
+	}
+ 4c0:	f9 ce       	rjmp	.-526    	; 0x2b4 <main+0x6e>
+
+000004c2 <_exit>:
+ 4c2:	f8 94       	cli
+
+000004c4 <__stop_program>:
+ 4c4:	ff cf       	rjmp	.-2      	; 0x4c4 <__stop_program>
