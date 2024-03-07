@@ -1,0 +1,8 @@
+# ninja log v5
+0	16	1709328850607821451	Code_autogen/timestamp	983338fbc4c0da3b
+0	16	1709328850607821451	Code_autogen/mocs_compilation.cpp	983338fbc4c0da3b
+0	16	1709328850607821451	/home/aksel/Documents/GitHub/Autonome_Robotter/build-Code-Desktop_Qt_6_6_1_GCC_64bit-Debug/Code_autogen/timestamp	983338fbc4c0da3b
+0	16	1709328850607821451	/home/aksel/Documents/GitHub/Autonome_Robotter/build-Code-Desktop_Qt_6_6_1_GCC_64bit-Debug/Code_autogen/mocs_compilation.cpp	983338fbc4c0da3b
+16	27	1709328850619823610	CMakeFiles/Code.dir/Code_autogen/mocs_compilation.cpp.o	4bee3fc64b8bf2c0
+16	995	1709328851587996750	CMakeFiles/Code.dir/main.cpp.o	759fea86902b9e95
+996	1101	1709328851692015287	Code	4b6648c9b5e53aa0

@@ -4,7 +4,12 @@
 #include "boardUpdate.h"
 #include "playerInput.h"
 #include "validMoves.h"
+#include "robotMove.h"
 #include <unistd.h>
+#include <ur_rtde/rtde_control_interface.h>
+#include <ur_rtde/rtde_receive_interface.h>
+
+using namespace ur_rtde;
 
 // Construct initial board
 std::vector<std::vector<std::string>> boards = {
@@ -41,6 +46,8 @@ int main() {
     std::string playerStart;
     std::string playerMove;
 
+    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, 0}, 1, 0.1);
+
     while(true){ //Game loop
         valid = false; //Varaible needs to be set to false if a human is playing. Not used when AI plays
 
@@ -64,6 +71,8 @@ int main() {
                     do{
                         jump = jumpPossible(playerTurn, boards);
                         valid = playerInput(playerStart, playerMove, jump, playerTurn, boards);
+                        moveSet.push_back(playerStart);
+                        moveSet.push_back(playerMove);
                         jumped = pieceJump(playerStart, playerMove, playerTurn, boards);
                         promotion = boardChange(playerTurn, boards, playerStart, playerMove, redPieces, blackPieces);
                         if(moreMoveCheck(jumpPossible(playerTurn, boards), playerMove) && jumped && !promotion){
@@ -102,6 +111,8 @@ int main() {
                 }
             }
 
+            robotMove(moveSet);
+
             blackPieces = black; //Sets the number of black pieces
             redPieces = red; //Sets the number of red pieces
 
@@ -119,6 +130,7 @@ int main() {
         }
         i++;
     }
+
 
     //Prints the winner of the game
     if(gameEnd){
