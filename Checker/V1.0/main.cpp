@@ -47,7 +47,7 @@ int main() {
     std::string playerMove;
 
     //Set up the robot
-    std::vector<double> boardPlane = robotStart();
+    std::vector<std::vector<double>> startUp = robotStart();
 
     while(true){ //Game loop
         valid = false; //Varaible needs to be set to false if a human is playing. Not used when AI plays
@@ -113,7 +113,7 @@ int main() {
             }
 
             //Moves the robot
-            robotMove(moveSet, boardPlane);
+            robotMove(moveSet, startUp);
 
             blackPieces = black; //Sets the number of black pieces
             redPieces = red; //Sets the number of red pieces
