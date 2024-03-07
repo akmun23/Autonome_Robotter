@@ -46,7 +46,8 @@ int main() {
     std::string playerStart;
     std::string playerMove;
 
-    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, 0}, 1, 0.1);
+    //Set up the robot
+    std::vector<double> boardPlane = robotStart();
 
     while(true){ //Game loop
         valid = false; //Varaible needs to be set to false if a human is playing. Not used when AI plays
@@ -67,7 +68,7 @@ int main() {
 
             if(playerTurn == 1){ //Player 1's turn
                 //Can be commented out to make it possible for player to make a move
-                /*while(!valid){
+                while(!valid){
                     do{
                         jump = jumpPossible(playerTurn, boards);
                         valid = playerInput(playerStart, playerMove, jump, playerTurn, boards);
@@ -79,15 +80,15 @@ int main() {
                             checkerBoard(boards);
                         }
                     } while(moreMoveCheck(jumpPossible(playerTurn, boards), playerMove) && jumped && !promotion);
-                }*/
+                }
 
-               alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX); //AI's move
+            /*   alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX); //AI's move
 
                //Prints the moves made by the AI
                 for (int i = 0; i < moveSet.size(); i += 2) {
                     std::cout << "AI moves from: " << moveSet[i] << std::endl;
                     std::cout << "AI moves to: " << moveSet[i+1] << std::endl;
-                }
+                }*/
 
             } else { //Player 2's turn
 
@@ -111,7 +112,8 @@ int main() {
                 }
             }
 
-            robotMove(moveSet);
+            //Moves the robot
+            robotMove(moveSet, boardPlane);
 
             blackPieces = black; //Sets the number of black pieces
             redPieces = red; //Sets the number of red pieces
