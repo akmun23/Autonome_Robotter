@@ -83,3 +83,12 @@ Hvis der gåes tilbage til Program i toppen og menuen Structure vælges, hvoreft
 ![image](https://github.com/akmun23/Autonome_Robotter/assets/159116437/78733ee3-a153-434e-b9bc-70f093ef73e2)
 
 Denne skal indsættes for at c++-scriptet kan kommunikere med robotten. Herefter skal der ikke gøres mere på tabletten og programmet skulle gerne kunne køre fra computer :D
+
+# C++-script
+Kommentarer til c++ script her
+
+# ATMega
+Kommentarer til ATMega her
+
+# Gripper
+Kommentarer til Gripper her
