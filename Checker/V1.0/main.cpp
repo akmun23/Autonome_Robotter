@@ -17,8 +17,8 @@ int main() {
     bool gameEnd = false; //If the game has ended
     int i = 0; //Counter for the number of turns
 
-    std::string player = "p"; //If the player is human or AI
-    std::string player2 = "p"; //If the player is human or AI
+    std::string player = "AI"; //If the player is human or AI
+    std::string player2 = "AI"; //If the player is human or AI
 
     std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
 

@@ -24,14 +24,32 @@ std::vector<std::vector<double>> robotStart() {
     rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, 0}, 1, 0.1);
     std::vector<double> target = rtde_receive.getActualTCPPose();
 
+/*
     rtde_control.teachMode();
     std::cin.get();
     std::vector<double> boardPlane1 = rtde_receive.getActualTCPPose();
+    std::cout << boardPlane1[0] << " " << boardPlane1[1] << " " << boardPlane1[2] << std::endl;
     std::cin.get();
     std::vector<double> boardPlane2 = rtde_receive.getActualTCPPose();
+    std::cout << boardPlane2[0] << " " << boardPlane2[1] << " " << boardPlane2[2] << std::endl;
     std::cin.get();
     std::vector<double> boardPlane3 = rtde_receive.getActualTCPPose();
+    std::cout << boardPlane3[0] << " " << boardPlane3[1] << " " << boardPlane3[2] << std::endl;
     rtde_control.endTeachMode();
+*/
+
+    std::vector<double> boardPlane1 = {-0.0842739, -0.305759, 0};
+    std::vector<double> boardPlane2 = {0.123559, -0.814958, 0};
+    std::vector<double> boardPlane3 = {0.378329, -0.113615, 0};
+
+    std::vector<double> speed = {0, 0, -0.1, 0, 0, 0};
+
+    rtde_control.moveUntilContact(speed);
+    rtde_control.stopScript();
+
+
+    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, 0}, 1, 0.1);
+    //boardPlane1[2] = rtde_receive.getActualTCPPose()[2]+0.05;
 
     vec1.push_back(boardPlane2[0] - boardPlane1[0]);
     vec1.push_back(boardPlane2[1] - boardPlane1[1]);
@@ -98,18 +116,15 @@ void robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>
 
         std::vector<double> target = rtde_receive.getActualTCPPose();
 
-        rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 0.5, 0.1);
+        rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
         rtde_control.moveL({xcord, ycord, zcord, target[3], target[4], target[5]}, 0.2, 0.05);
-        rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 0.5, 0.1);
-        rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 0.5, 0.1);
+        rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
+        rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 1, 0.2);
         rtde_control.moveL({xcord2, ycord2, zcord2, target[3], target[4], target[5]}, 0.2, 0.05);
-        rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 0.5, 0.1);
+        rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 1, 0.2);
         rtde_control.moveL(target, 1, 0.1);
 
     }
 }
-
-
-
 
 #endif // ROBOTMOVE_H
