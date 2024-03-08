@@ -1,0 +1,6 @@
+Måden som brættet bliver fremstilt på er blevet ændret, således hvert segment af brættet kan interageres med.
+Interaktivitet er blevet delvist implementeret:
+-  Det er muligt at klikke på spilbræt segmenter, hvorefter der bliver tjekket om der befinder sig en spilbrik på segmentet.
+
+Der er blevet implementeret række og kolonne navne (eks. A8).
+Det er endu ikke muligt at rykke på spil brikkerne.
