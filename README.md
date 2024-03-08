@@ -85,7 +85,8 @@ Hvis der gåes tilbage til Program i toppen og menuen Structure vælges, hvoreft
 Denne skal indsættes for at c++-scriptet kan kommunikere med robotten. Herefter skal der ikke gøres mere på tabletten og programmet skulle gerne kunne køre fra computer :D
 
 # C++-script
-Kommentarer til c++ script her
+UR-script dokumentation:
+https://s3-eu-west-1.amazonaws.com/ur-support-site/124999/scriptManual_3.15.4.pdf
 
 # ATMega
 Kommentarer til ATMega her
