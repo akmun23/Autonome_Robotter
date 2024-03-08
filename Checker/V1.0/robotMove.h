@@ -98,13 +98,13 @@ void robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>
 
         std::vector<double> target = rtde_receive.getActualTCPPose();
 
-        rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 0.2, 0.05);
+        rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 0.5, 0.1);
         rtde_control.moveL({xcord, ycord, zcord, target[3], target[4], target[5]}, 0.2, 0.05);
-        rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 0.2, 0.05);
-        rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 0.2, 0.05);
+        rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 0.5, 0.1);
+        rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 0.5, 0.1);
         rtde_control.moveL({xcord2, ycord2, zcord2, target[3], target[4], target[5]}, 0.2, 0.05);
-        rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 0.2, 0.05);
-        rtde_control.moveL(target, 0.2, 0.05);
+        rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 0.5, 0.1);
+        rtde_control.moveL(target, 1, 0.1);
 
     }
 }

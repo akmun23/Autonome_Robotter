@@ -1,6 +1,8 @@
 #ifndef VALIDMOVES_H
 #define VALIDMOVES_H
 
+#include "boardUpdate.h"
+#include "playerInput.h"
 #include <climits>
 #include <iostream>
 #include <unistd.h>
@@ -453,6 +455,35 @@ bool boardChange(int playerTurn, std::vector<std::vector<std::string>>& boards, 
 
      //If no promotion has been made, it returns false
      return false;
+}
+
+std::vector<std::string> move(int playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces){
+    bool valid = false;
+    bool jumped = false; //If a piece has jumped
+    bool promotion = false; //If a piece has been promoted
+
+    //Get the player"s move
+    std::string playerStart;
+    std::string playerMove;
+
+    std::vector<std::string> jump = {}; //Possible jump moves
+    std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
+
+    while(!valid){
+        do{
+            jump = jumpPossible(playerTurn, boards);
+            valid = playerInput(playerStart, playerMove, jump, playerTurn, boards);
+            moveSet.push_back(playerStart);
+            moveSet.push_back(playerMove);
+            jumped = pieceJump(playerStart, playerMove, playerTurn, boards);
+            promotion = boardChange(playerTurn, boards, playerStart, playerMove, redPieces, blackPieces);
+            if(moreMoveCheck(jumpPossible(playerTurn, boards), playerMove) && jumped && !promotion){
+                checkerBoard(boards);
+            }
+        } while(moreMoveCheck(jumpPossible(playerTurn, boards), playerMove) && jumped && !promotion);
+    }
+
+    return moveSet;
 }
 
 //Gives the board a game score based on the number of pieces and the number of possible moves
