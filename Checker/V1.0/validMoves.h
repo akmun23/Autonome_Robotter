@@ -493,7 +493,10 @@ int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn)
     int black = 0;
     int red = 0;
     int diff = 0;
-    int random;
+    std::random_device rd;  // Obtain a random number from hardware
+    std::mt19937 eng(rd()); // Seed the generator
+    std::uniform_int_distribution<> distr(0, 10); // Define the range for the random number
+    int random = distr(eng); // Generate a random number
     //Gives score depending on the number of pieces on the board
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
@@ -547,9 +550,6 @@ int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn)
         }
         score *= 1000;
 
-        std::random_device rd;  // Obtain a random number from hardware
-        std::mt19937 eng(rd()); // Seed the generator
-        std::uniform_int_distribution<> distr(0, 10); // Define the range for the random number
         random = distr(eng); // Generate a random number
 
         score += rand()%10;
@@ -576,11 +576,6 @@ int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn)
             score -= 1000;
         }
         score *= 1000;
-
-        std::random_device rd;  // Obtain a random number from hardware
-        std::mt19937 eng(rd()); // Seed the generator
-        std::uniform_int_distribution<> distr(0, 10); // Define the range for the random number
-        random = distr(eng); // Generate a random number
 
         score -= random;
     }
