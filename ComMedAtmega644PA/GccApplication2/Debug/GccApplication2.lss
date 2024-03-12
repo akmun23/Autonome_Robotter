@@ -3,29 +3,29 @@ GccApplication2.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800100  00800100  00000238  2**0
+  0 .data         00000000  00800100  00800100  000001b8  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         000001e4  00000000  00000000  00000054  2**1
+  1 .text         00000164  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .comment      00000030  00000000  00000000  00000238  2**0
+  2 .comment      00000030  00000000  00000000  000001b8  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000268  2**2
+  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000001e8  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000040  00000000  00000000  000002a8  2**0
+  4 .debug_aranges 00000038  00000000  00000000  00000228  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000a4a  00000000  00000000  000002e8  2**0
+  5 .debug_info   00000986  00000000  00000000  00000260  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000827  00000000  00000000  00000d32  2**0
+  6 .debug_abbrev 00000800  00000000  00000000  00000be6  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   0000041c  00000000  00000000  00001559  2**0
+  7 .debug_line   000003ad  00000000  00000000  000013e6  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000078  00000000  00000000  00001978  2**2
+  8 .debug_frame  00000068  00000000  00000000  00001794  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000446  00000000  00000000  000019f0  2**0
+  9 .debug_str    0000042f  00000000  00000000  000017fc  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    0000018e  00000000  00000000  00001e36  2**0
+ 10 .debug_loc    000000fe  00000000  00000000  00001c2b  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000030  00000000  00000000  00001fc4  2**0
+ 11 .debug_ranges 00000028  00000000  00000000  00001d29  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -70,290 +70,206 @@ Disassembly of section .text:
   82:	d0 e1       	ldi	r29, 0x10	; 16
   84:	de bf       	out	0x3e, r29	; 62
   86:	cd bf       	out	0x3d, r28	; 61
-  88:	0e 94 85 00 	call	0x10a	; 0x10a <main>
-  8c:	0c 94 f0 00 	jmp	0x1e0	; 0x1e0 <_exit>
+  88:	0e 94 58 00 	call	0xb0	; 0xb0 <main>
+  8c:	0c 94 b0 00 	jmp	0x160	; 0x160 <_exit>
 
 00000090 <__bad_interrupt>:
   90:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
 
 00000094 <swrite>:
-void WriteMessage(char* sendthis){
-	
-	for (int i = 0; i < strlen(sendthis); i++){
-		swrite(sendthis[i]);
-	}
-}
+void PWM75();
+void PWM50();
+void PWM25();*/
+
+void swrite(uint8_t byte) {
+	while (!( UCSR1A & (1<<UDRE1) ));
   94:	90 91 c8 00 	lds	r25, 0x00C8	; 0x8000c8 <__TEXT_REGION_LENGTH__+0x7f00c8>
   98:	95 ff       	sbrs	r25, 5
   9a:	fc cf       	rjmp	.-8      	; 0x94 <swrite>
+	UDR1 = byte;
   9c:	80 93 ce 00 	sts	0x00CE, r24	; 0x8000ce <__TEXT_REGION_LENGTH__+0x7f00ce>
   a0:	08 95       	ret
 
 000000a2 <sread>:
+}
+
+uint8_t sread(){
+	while (!( UCSR1A & (1<<RXC1) ));
   a2:	80 91 c8 00 	lds	r24, 0x00C8	; 0x8000c8 <__TEXT_REGION_LENGTH__+0x7f00c8>
   a6:	88 23       	and	r24, r24
   a8:	e4 f7       	brge	.-8      	; 0xa2 <sread>
+	return UDR1;
   aa:	80 91 ce 00 	lds	r24, 0x00CE	; 0x8000ce <__TEXT_REGION_LENGTH__+0x7f00ce>
+}
   ae:	08 95       	ret
 
-000000b0 <PWM>:
-	}
-}*/
-
-
- void PWM(){
-	    DDRD |= (1 << DDD5);
-  b0:	8a b1       	in	r24, 0x0a	; 10
-  b2:	80 62       	ori	r24, 0x20	; 32
-  b4:	8a b9       	out	0x0a, r24	; 10
-	    // PB1 and PB2 is now an output
-	    
-	    ICR1 = 0xFFFF;
-  b6:	8f ef       	ldi	r24, 0xFF	; 255
-  b8:	9f ef       	ldi	r25, 0xFF	; 255
-  ba:	90 93 87 00 	sts	0x0087, r25	; 0x800087 <__TEXT_REGION_LENGTH__+0x7f0087>
-  be:	80 93 86 00 	sts	0x0086, r24	; 0x800086 <__TEXT_REGION_LENGTH__+0x7f0086>
-	    // set TOP to 16bit
-	    
-	    OCR1A = 0x3FFF;
-  c2:	8f ef       	ldi	r24, 0xFF	; 255
-  c4:	9f e3       	ldi	r25, 0x3F	; 63
-  c6:	90 93 89 00 	sts	0x0089, r25	; 0x800089 <__TEXT_REGION_LENGTH__+0x7f0089>
-  ca:	80 93 88 00 	sts	0x0088, r24	; 0x800088 <__TEXT_REGION_LENGTH__+0x7f0088>
-	    // set PWM for 25% duty cycle @ 16bit
-	    
-	    
-	    TCCR1A |= (1 << COM1A1);
-  ce:	e0 e8       	ldi	r30, 0x80	; 128
-  d0:	f0 e0       	ldi	r31, 0x00	; 0
-  d2:	80 81       	ld	r24, Z
-  d4:	80 68       	ori	r24, 0x80	; 128
-  d6:	80 83       	st	Z, r24
-	    // set none-inverting mode
-	    
-	    TCCR1A |= (1 << WGM11);
-  d8:	80 81       	ld	r24, Z
-  da:	82 60       	ori	r24, 0x02	; 2
-  dc:	80 83       	st	Z, r24
-	    TCCR1B |= (1 << WGM12)|(1 << WGM13);
-  de:	e1 e8       	ldi	r30, 0x81	; 129
-  e0:	f0 e0       	ldi	r31, 0x00	; 0
-  e2:	80 81       	ld	r24, Z
-  e4:	88 61       	ori	r24, 0x18	; 24
-  e6:	80 83       	st	Z, r24
-	    // set Fast PWM mode using ICR1 as TOP
-	    
-	    TCCR1B |= (1 << CS10);
-  e8:	80 81       	ld	r24, Z
-  ea:	81 60       	ori	r24, 0x01	; 1
-  ec:	80 83       	st	Z, r24
-	#else
-		//round up by default
-		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
-	#endif
-
-	__builtin_avr_delay_cycles(__ticks_dc);
-  ee:	2f ef       	ldi	r18, 0xFF	; 255
-  f0:	3f eb       	ldi	r19, 0xBF	; 191
-  f2:	84 ed       	ldi	r24, 0xD4	; 212
-  f4:	91 e0       	ldi	r25, 0x01	; 1
-  f6:	21 50       	subi	r18, 0x01	; 1
-  f8:	30 40       	sbci	r19, 0x00	; 0
-  fa:	80 40       	sbci	r24, 0x00	; 0
-  fc:	90 40       	sbci	r25, 0x00	; 0
-  fe:	d9 f7       	brne	.-10     	; 0xf6 <PWM+0x46>
- 100:	00 c0       	rjmp	.+0      	; 0x102 <PWM+0x52>
- 102:	00 00       	nop
-	    /*while (1);
-	    {
-		    // we have a working Fast PWM
-	    }*/
-		_delay_ms(1000);
-		DDRD = 0b00000000;
- 104:	1a b8       	out	0x0a, r1	; 10
-		PORTD = 0b00000000;
- 106:	1b b8       	out	0x0b, r1	; 11
- 108:	08 95       	ret
-
-0000010a <main>:
+000000b0 <main>:
 
 int main(void)
 {
 
 	// UBRR1L = 103;
 	UBRR1L = 119;                         // UBBR = Freq / (16 * (BaudRate)) – 1
- 10a:	87 e7       	ldi	r24, 0x77	; 119
- 10c:	80 93 cc 00 	sts	0x00CC, r24	; 0x8000cc <__TEXT_REGION_LENGTH__+0x7f00cc>
+  b0:	87 e7       	ldi	r24, 0x77	; 119
+  b2:	80 93 cc 00 	sts	0x00CC, r24	; 0x8000cc <__TEXT_REGION_LENGTH__+0x7f00cc>
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);  // Enable reading and writing
- 110:	88 e1       	ldi	r24, 0x18	; 24
- 112:	80 93 c9 00 	sts	0x00C9, r24	; 0x8000c9 <__TEXT_REGION_LENGTH__+0x7f00c9>
+  b6:	88 e1       	ldi	r24, 0x18	; 24
+  b8:	80 93 c9 00 	sts	0x00C9, r24	; 0x8000c9 <__TEXT_REGION_LENGTH__+0x7f00c9>
 
 	while (1) {
 		
 		
 		char ReceivedMessage[1];
 		ReceivedMessage[0] = sread();
- 116:	0e 94 51 00 	call	0xa2	; 0xa2 <sread>
- 11a:	c8 2f       	mov	r28, r24
- 11c:	d8 2f       	mov	r29, r24
+  bc:	0e 94 51 00 	call	0xa2	; 0xa2 <sread>
+  c0:	c8 2f       	mov	r28, r24
+  c2:	d8 2f       	mov	r29, r24
 		
 		if (ReceivedMessage[0] == 's')
- 11e:	83 37       	cpi	r24, 0x73	; 115
- 120:	11 f4       	brne	.+4      	; 0x126 <main+0x1c>
+  c4:	83 37       	cpi	r24, 0x73	; 115
+  c6:	11 f4       	brne	.+4      	; 0xcc <main+0x1c>
 		{
 			swrite(ReceivedMessage[0]);
- 122:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
+  c8:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
 
 		}
 		
 		if (ReceivedMessage[0] == '0')
- 126:	c0 33       	cpi	r28, 0x30	; 48
- 128:	19 f4       	brne	.+6      	; 0x130 <main+0x26>
+  cc:	c0 33       	cpi	r28, 0x30	; 48
+  ce:	19 f4       	brne	.+6      	; 0xd6 <main+0x26>
 		{
 			//Timer250us();
 			swrite(ReceivedMessage[0]);
- 12a:	8c 2f       	mov	r24, r28
- 12c:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
+  d0:	8c 2f       	mov	r24, r28
+  d2:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
 		}
 		if (ReceivedMessage[0] == '1')
- 130:	c1 33       	cpi	r28, 0x31	; 49
- 132:	49 f4       	brne	.+18     	; 0x146 <main+0x3c>
+  d6:	c1 33       	cpi	r28, 0x31	; 49
+  d8:	31 f4       	brne	.+12     	; 0xe6 <main+0x36>
 		{
 			
 			DDRD = 0b00100000; 
- 134:	80 e2       	ldi	r24, 0x20	; 32
- 136:	8a b9       	out	0x0a, r24	; 10
+  da:	80 e2       	ldi	r24, 0x20	; 32
+  dc:	8a b9       	out	0x0a, r24	; 10
 			PORTD = 0b00100000;
- 138:	8b b9       	out	0x0b, r24	; 11
-			swrite('p');
- 13a:	80 e7       	ldi	r24, 0x70	; 112
- 13c:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
+  de:	8b b9       	out	0x0b, r24	; 11
 			swrite(ReceivedMessage[0]);
- 140:	8c 2f       	mov	r24, r28
- 142:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
+  e0:	8c 2f       	mov	r24, r28
+  e2:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
 
 		}
 		if (ReceivedMessage[0] == '2')
- 146:	d2 33       	cpi	r29, 0x32	; 50
- 148:	41 f4       	brne	.+16     	; 0x15a <main+0x50>
+  e6:	d2 33       	cpi	r29, 0x32	; 50
+  e8:	29 f4       	brne	.+10     	; 0xf4 <main+0x44>
 		{
 			DDRD = 0b00000000;
- 14a:	1a b8       	out	0x0a, r1	; 10
+  ea:	1a b8       	out	0x0a, r1	; 10
 			PORTD = 0b00000000;
- 14c:	1b b8       	out	0x0b, r1	; 11
-			swrite('p');
- 14e:	80 e7       	ldi	r24, 0x70	; 112
- 150:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
+  ec:	1b b8       	out	0x0b, r1	; 11
 			swrite(ReceivedMessage[0]);
- 154:	8c 2f       	mov	r24, r28
- 156:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
+  ee:	8c 2f       	mov	r24, r28
+  f0:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
 			
 		}
 		if (ReceivedMessage[0] == '3')
- 15a:	d3 33       	cpi	r29, 0x33	; 51
- 15c:	99 f4       	brne	.+38     	; 0x184 <main+0x7a>
+  f4:	d3 33       	cpi	r29, 0x33	; 51
+  f6:	31 f4       	brne	.+12     	; 0x104 <main+0x54>
 		{
-			DDRD = 0b00100000;
- 15e:	80 e2       	ldi	r24, 0x20	; 32
- 160:	8a b9       	out	0x0a, r24	; 10
-			PORTD = 0b00100000;
- 162:	8b b9       	out	0x0b, r24	; 11
- 164:	2f ef       	ldi	r18, 0xFF	; 255
- 166:	3f eb       	ldi	r19, 0xBF	; 191
- 168:	84 ed       	ldi	r24, 0xD4	; 212
- 16a:	91 e0       	ldi	r25, 0x01	; 1
- 16c:	21 50       	subi	r18, 0x01	; 1
- 16e:	30 40       	sbci	r19, 0x00	; 0
- 170:	80 40       	sbci	r24, 0x00	; 0
- 172:	90 40       	sbci	r25, 0x00	; 0
- 174:	d9 f7       	brne	.-10     	; 0x16c <main+0x62>
- 176:	00 c0       	rjmp	.+0      	; 0x178 <main+0x6e>
- 178:	00 00       	nop
-			_delay_ms(1000);
-			DDRD = 0b00000000;
- 17a:	1a b8       	out	0x0a, r1	; 10
-			PORTD = 0b00000000;
- 17c:	1b b8       	out	0x0b, r1	; 11
+			//PWM100();
+			DDRD = 0b00010000;
+  f8:	80 e1       	ldi	r24, 0x10	; 16
+  fa:	8a b9       	out	0x0a, r24	; 10
+			PORTD = 0b00010000;
+  fc:	8b b9       	out	0x0b, r24	; 11
 			swrite(ReceivedMessage[0]);
- 17e:	8c 2f       	mov	r24, r28
- 180:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
+  fe:	8c 2f       	mov	r24, r28
+ 100:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
 
 		}
 		if (ReceivedMessage[0] == '4')
- 184:	dc 2f       	mov	r29, r28
- 186:	c4 33       	cpi	r28, 0x34	; 52
- 188:	29 f4       	brne	.+10     	; 0x194 <main+0x8a>
+ 104:	d4 33       	cpi	r29, 0x34	; 52
+ 106:	29 f4       	brne	.+10     	; 0x112 <main+0x62>
 		{
-			PWM();
- 18a:	0e 94 58 00 	call	0xb0	; 0xb0 <PWM>
+			//PWM75();
+			DDRD = 0b00000000;
+ 108:	1a b8       	out	0x0a, r1	; 10
+			PORTD = 0b00000000;
+ 10a:	1b b8       	out	0x0b, r1	; 11
 			swrite(ReceivedMessage[0]);
- 18e:	8c 2f       	mov	r24, r28
- 190:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
+ 10c:	8c 2f       	mov	r24, r28
+ 10e:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
 		}
 		if (ReceivedMessage[0] == '5')
- 194:	d5 33       	cpi	r29, 0x35	; 53
- 196:	19 f4       	brne	.+6      	; 0x19e <main+0x94>
+ 112:	dc 2f       	mov	r29, r28
+ 114:	c5 33       	cpi	r28, 0x35	; 53
+ 116:	19 f4       	brne	.+6      	; 0x11e <main+0x6e>
 		{
-			//PWM(500,500);
+			//PWM50();
 			swrite(ReceivedMessage[0]);
- 198:	8c 2f       	mov	r24, r28
- 19a:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
+ 118:	8c 2f       	mov	r24, r28
+ 11a:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
 		}
 		if (ReceivedMessage[0] == '6')
- 19e:	d6 33       	cpi	r29, 0x36	; 54
- 1a0:	19 f4       	brne	.+6      	; 0x1a8 <main+0x9e>
+ 11e:	d6 33       	cpi	r29, 0x36	; 54
+ 120:	19 f4       	brne	.+6      	; 0x128 <main+0x78>
 		{
-			//PWM(200,200)
+			//PWM25();
 			swrite(ReceivedMessage[0]);
- 1a2:	8c 2f       	mov	r24, r28
- 1a4:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
+ 122:	8c 2f       	mov	r24, r28
+ 124:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
 		}
 		if (ReceivedMessage[0] == '7')
- 1a8:	d7 33       	cpi	r29, 0x37	; 55
- 1aa:	19 f4       	brne	.+6      	; 0x1b2 <main+0xa8>
+ 128:	d7 33       	cpi	r29, 0x37	; 55
+ 12a:	19 f4       	brne	.+6      	; 0x132 <main+0x82>
 		{
 			//PWM(50,100)
 			swrite(ReceivedMessage[0]);
- 1ac:	8c 2f       	mov	r24, r28
- 1ae:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
+ 12c:	8c 2f       	mov	r24, r28
+ 12e:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
 		}
 		if (ReceivedMessage[0] == '8')
- 1b2:	d8 33       	cpi	r29, 0x38	; 56
- 1b4:	19 f4       	brne	.+6      	; 0x1bc <main+0xb2>
+ 132:	d8 33       	cpi	r29, 0x38	; 56
+ 134:	19 f4       	brne	.+6      	; 0x13c <main+0x8c>
 		{
 			//PWM(100,50);
 			swrite(ReceivedMessage[0]);
- 1b6:	8c 2f       	mov	r24, r28
- 1b8:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
+ 136:	8c 2f       	mov	r24, r28
+ 138:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
 		}
 		if (ReceivedMessage[0] == '9')
- 1bc:	d9 33       	cpi	r29, 0x39	; 57
- 1be:	09 f0       	breq	.+2      	; 0x1c2 <main+0xb8>
- 1c0:	aa cf       	rjmp	.-172    	; 0x116 <main+0xc>
- 1c2:	2f ef       	ldi	r18, 0xFF	; 255
- 1c4:	3f eb       	ldi	r19, 0xBF	; 191
- 1c6:	84 ed       	ldi	r24, 0xD4	; 212
- 1c8:	91 e0       	ldi	r25, 0x01	; 1
- 1ca:	21 50       	subi	r18, 0x01	; 1
- 1cc:	30 40       	sbci	r19, 0x00	; 0
- 1ce:	80 40       	sbci	r24, 0x00	; 0
- 1d0:	90 40       	sbci	r25, 0x00	; 0
- 1d2:	d9 f7       	brne	.-10     	; 0x1ca <main+0xc0>
- 1d4:	00 c0       	rjmp	.+0      	; 0x1d6 <main+0xcc>
- 1d6:	00 00       	nop
+ 13c:	d9 33       	cpi	r29, 0x39	; 57
+ 13e:	09 f0       	breq	.+2      	; 0x142 <main+0x92>
+ 140:	bd cf       	rjmp	.-134    	; 0xbc <main+0xc>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 142:	2f ef       	ldi	r18, 0xFF	; 255
+ 144:	3f eb       	ldi	r19, 0xBF	; 191
+ 146:	84 ed       	ldi	r24, 0xD4	; 212
+ 148:	91 e0       	ldi	r25, 0x01	; 1
+ 14a:	21 50       	subi	r18, 0x01	; 1
+ 14c:	30 40       	sbci	r19, 0x00	; 0
+ 14e:	80 40       	sbci	r24, 0x00	; 0
+ 150:	90 40       	sbci	r25, 0x00	; 0
+ 152:	d9 f7       	brne	.-10     	; 0x14a <main+0x9a>
+ 154:	00 c0       	rjmp	.+0      	; 0x156 <main+0xa6>
+ 156:	00 00       	nop
 		{
 			_delay_ms(1000);
 			swrite(ReceivedMessage[0]);
- 1d8:	8c 2f       	mov	r24, r28
- 1da:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
+ 158:	8c 2f       	mov	r24, r28
+ 15a:	0e 94 4a 00 	call	0x94	; 0x94 <swrite>
 		}
 		
 		
 	}
- 1de:	9b cf       	rjmp	.-202    	; 0x116 <main+0xc>
+ 15e:	ae cf       	rjmp	.-164    	; 0xbc <main+0xc>
 
-000001e0 <_exit>:
- 1e0:	f8 94       	cli
+00000160 <_exit>:
+ 160:	f8 94       	cli
 
-000001e2 <__stop_program>:
- 1e2:	ff cf       	rjmp	.-2      	; 0x1e2 <__stop_program>
+00000162 <__stop_program>:
+ 162:	ff cf       	rjmp	.-2      	; 0x162 <__stop_program>

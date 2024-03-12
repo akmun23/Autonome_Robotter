@@ -1,15 +1,16 @@
 #define F_CPU 184320000UL
-//#define F_CPU 160000000UL
-#define outp(a, b) b = a
 
 #include <stdint.h>
-//#define __AVR_ATmega644PA__
 #include <avr/io.h>
 #include <util/delay.h>
 #include <string.h>
 
 void WriteMessage();
-void PWM();
+/*
+void PWM100();
+void PWM75();
+void PWM50();
+void PWM25();*/
 
 void swrite(uint8_t byte) {
 	while (!( UCSR1A & (1<<UDRE1) ));
@@ -27,6 +28,10 @@ int main(void)
 	// UBRR1L = 103;
 	UBRR1L = 119;                         // UBBR = Freq / (16 * (BaudRate)) – 1
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);  // Enable reading and writing
+	
+
+	
+	// It returns automatically to 0 when conversion is complete.
 
 	while (1) {
 		
@@ -50,7 +55,6 @@ int main(void)
 			
 			DDRD = 0b00100000; 
 			PORTD = 0b00100000;
-			swrite('p');
 			swrite(ReceivedMessage[0]);
 
 		}
@@ -58,33 +62,32 @@ int main(void)
 		{
 			DDRD = 0b00000000;
 			PORTD = 0b00000000;
-			swrite('p');
 			swrite(ReceivedMessage[0]);
 			
 		}
 		if (ReceivedMessage[0] == '3')
 		{
-			DDRD = 0b00100000;
-			PORTD = 0b00100000;
-			_delay_ms(1000);
-			DDRD = 0b00000000;
-			PORTD = 0b00000000;
+			//PWM100();
+			DDRD = 0b00010000;
+			PORTD = 0b00010000;
 			swrite(ReceivedMessage[0]);
 
 		}
 		if (ReceivedMessage[0] == '4')
 		{
-			PWM();
+			//PWM75();
+			DDRD = 0b00000000;
+			PORTD = 0b00000000;
 			swrite(ReceivedMessage[0]);
 		}
 		if (ReceivedMessage[0] == '5')
 		{
-			//PWM(500,500);
+			//PWM50();
 			swrite(ReceivedMessage[0]);
 		}
 		if (ReceivedMessage[0] == '6')
 		{
-			//PWM(200,200)
+			//PWM25();
 			swrite(ReceivedMessage[0]);
 		}
 		if (ReceivedMessage[0] == '7')
@@ -113,30 +116,71 @@ void WriteMessage(char* sendthis){
 		swrite(sendthis[i]);
 	}
 }
+
 /*
-void PWM(){
+
+void setupADC(){
 	
-	for (int i = 0; i < 25; i++)
-	{
-		DDRD = 0b00100000;
-		PORTD = 0b00100000;
-		_delay_ms(5);
-		DDRD = 0b00000000;
-		PORTD = 0b00000000;
-		_delay_ms(5);
+	ADMUX = (1 << REFS0) ;
+	ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADPS0) | (1 << ADPS1) | (1 << ADPS2);
+	DIDR0 = (1 << ADC5D);
+	void startConversion(){
 
-	}
-}*/
+}
+
+void startConversion(){
+	
+	ADCSRA |= (1 << ADSC);
+	
+}
 
 
- void PWM(){
+
+
+*/
+
+
+
+
+
+
+
+
+/*void PWM100(){
+	DDRD |= (1 << DDD5);
+	// PD5 is now an output
+	
+	ICR1 = 0xFFFF;
+	// set TOP to 16bit
+	
+	OCR1A = 0xBFFF;
+	// set PWM for 25% duty cycle @ 16bit
+	
+	
+	TCCR1A |= (1 << COM1A1);
+	// set none-inverting mode
+	
+	TCCR1A |= (1 << WGM11);
+	TCCR1B |= (1 << WGM12)|(1 << WGM13);
+	// set Fast PWM mode using ICR1 as TOP
+	
+	TCCR1B |= (1 << CS10);
+	// START the timer with no prescaler
+
+
+}
+
+
+
+
+ void PWM75(){
 	    DDRD |= (1 << DDD5);
-	    // PB1 and PB2 is now an output
+	    // PD5 is now an output
 	    
 	    ICR1 = 0xFFFF;
 	    // set TOP to 16bit
 	    
-	    OCR1A = 0x3FFF;
+	    OCR1A = 0xBFFF;
 	    // set PWM for 25% duty cycle @ 16bit
 	    
 	    
@@ -149,12 +193,54 @@ void PWM(){
 	    
 	    TCCR1B |= (1 << CS10);
 	    // START the timer with no prescaler
-	    
-	    /*while (1);
-	    {
-		    // we have a working Fast PWM
-	    }*/
-		_delay_ms(1000);
-		DDRD = 0b00000000;
-		PORTD = 0b00000000;
+
+
 }
+
+void PWM50(){
+	DDRD |= (1 << DDD5);
+	// PD5 is now an output
+	
+	ICR1 = 0xFFFF;
+	// set TOP to 16bit
+	
+	OCR1A = 0x7FFF;
+	// set PWM for 25% duty cycle @ 16bit
+	
+	
+	TCCR1A |= (1 << COM1A1);
+	// set none-inverting mode
+	
+	TCCR1A |= (1 << WGM11);
+	TCCR1B |= (1 << WGM12)|(1 << WGM13);
+	// set Fast PWM mode using ICR1 as TOP
+	
+	TCCR1B |= (1 << CS10);
+	// START the timer with no prescaler
+
+
+}
+
+void PWM25(){
+	DDRD |= (1 << DDD5);
+	// PD5 is now an output
+	
+	ICR1 = 0xFFFF;
+	// set TOP to 16bit
+	
+	OCR1A = 0x3FFF;
+	// set PWM for 25% duty cycle @ 16bit
+	
+	
+	TCCR1A |= (1 << COM1A1);
+	// set none-inverting mode
+	
+	TCCR1A |= (1 << WGM11);
+	TCCR1B |= (1 << WGM12)|(1 << WGM13);
+	// set Fast PWM mode using ICR1 as TOP
+	
+	TCCR1B |= (1 << CS10);
+	// START the timer with no prescaler
+
+
+}*/ 
