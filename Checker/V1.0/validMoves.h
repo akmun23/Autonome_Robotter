@@ -486,6 +486,26 @@ std::vector<std::string> move(int playerTurn, std::vector<std::vector<std::strin
     return moveSet;
 }
 
+// Counts the number of pieces on the board
+int pieceCount(std::vector<std::vector<std::string>> boards, int& blackPieces, int& redPieces){
+    int count = 0;
+    int count2 = 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if(boards[i][j] == "R " || boards[i][j] == "RK"){
+                count2++;
+            } else if(boards[i][j] == "B " || boards[i][j] == "BK"){
+                count++;
+            }
+        }
+    }
+
+    redPieces = count2;
+    blackPieces = count;
+
+    return count;
+}
+
 //Gives the board a game score based on the number of pieces and the number of possible moves
 //Used in the alphaBeta function
 int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn){

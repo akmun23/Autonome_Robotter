@@ -3,7 +3,7 @@
 #include<string>
 #include "boardUpdate.h"
 #include "validMoves.h"
-#include "robotMove.h"
+// #include "robotMove.h"
 #include <unistd.h>
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
@@ -25,8 +25,8 @@ int main() {
     // Construct initial board
     std::vector<std::vector<std::string>> boards = startUp();
 
-    //Set up the robot
-    std::vector<std::vector<double>> startUpRobot = robotStart();
+    // Set up the robot
+    // std::vector<std::vector<double>> startUpRobot = robotStart();
 
     while(true){ //Game loop
         if(i%2 == 0){ //Switch player's turn
@@ -35,63 +35,29 @@ int main() {
             playerTurn = 2;
         }
 
-        int black = 0; //Variable used to count number of black pieces on board
-        int red = 0; //Variable used to count number of red pieces on board
-
         //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
         if(((movePossible(playerTurn, boards, jumpPossible(playerTurn, boards), false, {}).size())/2) > 0 && redPieces > 0 && blackPieces > 0){
 
             std::cout << "Player " << playerTurn << "'s turn:" << std::endl; //Prints which player's turn it is
 
-            if(playerTurn == 1){ //Player 1's turn
-                if(player == "p"){
+            if((playerTurn == 1 && player == "p") || (playerTurn == 2 && player2 == "p")){
 
-                    moveSet = move(playerTurn, boards, redPieces, blackPieces);
+                moveSet = move(playerTurn, boards, redPieces, blackPieces); //Player's move
 
-                } else {
-
-                    alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX); //AI's move
-
-                   //Prints the moves made by the AI
-                    for (int i = 0; i < moveSet.size(); i += 2) {
-                        std::cout << "AI moves from: " << moveSet[i] << std::endl;
-                        std::cout << "AI moves to: " << moveSet[i+1] << std::endl;
-                    }
-                }
-
-            } else { //Player 2's turn
-                if(player2 == "p"){
-
-                    moveSet = move(playerTurn, boards, redPieces, blackPieces);
-
-                } else {
-
-                    alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX); //AI's move
-
-                    //Prints the moves made by the AI
-                    for (int i = 0; i < moveSet.size(); i += 2) {
-                        std::cout << "AI moves from: " << moveSet[i] << std::endl;
-                        std::cout << "AI moves to: " << moveSet[i+1] << std::endl;
-                    }
+            } else {
+                alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX); //AI's move
+               //Prints the moves made by the AI
+                for (int i = 0; i < moveSet.size(); i += 2) {
+                    std::cout << "AI moves from: " << moveSet[i] << std::endl;
+                    std::cout << "AI moves to: " << moveSet[i+1] << std::endl;
                 }
             }
 
-            //Counts the number of pieces on the board
-            for (int i = 0; i < 8; ++i) {
-                for (int j = 0; j < 8; ++j) {
-                    if(boards[i][j] == "R " || boards[i][j] == "RK"){
-                        red++;
-                    } else if(boards[i][j] == "B " || boards[i][j] == "BK"){
-                        black++;
-                    }
-                }
-            }
+            // Moves the robot
+            // robotMove(moveSet, startUpRobot);
 
-            //Moves the robot
-            robotMove(moveSet, startUpRobot);
-
-            blackPieces = black; //Sets the number of black pieces
-            redPieces = red; //Sets the number of red pieces
+            // Counts the number of pieces
+            pieceCount(boards, blackPieces, redPieces);
 
             //Prints data from the state of the game and prints the board
             std::cout << "There are " << redPieces << " red pieces left." << std::endl;
