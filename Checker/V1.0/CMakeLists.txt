@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(main main.cpp
-    playerInput.h
     validMoves.h
     boardUpdate.h
     robotMove.h)

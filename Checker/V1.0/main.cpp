@@ -45,8 +45,8 @@ int main() {
                 moveSet = move(playerTurn, boards, redPieces, blackPieces); //Player's move
 
             } else {
-                alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX); //AI's move
-               //Prints the moves made by the AI
+                alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces); //AI's move
+                //Prints the moves made by the AI
                 for (int i = 0; i < moveSet.size(); i += 2) {
                     std::cout << "AI moves from: " << moveSet[i] << std::endl;
                     std::cout << "AI moves to: " << moveSet[i+1] << std::endl;
@@ -55,9 +55,6 @@ int main() {
 
             // Moves the robot
             // robotMove(moveSet, startUpRobot);
-
-            // Counts the number of pieces
-            pieceCount(boards, blackPieces, redPieces);
 
             //Prints data from the state of the game and prints the board
             std::cout << "There are " << redPieces << " red pieces left." << std::endl;
