@@ -486,6 +486,26 @@ std::vector<std::string> move(int playerTurn, std::vector<std::vector<std::strin
     return moveSet;
 }
 
+// Counts the number of pieces on the board
+int pieceCount(std::vector<std::vector<std::string>> boards, int& blackPieces, int& redPieces){
+    int count = 0;
+    int count2 = 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if(boards[i][j] == "R " || boards[i][j] == "RK"){
+                count2++;
+            } else if(boards[i][j] == "B " || boards[i][j] == "BK"){
+                count++;
+            }
+        }
+    }
+
+    redPieces = count2;
+    blackPieces = count;
+
+    return count;
+}
+
 //Gives the board a game score based on the number of pieces and the number of possible moves
 //Used in the alphaBeta function
 int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn){
@@ -493,7 +513,10 @@ int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn)
     int black = 0;
     int red = 0;
     int diff = 0;
-    int random;
+    std::random_device rd;  // Obtain a random number from hardware
+    std::mt19937 eng(rd()); // Seed the generator
+    std::uniform_int_distribution<> distr(0, 10); // Define the range for the random number
+    int random = distr(eng); // Generate a random number
     //Gives score depending on the number of pieces on the board
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
@@ -547,9 +570,6 @@ int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn)
         }
         score *= 1000;
 
-        std::random_device rd;  // Obtain a random number from hardware
-        std::mt19937 eng(rd()); // Seed the generator
-        std::uniform_int_distribution<> distr(0, 10); // Define the range for the random number
         random = distr(eng); // Generate a random number
 
         score += rand()%10;
@@ -576,11 +596,6 @@ int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn)
             score -= 1000;
         }
         score *= 1000;
-
-        std::random_device rd;  // Obtain a random number from hardware
-        std::mt19937 eng(rd()); // Seed the generator
-        std::uniform_int_distribution<> distr(0, 10); // Define the range for the random number
-        random = distr(eng); // Generate a random number
 
         score -= random;
     }
