@@ -75,6 +75,26 @@ std::vector<std::vector<double>> robotStart() {
     return {boardPlane1, rotMatrix};
 }
 
+void checkerJump(std::vector<std::string> moveSet, std::vector<std::vector<double>> startUp){
+    double factor = 0.05;
+    for (int i = 0; i < moveSet.size(); i += 2) {
+        int column = moveSet[i][0] - (moveSet[i][0] - moveSet[i+1][0])/2;
+        int row = moveSet[i][1] - (moveSet[i][1] - moveSet[i+1][1])/2;
+        std::vector<double> boardPlane = startUp[0];
+        std::vector<double> rotMatrix = startUp[1];
+
+        double xcord = rotMatrix[0]*column*factor + rotMatrix[3]*row*factor + rotMatrix[6]*0*factor + boardPlane[0];
+        double ycord = rotMatrix[1]*column*factor + rotMatrix[4]*row*factor + rotMatrix[7]*0*factor + boardPlane[1];
+        double zcord = boardPlane[2];
+
+        std::vector<double> target = rtde_receive.getActualTCPPose();
+
+        rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
+        rtde_control.moveL({xcord, ycord, zcord, target[3], target[4], target[5]}, 0.2, 0.05);
+        rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
+    }
+}
+
 //Function to move the robot
 void robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>> startUp){
     double factor = 0.05;
@@ -115,6 +135,11 @@ void robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>
         rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 1, 0.2);
         rtde_control.moveL({xcord2, ycord2, zcord2, target[3], target[4], target[5]}, 0.2, 0.05);
         rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 1, 0.2);
+
+        if(moveSet[i][0] - moveSet[i+1][0] == 2 || moveSet[i][0] - moveSet[i+1][0] == -2){
+            checkerJump(moveSet, startUp);
+        }
+
         rtde_control.moveL(target, 1, 0.1);
 
     }

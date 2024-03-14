@@ -46,11 +46,12 @@ int main() {
 
             } else {
                 alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces); //AI's move
-                //Prints the moves made by the AI
-                for (int i = 0; i < moveSet.size(); i += 2) {
-                    std::cout << "AI moves from: " << moveSet[i] << std::endl;
-                    std::cout << "AI moves to: " << moveSet[i+1] << std::endl;
-                }
+            }
+
+            //Prints the moves made by the AI
+            for (int i = 0; i < moveSet.size(); i += 2) {
+                std::cout << "Player " << playerTurn << "  moves from: " << moveSet[i] << std::endl;
+                std::cout << "Player " << playerTurn << " moves to: " << moveSet[i+1] << std::endl;
             }
 
             // Moves the robot
