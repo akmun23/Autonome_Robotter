@@ -31,6 +31,7 @@ int main(void)
 
 	UBRR1L = 119;							// UBBR = Freq / (16 * (BaudRate)) – 1
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);	// Tænder for reading og writing
+    InitPWMandADC();
 
 	while (1) {
 		
@@ -81,12 +82,11 @@ int main(void)
 		}
 		if (ReceivedMessage[0] == '5')
 		{
-			//PWM50();
 			swrite(ReceivedMessage[0]);
 		}
 		if (ReceivedMessage[0] == '6')
 		{
-			//PWM25();
+			PWMStart();
 			swrite(ReceivedMessage[0]);
 		}
 		if (ReceivedMessage[0] == '7')
@@ -206,19 +206,27 @@ void InitPWMandADC(){
 }
 
 void PWMStart(){
-	dutyCycle = 65535;				// Full speed 16 bit
-	_delay_ms(100);
-	while (ADCH < 125) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
+	DDRD = 0b00010000;
+	PORTD = 0b00010000;
+	dutyCycle = 1023;				// Full speed 16 bit
+	_delay_ms(300);
+	while (!(ADCH < 114)) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
+		uint8_t Power = ADCH;
+		swrite(Power);
 	}
-	dutyCycle = 65535/2;			// half speed
+	dutyCycle = dutyCycle/2;			// half speed
 	swrite('7');
-	while (stopcommand[0] != 8){
-		stopcommand[0] = sread();	// Venter på at den får sendt signal af robot der siger den er hvor der skal slippes
-	}
+	stopcommand[0] = sread();
+	//while (stopcommand[0] != 8){
+				// Venter på at den får sendt signal af robot der siger den er hvor der skal slippes
+	//}
+	
 	PORTC = 0b00001000;				// Vender retningen på strømmen til motoren så den kører baglæns
 	DDRC = 0b00001000;
 	_delay_ms(300);					// Find værdi her der passer med at den er åben
-	dutyCycle = 0;					// half speed
+	//dutyCycle = 0;					// half speed
+	DDRD = 0b00000000;
+	PORTD = 0b00000000;
 	PORTC = 0b00000000;				// Vender retningen til den anden vej igen og slukker motoren
 	DDRC = 0b00000000;
 	
