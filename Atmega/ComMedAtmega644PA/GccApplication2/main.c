@@ -24,7 +24,7 @@ void PWM25();*/
 
 
 //Sætter variabler
-double dutyCycle = 0;
+double dutyCycle = 1023;
 char stopcommand[1];
 int main(void)
 {
@@ -32,6 +32,8 @@ int main(void)
 	UBRR1L = 119;							// UBBR = Freq / (16 * (BaudRate)) – 1
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);	// Tænder for reading og writing
     InitPWMandADC();
+	DDRD = 0b00000000;
+	PORTD = 0b00000000;
 
 	while (1) {
 		
@@ -91,6 +93,7 @@ int main(void)
 		}
 		if (ReceivedMessage[0] == '7')
 		{
+			swrite(2 + '0');
 			//PWM(50,100)
 			swrite(ReceivedMessage[0]);
 		}
@@ -209,11 +212,12 @@ void PWMStart(){
 	DDRD = 0b00010000;
 	PORTD = 0b00010000;
 	dutyCycle = 1023;				// Full speed 16 bit
-	_delay_ms(300);
+	_delay_ms(300);	
 	while (!(ADCH < 114)) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
-		uint8_t Power = ADCH;
-		swrite(Power);
+		
+		//swrite(ADCH); //Outputter spændingen den måler på porten
 	}
+	//swrite(ADCH);
 	dutyCycle = dutyCycle/2;			// half speed
 	swrite('7');
 	stopcommand[0] = sread();
