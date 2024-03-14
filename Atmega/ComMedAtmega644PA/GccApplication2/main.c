@@ -211,7 +211,7 @@ void PWMStart(){
 	while (ADCH < 125) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
 	}
 	dutyCycle = 65535/2;			// half speed
-	
+	swrite('7');
 	while (stopcommand[0] != 8){
 		stopcommand[0] = sread();	// Venter på at den får sendt signal af robot der siger den er hvor der skal slippes
 	}
