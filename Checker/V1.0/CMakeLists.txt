@@ -10,7 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(main main.cpp
     validMoves.h
     boardUpdate.h
-    robotMove.h)
+    robotMove.h
+    AtmegaCom.h)
 
 target_link_libraries(main PRIVATE ur_rtde::rtde)
 

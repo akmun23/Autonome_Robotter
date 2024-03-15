@@ -3,7 +3,7 @@
 #include<string>
 #include "boardUpdate.h"
 #include "validMoves.h"
-// #include "robotMove.h"
+#include "robotMove.h"
 #include <unistd.h>
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
@@ -26,7 +26,7 @@ int main() {
     std::vector<std::vector<std::string>> boards = startUp();
 
     // Set up the robot
-    // std::vector<std::vector<double>> startUpRobot = robotStart();
+    std::vector<std::vector<double>> startUpRobot = robotStart();
 
     while(true){ //Game loop
         if(i%2 == 0){ //Switch player's turn
@@ -55,7 +55,7 @@ int main() {
             }
 
             // Moves the robot
-            // robotMove(moveSet, startUpRobot);
+            robotMove(moveSet, startUpRobot);
 
             //Prints data from the state of the game and prints the board
             std::cout << "There are " << redPieces << " red pieces left." << std::endl;
