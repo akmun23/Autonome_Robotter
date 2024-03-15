@@ -61,8 +61,8 @@ bool atmegaCom(char InputNumber){
     tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
     tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
 
-    tty.c_cc[VTIME] = 0;    // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
-    tty.c_cc[VMIN] = 1;
+    tty.c_cc[VTIME] = 0;
+    tty.c_cc[VMIN] = 1; // Wait for at least 1 bytes to read
 
     // Set in/out baud rate to be 9600
     cfsetispeed(&tty, B9600);
