@@ -89,7 +89,6 @@ int main(void)
 		if (ReceivedMessage[0] == '6')
 		{
 			PWMStart();
-			swrite(ReceivedMessage[0]);
 		}
 		if (ReceivedMessage[0] == '7')
 		{
@@ -212,27 +211,31 @@ void PWMStart(){
 	DDRD = 0b00010000;
 	PORTD = 0b00010000;
 	dutyCycle = 1023;				// Full speed 16 bit
-	_delay_ms(300);	
+	_delay_ms(100);	
 	while (!(ADCH < 114)) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
 		
 		//swrite(ADCH); //Outputter spændingen den måler på porten
 	}
 	//swrite(ADCH);
-	dutyCycle = dutyCycle/2;			// half speed
+	//dutyCycle = dutyCycle/2;			// half speed
+	dutyCycle = 0;
 	swrite('7');
-	stopcommand[0] = sread();
-	//while (stopcommand[0] != 8){
-				// Venter på at den får sendt signal af robot der siger den er hvor der skal slippes
-	//}
+	stopcommand[0] = sread(); // Venter på at den får sendt signal af robot der siger den er hvor der skal slippes
 	
+	dutyCycle = 1023;
 	PORTC = 0b00001000;				// Vender retningen på strømmen til motoren så den kører baglæns
 	DDRC = 0b00001000;
-	_delay_ms(300);					// Find værdi her der passer med at den er åben
-	//dutyCycle = 0;					// half speed
+	_delay_ms(100);					// Find værdi her der passer med at den er åben
+	while (!(ADCH > 140)) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
+		
+		//swrite(ADCH); //Outputter spændingen den måler på porten
+	}				// half speed
 	DDRD = 0b00000000;
 	PORTD = 0b00000000;
 	PORTC = 0b00000000;				// Vender retningen til den anden vej igen og slukker motoren
 	DDRC = 0b00000000;
+	swrite('7');
+
 	
 }
 
