@@ -29,7 +29,7 @@ std::vector<std::vector<double>> robotStart() {
     while(rtde_receive.getActualTCPForce()[2] < 30){
         std::cout << rtde_receive.getActualTCPForce()[2] << std::endl;
     }
-    double table = rtde_receive.getActualTCPPose()[2]+0.001;
+    double table = rtde_receive.getActualTCPPose()[2]+0.0005;
     rtde_control.speedStop();
 
 
@@ -84,7 +84,7 @@ std::vector<std::vector<double>> robotStart() {
 }
 
 void checkerJump(std::vector<std::string> moveSet, std::vector<std::vector<double>> startUp){
-    double factor = 0.05;
+    double factor = 0.032;
     int column = moveSet[0][0] - (moveSet[0][0] - moveSet[1][0])/2;
     column = column - 'a';
     int row = moveSet[0][1] - (moveSet[0][1] - moveSet[1][1])/2;
@@ -105,7 +105,7 @@ void checkerJump(std::vector<std::string> moveSet, std::vector<std::vector<doubl
 
 //Function to move the robot
 void robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>> startUp){
-    double factor = 0.05;
+    double factor = 0.032;
     for (int i = 0; i < moveSet.size(); i += 2) {
         double xcord = 0;
         double ycord = 0;
