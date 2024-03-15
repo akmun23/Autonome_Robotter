@@ -39,7 +39,6 @@ int main() {
         } else {
             playerTurn = 2;
         }
-        atmegaCom('6');
 
         //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
         if(((movePossible(playerTurn, boards, jumpPossible(playerTurn, boards), false, {}).size())/2) > 0 && redPieces > 0 && blackPieces > 0){
