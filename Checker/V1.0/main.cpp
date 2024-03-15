@@ -19,6 +19,7 @@ int main() {
     bool gameEnd = false; //If the game has ended
     int i = 0; //Counter for the number of turns
 
+
     atmegaCom('8'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
 
     std::string player = "AI"; //If the player is human or AI
@@ -38,11 +39,13 @@ int main() {
         } else {
             playerTurn = 2;
         }
+        atmegaCom('6');
 
         //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
         if(((movePossible(playerTurn, boards, jumpPossible(playerTurn, boards), false, {}).size())/2) > 0 && redPieces > 0 && blackPieces > 0){
 
             std::cout << "Player " << playerTurn << "'s turn:" << std::endl; //Prints which player's turn it is
+            std::vector<std::vector<std::string>> tempBoard = boards; // To be used in robotMove
 
             if((playerTurn == 1 && player == "p") || (playerTurn == 2 && player2 == "p")){
 
@@ -59,7 +62,7 @@ int main() {
             }
 
             // Moves the robot
-            robotMove(moveSet, startUpRobot);
+            robotMove(moveSet, startUpRobot, boards);
 
             //Prints data from the state of the game and prints the board
             std::cout << "There are " << redPieces << " red pieces left." << std::endl;
