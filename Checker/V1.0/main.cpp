@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
+#include "AtmegaCom.h"
+
 
 using namespace ur_rtde;
 
@@ -16,6 +18,8 @@ int main() {
     int redPieces = 12; //Initial number of red pieces
     bool gameEnd = false; //If the game has ended
     int i = 0; //Counter for the number of turns
+
+    atmegaCom('8'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
 
     std::string player = "AI"; //If the player is human or AI
     std::string player2 = "AI"; //If the player is human or AI
