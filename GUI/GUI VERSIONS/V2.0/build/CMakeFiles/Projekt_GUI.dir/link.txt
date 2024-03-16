@@ -1,0 +1,1 @@
+/usr/bin/g++ -g -rdynamic CMakeFiles/Projekt_GUI.dir/main.cpp.o -o Projekt_GUI 
