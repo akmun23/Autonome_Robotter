@@ -12,91 +12,85 @@
 
 
 
-// Create new termios struct, we call it 'tty' for convention
-// No need for "= {0}" at the end as we'll immediately write the existing
-// config to this struct
 
 
 
 
 bool atmegaCom(char InputNumber){
 
-    int serial_port = open("/dev/ttyUSB0", O_RDWR);
+    int serial_port = open("/dev/ttyUSB0", O_RDWR);                     // Her åbner vi serie port forbindelsen
 
     // Check for errors
     if (serial_port < 0) {
-        printf("Error %i from open: %s\n", errno, strerror(errno));
+        printf("Error %i from open: %s\n", errno, strerror(errno));     // Her tjekker vi for om den har fundet en forbindelse til porten
     }
 
-    struct termios tty;
+    struct termios tty;                                                 // Her benytter vi structen termios som er en inbygget struct i linux til at konfigurere vores port
     if(tcgetattr(serial_port, &tty) != 0) {
         printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
     }
 
 
-    tty.c_cflag &= ~PARENB; // Clear parity bit, disabling parity (most common)
+    tty.c_cflag &= ~PARENB;                                             // Her slår vi parity bit fra
 
-    tty.c_cflag &= ~CSTOPB; // Clear stop field, only one stop bit used in communication (most common)
+    tty.c_cflag &= ~CSTOPB;                                             // Sætter at der skal være 1 stop bit
 
-    tty.c_cflag &= ~CSIZE; // Clear all the size bits, then use one of the statements below
-    tty.c_cflag |= CS8; // 8 bits per byte (most common)
+    tty.c_cflag &= ~CSIZE;                                              // Clear alle size bit og bruger den næste linje til at sætte størrelsen på dataen
+    tty.c_cflag |= CS8;                                                 // Her sætter vi vores port til at bruge 8 bits data
 
-    tty.c_cflag &= ~CRTSCTS; // Disable RTS/CTS hardware flow control (most common)
+    tty.c_cflag &= ~CRTSCTS;                                            // Disable RTS/CTS som betyder at man har 2 ekstra ledninger til at fortælle hvornår den skal sende og modtage det har vi ikke så den er slået fra
 
 
-    tty.c_cflag |= CREAD | CLOCAL; // Turn on READ & ignore ctrl lines (CLOCAL = 1)
+    tty.c_cflag |= CREAD | CLOCAL;                                      // CREAD betyder at vi kan læse fra porten og CLOCAL betyder at vi ignorerer modem control lines
 
-    tty.c_lflag &= ~ICANON;
+    tty.c_lflag &= ~ICANON;                                             // Her slår vi canonical mode fra som betyder at vi læser en byte ad gangen
 
-    tty.c_lflag &= ~ECHO; // Disable echo
-    tty.c_lflag &= ~ECHOE; // Disable erasure
-    tty.c_lflag &= ~ECHONL; // Disable new-line echo
+                                                                        // De her 3 ting burde ikke være nødvendige at slå fra da de bruges af canonical mode men de slås fra for en sikkerheds skyld
+    tty.c_lflag &= ~ECHO;                                               // Disable echo
+    tty.c_lflag &= ~ECHOE;                                              // Disable erasure
+    tty.c_lflag &= ~ECHONL;                                             // Disable new-line echo
 
-    tty.c_lflag &= ~ISIG; // Disable interpretation of INTR, QUIT and SUSP
+    tty.c_lflag &= ~ISIG;                                               // Her slår vi fra at serial porten læser de her komandoer ud fra dataen INTR, QUIT and SUSP
 
-    tty.c_iflag &= ~(IXON | IXOFF | IXANY); // Turn off s/w flow ctrl
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY);                             // Her slår vi software flow control fra
 
-    tty.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL); // Disable any special handling of received bytes
+    tty.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL);    // Her slår vi fra at der skal være speciel behandling af input bytes vi vil bare have dem som de er dejlig rå data
 
-    tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
-    tty.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
+    tty.c_oflag &= ~OPOST;                                              // Her fjerner vi speciel tolkelse af output data som fx newline chars
+    tty.c_oflag &= ~ONLCR;                                              // Igen bare at vi fortsætter med at fjerne special tolkelse af output data
 
-    tty.c_cc[VTIME] = 0;
-    tty.c_cc[VMIN] = 1; // Wait for at least 1 bytes to read
+                                                                        // Måske skal vi køre på timer istedet i forhold til at måle strøm
+    tty.c_cc[VTIME] = 0;                                                // Her sætter vi timeout til 0 så den venter ikke på at der kommer noget data i forhold til tid hvis den ikke får noget data så går den videre
+                                                                        // men hvis den får data indenfor intervaller af timeout fortsætter den
 
-    // Set in/out baud rate to be 9600
-    cfsetispeed(&tty, B9600);
+    tty.c_cc[VMIN] = 1;                                                 // Venter på at mindst 1 byte er læst ind før den går videre altså den venter her for evigt indtil den får en byte data
+
+
+    cfsetispeed(&tty, B9600);                                           // Sætter in og output baud rate til 9600
     cfsetospeed(&tty, B9600);
 
-    // Save tty settings, also checking for error
-    if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {
+
+    if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {                   // Gemmer de nye settings vi har defineret indtil nu og tjekker for fejl
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
     }
 
-    char msg[] = {InputNumber};
+    char msg[] = {InputNumber};                                         // Her skriver vi vores besked til atmegaen
     write(serial_port, msg, sizeof(msg));
 
-    // Allocate memory for read buffer, set size according to your needs
-    char read_buf [1];
+    char read_buf [1];                                                  // Her laver vi en buffer til at læse data ind i
 
-    // Read bytes. The behaviour of read() (e.g. does it block?,
-    // how long does it block for?) depends on the configuration
-    // settings above, specifically VMIN and VTIME
 
-    int n = read(serial_port, &read_buf, sizeof(read_buf));
+    int n = read(serial_port, &read_buf, sizeof(read_buf));             // Her læser vi data ind fra atmegaen i variablen n
 
-    // n is the number of bytes read. n may be 0 if no bytes were received, and can also be negative to signal an error.
     std::cout << std::endl;
-    printf("Read %i bytes. Received message: %s", n, read_buf);
+    printf("Read %i bytes. Received message: %s", n, read_buf);         // Her printer vi hvor mange bytes vi har læst og hvad vi har læst
     std::cout << std::endl;
 
 
 
-    if (msg[0] == n){
-        return true;
-    } else {
-        return false;
-    }
+
+    return true;
+
     close(serial_port);
 }
 

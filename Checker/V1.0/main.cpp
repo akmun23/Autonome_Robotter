@@ -34,6 +34,7 @@ int main() {
 //    std::vector<std::vector<double>> startUpRobot = robotStart();
 
     while(true){ //Game loop
+
         thisTurn = playerTurn; //Which player's turn it is
 
         //Checks if the game has ended either by player not having any possible moves or no more pieces on the board

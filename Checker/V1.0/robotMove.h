@@ -26,9 +26,11 @@ std::vector<std::vector<double>> robotStart() {
 
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
 
+
     while(rtde_receive.getActualTCPForce()[2] < 30){
         std::cout << rtde_receive.getActualTCPForce()[2] << std::endl;
     }
+        std::cout << rtde_receive.getActualTCPForce()[2] << std::endl;
     double table = rtde_receive.getActualTCPPose()[2]+0.0005;
     rtde_control.speedStop();
 
@@ -104,7 +106,7 @@ void checkerJump(std::vector<std::string> moveSet, std::vector<std::vector<doubl
     rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
 
     int gravex = 3 + playerTurn;
-    int gravey = -2;
+    int gravey = -3;
 
     double xcord2 = rotMatrix[0]*gravex*factor + rotMatrix[3]*gravey*factor + rotMatrix[6]*0*factor + boardPlane[0];
     double ycord2 = rotMatrix[1]*gravex*factor + rotMatrix[4]*gravey*factor + rotMatrix[7]*0*factor + boardPlane[1];
@@ -162,6 +164,8 @@ void promotePiece(std::vector<std::string> moveSet, std::vector<std::vector<doub
 
     rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord, ycord, zcord+0.005, target[3], target[4], target[5]}, 0.2, 0.05);
+    atmegaCom('8');
+    rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
 
 
 }
