@@ -109,7 +109,7 @@ void checkerJump(std::vector<std::string> moveSet, std::vector<std::vector<doubl
     double xcord2 = rotMatrix[0]*gravex*factor + rotMatrix[3]*gravey*factor + rotMatrix[6]*0*factor + boardPlane[0];
     double ycord2 = rotMatrix[1]*gravex*factor + rotMatrix[4]*gravey*factor + rotMatrix[7]*0*factor + boardPlane[1];
 
-    rtde_control.moveL({xcord2+0.1, ycord2+0.1, target[2], target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({xcord2+0.005, ycord2+0.005, target[2], target[3], target[4], target[5]}, 1, 0.2);
 
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){

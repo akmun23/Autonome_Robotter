@@ -3,24 +3,24 @@
 #include<string>
 #include "boardUpdate.h"
 #include "validMoves.h"
-#include "robotMove.h"
+//#include "robotMove.h"
 #include <unistd.h>
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
-#include "AtmegaCom.h"
+//#include "AtmegaCom.h"
 
 
 using namespace ur_rtde;
 
 int main() {
-    int playerTurn; //Which player's turn it is
+    int playerTurn = 1; //Which player's turn it is
     int blackPieces = 12; //Initial number of black pieces
     int redPieces = 12; //Initial number of red pieces
     bool gameEnd = false; //If the game has ended
-    int i = 0; //Counter for the number of turns
+    int thisTurn = playerTurn; //Which player's turn it is
 
 
-    atmegaCom('8'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
+//    atmegaCom('8'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
 
     std::string player = "AI"; //If the player is human or AI
     std::string player2 = "AI"; //If the player is human or AI
@@ -31,15 +31,10 @@ int main() {
     std::vector<std::vector<std::string>> boards = startUp();
 
     // Set up the robot
-    std::vector<std::vector<double>> startUpRobot = robotStart();
+//    std::vector<std::vector<double>> startUpRobot = robotStart();
 
     while(true){ //Game loop
-        if(i%2 == 0){ //Switch player's turn
-            playerTurn = 1;
-        } else {
-            playerTurn = 2;
-        }
-        atmegaCom('6');
+        thisTurn = playerTurn; //Which player's turn it is
 
         //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
         if(((movePossible(playerTurn, boards, jumpPossible(playerTurn, boards), false, {}).size())/2) > 0 && redPieces > 0 && blackPieces > 0){
@@ -52,31 +47,33 @@ int main() {
                 moveSet = move(playerTurn, boards, redPieces, blackPieces); //Player's move
 
             } else {
-                alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces); //AI's move
+
+                alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+
             }
 
             //Prints the moves made by the AI
             for (int i = 0; i < moveSet.size(); i += 2) {
-                std::cout << "Player " << playerTurn << "  moves from: " << moveSet[i] << std::endl;
-                std::cout << "Player " << playerTurn << " moves to: " << moveSet[i+1] << std::endl;
+                std::cout << "Player " << thisTurn << "  moves from: " << moveSet[i] << std::endl;
+                std::cout << "Player " << thisTurn << " moves to: " << moveSet[i+1] << std::endl;
             }
 
             // Moves the robot
-            robotMove(moveSet, startUpRobot, boards);
+//            robotMove(moveSet, startUpRobot, boards);
 
             //Prints data from the state of the game and prints the board
             std::cout << "There are " << redPieces << " red pieces left." << std::endl;
             std::cout << "There are " << blackPieces << " black pieces left." << std::endl;
             std::cout << std::endl;
             checkerBoard(boards);
-            std::cout << "Game score is: " << giveBoardScore(boards, playerTurn) << std::endl;
+            std::cout << "Game score is: " << giveBoardScore(boards, playerTurn, blackPieces, redPieces) << std::endl;
             std::cout << std::endl;
 
         } else { //If no valid moves, or no more pieces on the board
             gameEnd = true; //Game has ended
             break;
         }
-        i++;
+
     }
 
 
@@ -85,7 +82,7 @@ int main() {
         if(redPieces == 0){
             std::cout << "Player 1 wins! No more red pieces" << std::endl;
         } else if(blackPieces == 0){
-            std::cout << "Player 1 wins! No more black pieces" << std::endl;
+            std::cout << "Player 2 wins! No more black pieces" << std::endl;
         } else if(playerTurn == 1){
             std::cout << "Player 2 wins! No more moves for black" << std::endl;
         } else if(playerTurn == 2){

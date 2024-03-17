@@ -355,7 +355,7 @@ bool boardChange(int playerTurn, std::vector<std::vector<std::string>>& boards, 
      return false;
 }
 
-std::vector<std::string> move(int playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces){
+std::vector<std::string> move(int& playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces){
     bool valid = false;
     bool jumped = false; //If a piece has jumped
     bool promotion = false; //If a piece has been promoted
@@ -378,35 +378,32 @@ std::vector<std::string> move(int playerTurn, std::vector<std::vector<std::strin
                 promotion = boardChange(playerTurn, boards, playerStart, playerMove, redPieces, blackPieces);
                 moveSet.push_back(playerStart);
                 moveSet.push_back(playerMove);
-                if(moreMoveCheck(jumpPossible(playerTurn, boards), playerMove) && jumped && !promotion){
-                    checkerBoard(boards);
-                    moves = movePossible(playerTurn, boards, jumpPossible(playerTurn, boards), moreMoveCheck(jumpPossible(playerTurn, boards), playerMove), playerMove);
-                    moreMove = true;
-                    break;
-                } else {
-                    valid = true;
-                    break;
-                }
+                valid = true;
+                break;
             }
         }
-        if(moreMove){
-            moreMove = false;
-            valid = false;
-        } else {
+
+        if(!valid){
             std::cout << "Move not valid. Please enter a new move." << std::endl;
         }
     }
 
-    return moveSet;
+    if(moreMoveCheck(jumpPossible(playerTurn, boards), playerMove) && jumped && !promotion){
+        return moveSet;
+    } else {
+        if(playerTurn == 1){
+            playerTurn = 2;
+        } else {
+            playerTurn = 1;
+        }
+        return moveSet;
+    }
 }
 
 //Gives the board a game score based on the number of pieces and the number of possible moves
 //Used in the alphaBeta function
-int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn){
+int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn, int black, int red){
     int score = 0;
-    int black = 0;
-    int red = 0;
-    int diff = 0;
     std::random_device rd;  // Obtain a random number from hardware
     std::mt19937 eng(rd()); // Seed the generator
     std::uniform_int_distribution<> distr(0, 10); // Define the range for the random number
@@ -415,78 +412,99 @@ int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn)
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             if(boards[i][j] == "B "){
-                score += 6;
-                black++;
-                diff++;
+                score += 10;
+                score += i/2;
+                if((i == 5) && (boards[i+2][j] == "R " || boards[i+2][j] == "RK")){
+                    score += 5;
+                }
+                if((j == 2) && (boards[i][j-2] == "R " || boards[i][j-2] == "RK")){
+                    score += 5;
+                } else if((j == 5) && (boards[i][j+2] == "R " || boards[i][j+2] == "RK")){
+                    score += 5;
+                }
             }
             else if(boards[i][j] == "BK"){
-                score += 10;
-                black++;
-                diff++;
+                score += 20;
+                if((i == 5) && (boards[i+2][j] == "R " || boards[i+2][j] == "RK")){
+                    score += 5;
+                } else if((i == 2) && (boards[i-2][j] == "R " || boards[i-2][j] == "RK")){
+                    score += 5;
+                }
+                if((j == 2) && (boards[i][j-2] == "R " || boards[i][j-2] == "RK")){
+                    score += 5;
+                } else if((j == 5) && (boards[i][j+2] == "R " || boards[i][j+2] == "RK")){
+                    score += 5;
+                }
             }
             else if(boards[i][j] == "R "){
-                score -= 6;
-                red++;
-                diff--;
+                score -= 10;
+                score -= -(4-(i+1)/2);
+                if((i == 2) && (boards[i-2][j] == "B " || boards[i-2][j] == "BK")){
+                    score -= 5;
+                }
+                if((j == 2) && (boards[i][j-2] == "B " || boards[i][j-2] == "BK")){
+                    score -= 5;
+                } else if((j == 5) && (boards[i][j+2] == "B " || boards[i][j+2] == "BK")){
+                    score -= 5;
+                }
             }
             else if(boards[i][j] == "RK"){
-                score -= 10;
-                red++;
-                diff--;
+                score -= 20;
+                if((i == 2) && (boards[i-2][j] == "B " || boards[i-2][j] == "BK")){
+                    score -= 5;
+                } else if((i == 5) && (boards[i+2][j] == "B " || boards[i+2][j] == "BK")){
+                    score -= 5;
+                }
+                if((j == 2) && (boards[i][j-2] == "B " || boards[i][j-2] == "BK")){
+                    score -= 5;
+                } else if((j == 5) && (boards[i][j+2] == "B " || boards[i][j+2] == "BK")){
+                    score -= 5;
+                }
             }
         }
     }
-    score += diff;
 
     //Gives score depending on the jumps that are possible
     //And if the game is in a winning state
     if(playerTurn == 1){
        if(jumpPossible(2, boards).empty()){
-            score += 15;
+            score += 20;
             if(!(jumpPossible(1, boards).empty())){
-                score += 25;
+                score += 50;
             }
         }
-        if(!(jumpPossible(1, boards).empty())){
-            score += 15;
-            if(!(jumpPossible(2, boards).empty())){
-                score -= 15;
-            }
-        }
+
         if(jumpPossible(1, boards).empty()){
-            score -= 20;
+            score -= 10;
             if(!(jumpPossible(2, boards).empty())){
-                score -= 50;
+                score -= 80;
             }
         }
+
+
         if(red == 0 || movePossible(2, boards, jumpPossible(2, boards), false, "").empty()){
-            score += 1000;
+            score += 10000;
         }
         score *= 1000;
 
         score += random;
 
     } else if(playerTurn == 2) {
-      if(jumpPossible(1, boards).empty()){
-                score -= 15;
+        if(jumpPossible(1, boards).empty()){
+            score -= 20;
             if(!(jumpPossible(2, boards).empty())){
-                score -= 25;
+                score -= 50;
             }
         }
-        if(!(jumpPossible(2, boards).empty())){
-                score -= 5;
-                if(!(jumpPossible(1, boards).empty())){
-                    score += 20;
-                }
-        }
+
         if(jumpPossible(2, boards).empty()){
-            score += 20;
+            score += 10;
             if(!(jumpPossible(1, boards).empty())){
-                score += 50;
-        }
+                score += 80;
+            }
     }
         if(black == 0 || movePossible(1, boards, jumpPossible(1, boards), false, "").empty()){
-            score -= 1000;
+            score -= 10000;
         }
         score *= 1000;
 
@@ -498,43 +516,39 @@ int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn)
 }
 
 // The alphaBeta function
-int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, std::vector<std::vector<std::string>>& boards2, std::vector<std::string>& moveSet, int alpha, int beta, int& blackPieces2, int& redPieces2){
-    int maxEval;
-    int eval;
-    bool jumped;
-    bool promotion;
-    int bestBlack;
-    int bestRed;
-    int tempBlack = blackPieces;
-    int tempRed = redPieces;
-    std::vector<std::vector<std::string>> tempBoard = boards;
-    std::vector<std::vector<std::string>> bestBoard;
-    std::string playerStart;
-    std::string playerMove;
-    std::vector<std::string> moves;
-    std::vector<std::string> bestMoves;
-    std::vector<std::string> posMove = movePossible(playerTurn, boards, jumpPossible(playerTurn, boards), moreMoveCheck(jumpPossible(playerTurn, boards), playerMove), playerMove);
-    moveSet = {};
+int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, std::vector<std::vector<std::string>>& boards2, std::vector<std::string>& moveSet, int alpha, int beta, int& blackPieces2, int& redPieces2, int& playerTurn2, std::string playerMove){
+    int maxEval; //The highest eval
+    int eval; //The eval
+    bool jumped; //If a piece has jumped
+    bool promotion; //If a piece has been promoted
+    int bestPlayer; //Keeps track of the playerTurn for the best board
+    int bestBlack; //Keeps track of the blackPieces for the best board
+    int bestRed; //Keeps track of the redPieces for the best board
+    int tempBlack = blackPieces; //Keeps track of the blackPieces
+    int tempRed = redPieces; //Keeps track of the redPieces
+    int tempPlayer = playerTurn; //Keeps track of the playerTurn
+    std::vector<std::vector<std::string>> tempBoard = boards; //Keeps track of the board
+    std::vector<std::vector<std::string>> bestBoard; //The best board
+    std::string playerStart; //The start position for the move
+    std::vector<std::string> moves; //The moves that have been made during the turn
+    std::vector<std::string> bestMoves; //The best moves
+
+    //The possible moves for the player
+    std::vector<std::string> posMove = movePossible(tempPlayer, boards, jumpPossible(tempPlayer, boards), moreMoveCheck(jumpPossible(tempPlayer, boards), playerMove), playerMove);
+    moveSet = {}; //Clears the moveSet
 
     //If the depth is 0, the game is in a winning state, or no moves are possible, it returns the score of the board
     if( depth == 0 || posMove.empty() || tempRed == 0 || tempBlack == 0) {
-        return giveBoardScore(boards, playerTurn);
+        return giveBoardScore(boards, tempPlayer, blackPieces, redPieces);
     }
 
     //If it is player 1's turn, it checks all the possible moves and returns the best move
-    if(playerTurn == 1){
+    if(tempPlayer == 1){
         maxEval = INT_MIN; //Set the maxEval to the lowest possible value
-        //Finds all possible moves
-        posMove = movePossible(playerTurn, tempBoard, jumpPossible(playerTurn, tempBoard), moreMoveCheck(jumpPossible(playerTurn, boards), playerMove), playerMove);
+
         //Iterates through all possible moves
         for (int i = 0; i < (posMove.size()-1); i += 2) {
-            //Finds all possible moves
-            posMove = movePossible(playerTurn, tempBoard, jumpPossible(playerTurn, tempBoard), moreMoveCheck(jumpPossible(playerTurn, tempBoard), playerMove), playerMove);
 
-            //If the for-statement has iterated further than should be possible it returns the maxEval
-            if(i > posMove.size()-1){
-                return maxEval;
-            }
             //Sets the start and end position for the move
             playerStart = posMove[i];
             playerMove = posMove[i+1];
@@ -544,28 +558,25 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
             moves.push_back(playerMove);
 
             //Checks if the piece has jumped
-            jumped = pieceJump(playerStart, playerMove, playerTurn, tempBoard);
+            jumped = pieceJump(playerStart, playerMove, tempPlayer, tempBoard);
 
             //Checks if the piece has been promoted
-            promotion = boardChange(playerTurn, tempBoard, playerStart, playerMove, tempRed, tempBlack);
+            promotion = boardChange(tempPlayer, tempBoard, playerStart, playerMove, tempRed, tempBlack);
 
-            //If the piece is able to jump again and hasnt been promoted, it iterates through all possible moves
-            while(moreMoveCheck(jumpPossible(playerTurn, tempBoard), playerMove) && jumped && !promotion){
-                posMove = movePossible(playerTurn, tempBoard, jumpPossible(playerTurn, tempBoard), moreMoveCheck(jumpPossible(playerTurn, tempBoard), playerMove), playerMove);
-                //Sets the start and end position for the move and adds it to the vector moves
-                playerStart = posMove[0];
-                moves.push_back(playerStart);
-                playerMove = posMove[1];
-                moves.push_back(playerMove);
+            // moreMoveCheck(jumpPossible(playerTurn, tempBoard), playerMove) && jumped && !promotion
 
-                //Checks if the piece has jumped or been promoted
-                jumped = pieceJump(playerStart, playerMove, playerTurn, tempBoard);
-                promotion = boardChange(playerTurn, tempBoard, playerStart, playerMove, tempRed, tempBlack);
+            //If the piece is able to jump again the turn doesnt change
+            if(moreMoveCheck(jumpPossible(tempPlayer, tempBoard), playerMove) && jumped && !promotion){
+
+                eval = alphaBeta(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove);
+
+            } else {
+
+                eval = alphaBeta(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, {});
+
             }
-            //Sets eval to the value that is being return by the alphaBeta function
-            eval = alphaBeta(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2);
 
-            //If the eval is higher than the maxEval, it sets the maxEval to eval and sets the bestBoard and bestMoves to the current board and moves
+            //If the eval is higher than the maxEval, it sets the maxEval to eval and sets the bestBoard, bestMoves, bestPieces and playerTurn to the match the board
             if(maxEval < eval){
                 maxEval = eval;
                 bestBoard = tempBoard;
@@ -573,6 +584,12 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
                 bestBlack = tempBlack;
                 bestRed = tempRed;
                 alpha = eval;
+
+                if(moreMoveCheck(jumpPossible(playerTurn, tempBoard), playerMove) && jumped && !promotion){
+                    bestPlayer = 1;
+                } else {
+                    bestPlayer = 2;
+                }
             }
 
             //If eval is higher than beta, it breaks the for-loop
@@ -584,46 +601,43 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
             tempBoard = boards;
             tempBlack = blackPieces;
             tempRed = redPieces;
+            tempPlayer = playerTurn;
             playerStart = {};
             playerMove = {};
             moves = {};
         }
 
-        //Sets the board and moves to the bestBoard and bestMoves
+        //Sets the best values found to the variables that are returned
             boards2 = bestBoard;
             moveSet = bestMoves;
             blackPieces2 = bestBlack;
             redPieces2 = bestRed;
+            playerTurn2 = bestPlayer;
         return maxEval;
 
     //The same is done for player 2
     } else {
         maxEval = INT_MAX;
-        posMove = movePossible(playerTurn, boards, jumpPossible(playerTurn, boards), false, playerMove);
 
         for (int i = 0; i < (posMove.size()-1); i += 2) {
-            posMove = movePossible(playerTurn, tempBoard, jumpPossible(playerTurn, tempBoard), false, playerMove);
-            if(i > posMove.size()-1){
-                return maxEval;
-            }
             playerStart = posMove[i];
             playerMove = posMove[i+1];
             moves.push_back(playerStart);
             moves.push_back(playerMove);
-            jumped = pieceJump(playerStart, playerMove, playerTurn, tempBoard);
-            promotion = boardChange(playerTurn, tempBoard, playerStart, playerMove, tempRed, tempBlack);
+            jumped = pieceJump(playerStart, playerMove, tempPlayer, tempBoard);
+            promotion = boardChange(tempPlayer, tempBoard, playerStart, playerMove, tempRed, tempBlack);
 
-            while(moreMoveCheck(jumpPossible(playerTurn, tempBoard), playerMove) && jumped && !promotion){
-                posMove = movePossible(playerTurn, tempBoard, jumpPossible(playerTurn, tempBoard), moreMoveCheck(jumpPossible(playerTurn, tempBoard), playerMove), playerMove);
-                playerStart = posMove[0];
-                playerMove = posMove[1];
-                moves.push_back(playerStart);
-                moves.push_back(playerMove);
-                jumped = pieceJump(playerStart, playerMove, playerTurn, tempBoard);
-                promotion = boardChange(playerTurn, tempBoard, playerStart, playerMove, tempRed, tempBlack);
+
+            //If the piece is able to jump again, it finds all possible moves
+            if(moreMoveCheck(jumpPossible(tempPlayer, tempBoard), playerMove) && jumped && !promotion){
+
+                eval = alphaBeta(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove);
+
+            } else {
+
+                eval = alphaBeta(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, {});
+
             }
-
-            eval = alphaBeta(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, blackPieces2, redPieces2);
 
             if(maxEval > eval){
                 maxEval = eval;
@@ -632,6 +646,12 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
                 bestBlack = tempBlack;
                 bestRed = tempRed;
                 beta = eval;
+
+                if(moreMoveCheck(jumpPossible(tempPlayer, tempBoard), playerMove) && jumped && !promotion){
+                    bestPlayer = 2;
+                } else {
+                    bestPlayer = 1;
+                }
             }
 
             if(eval < alpha){
@@ -641,6 +661,7 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
             tempBoard = boards;
             tempBlack = blackPieces;
             tempRed = redPieces;
+            tempPlayer = playerTurn;
             playerStart = {};
             playerMove = {};
             moves = {};
@@ -650,6 +671,7 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
         moveSet = bestMoves;
         blackPieces2 = bestBlack;
         redPieces2 = bestRed;
+        playerTurn2 = bestPlayer;
         return maxEval;
     }
 
