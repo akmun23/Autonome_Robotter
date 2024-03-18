@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 3.1...3.28)
 # This is your project statement. You should always list languages;
 # Listing the version is nice here since it sets lots of useful variables
 project(
-  ModernCMakeExample
+  CheckersDatabase
   VERSION 1.0
   LANGUAGES CXX)
 
@@ -30,7 +30,9 @@ project(
 find_package(Qt5Sql REQUIRED)
 
 # Link each target with other targets or add options, etc.
-add_executable(MainTest main.cpp)
+add_executable(MainTest main.cpp
+    Funktioner.h
+    Funktioner.cpp)
 target_link_libraries(MainTest  Qt5::Core Qt5::Sql)
 
 # Make sure you link your targets with this command. It can also link libraries and
