@@ -1,7 +1,0 @@
-/home/aksel/Documents/GitHub/AkselMiniProjekter/Checker/CMakeFiles/main.dir
-/home/aksel/Documents/GitHub/AkselMiniProjekter/Checker/CMakeFiles/edit_cache.dir
-/home/aksel/Documents/GitHub/AkselMiniProjekter/Checker/CMakeFiles/rebuild_cache.dir
-/home/aksel/Documents/GitHub/AkselMiniProjekter/Checker/CMakeFiles/list_install_components.dir
-/home/aksel/Documents/GitHub/AkselMiniProjekter/Checker/CMakeFiles/install.dir
-/home/aksel/Documents/GitHub/AkselMiniProjekter/Checker/CMakeFiles/install/local.dir
-/home/aksel/Documents/GitHub/AkselMiniProjekter/Checker/CMakeFiles/install/strip.dir

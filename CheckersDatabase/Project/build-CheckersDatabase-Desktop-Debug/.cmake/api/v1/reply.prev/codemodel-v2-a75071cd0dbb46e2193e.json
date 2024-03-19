@@ -1,0 +1,61 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-c73ef7b70ca0ef721edb.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "CheckersDatabase",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "CheckersDatabase::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-CheckersDatabase-Debug-d58671d0391f5627c600.json",
+					"name" : "CheckersDatabase",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/pascal/Desktop/SoftwareUdvikling/CheckersDatabase/Project/build-CheckersDatabase-Desktop-Debug",
+		"source" : "/home/pascal/Desktop/SoftwareUdvikling/CheckersDatabase/Project/CheckersDatabase"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}
