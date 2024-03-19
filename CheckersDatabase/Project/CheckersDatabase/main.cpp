@@ -10,11 +10,20 @@ int main()
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
     db.setDatabaseName("CheckersDatabase");
-    db.setUserName("Indsæt dit brugernavn");  // Change to username
-    db.setPassword("Indsæt password");  // Change to password
+    db.setUserName("Pascal");  // Change to username
+    db.setPassword("Superbror22!");  // Change to password
     db.open();
 
     QSqlQuery query;
+
+    query.exec("ALTER TABLE UniqueBoard ADD PRIMARY KEY (board_id)");
+
+
+    query.exec("Create Table Moves ("
+               " board_id int,"
+               " Move char(20)"
+               " WinRate double"
+               " FOREIGN KEY (board_id) REFERENCES UniqueBoard(board_id))");
 
     printBoardStates();
 
