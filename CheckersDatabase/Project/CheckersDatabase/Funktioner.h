@@ -2,6 +2,6 @@
 #define FUNKTIONER_H
 #include <string>
 void printBoardStates();
-void AddMove(std::string BoardStateInputtet);
-void AddBoard(std::string BoardStateInputtet);
+void AddMove(int TempBoardID);
+void AddBoard(int TempBoardID);
 #endif // FUNKTIONER_H

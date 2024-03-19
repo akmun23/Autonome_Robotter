@@ -20,11 +20,19 @@ void printBoardStates(){
 }
 
 
-void AddBoard(std::string BoardStateInputtet){
+void AddBoard(int TempBoardID){
 
     QSqlDatabase db = QSqlDatabase::database("QMYSQL");
 
     QSqlQuery query = QSqlQuery(db);
+
+
+    std::string BoardStateInputtet;
+
+    query.exec("Select BoardState FROM Temp WHERE tempBoard_id = " + QString::number(TempBoardID));
+    while (query.next()) {
+        BoardStateInputtet = query.value(0).toString().toStdString();
+    }
 
     std::vector<std::string> OldBoardState;
     OldBoardState.clear();
@@ -48,7 +56,7 @@ void AddBoard(std::string BoardStateInputtet){
 
         for (int i = 0; i <= OldBoardState.size(); i++) {
             if (BoardStateInputtet == OldBoardState[i]) {
-                AddMove(BoardStateInputtet);
+                AddMove(TempBoardID);
                 return;
 
             }
@@ -67,15 +75,25 @@ void AddBoard(std::string BoardStateInputtet){
 
 }
 
-void AddMove(std::string BoardStateInputtet){
+void AddMove(int TempBoardID){
+
+
 
     //Declare variables
     int BoardID = 0;
+    std::string BoardStateInputtet;
 
 
     QSqlDatabase db = QSqlDatabase::database("QMYSQL");
 
     QSqlQuery query = QSqlQuery(db);
+
+    //BoardStateInputtet sæt den her lig noget
+
+    query.exec("Select BoardState FROM Temp WHERE tempBoard_id = " + QString::number(TempBoardID));
+    while (query.next()) {
+        BoardStateInputtet = query.value(0).toString().toStdString();
+    }
 
     query.exec("SELECT board_id FROM UniqueBoard WHERE BoardState = '" + QString::fromStdString(BoardStateInputtet) + "'");
     while (query.next()) {
@@ -84,9 +102,12 @@ void AddMove(std::string BoardStateInputtet){
 
     std::cout << "BoardID: " << BoardID << std::endl;
 
-    std::string str2;
-    std::cout << "What is the move u want to save";
-    std::cin >> str2;
+    std::string MoveToCheck;
+
+    query.exec("Select Move FROM Temp WHERE tempBoard_id = " + QString::number(TempBoardID));
+    while (query.next()) {
+        MoveToCheck = query.value(0).toString().toStdString();
+    }
 
     std::vector<std::string> OldMoves;
     OldMoves.clear();
@@ -102,14 +123,14 @@ void AddMove(std::string BoardStateInputtet){
         query.prepare("INSERT INTO Moves ( board_id, Move) "
                       "VALUES (:board_id, :Move)");
         query.bindValue(":board_id", BoardID);
-        query.bindValue(":Move", str2.c_str());
+        query.bindValue(":Move", MoveToCheck.c_str());
         query.exec();
     }
 
     else{
 
         for (int i = 0; i <= OldMoves.size(); i++) {
-            if (str2 == OldMoves[i]) {
+            if (MoveToCheck == OldMoves[i]) {
                 std::cout << "Move is already stored" << std::endl << std::endl;
                 return;
 
@@ -120,7 +141,7 @@ void AddMove(std::string BoardStateInputtet){
                 query.prepare("INSERT INTO Moves ( board_id, Move) "
                               "VALUES (:board_id, :Move)");
                 query.bindValue(":board_id", BoardID);
-                query.bindValue(":Move", str2.c_str());
+                query.bindValue(":Move", MoveToCheck.c_str());
                 query.exec();
             }
         }
