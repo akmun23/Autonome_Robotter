@@ -50,7 +50,7 @@ int main()
 
     printBoardStates();
 
-    //query.exec("DELETE FROM UniqueBoard WHERE board_id >= 4");
+    query.exec("DELETE FROM Temp WHERE tempBoard_id >= 0");
 
 
 
