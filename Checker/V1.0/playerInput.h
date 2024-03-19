@@ -3,7 +3,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "validMoves.h"
+
+bool playerMover(std::string playerStart, std::string playerMove, int playerTurn, std::vector<std::vector<std::string>> boards);
 
 //Function to get the player's input
 bool playerInput(std::string& playerStart, std::string& playerMove, std::vector<std::string>& playerJump, int playerTurn, std::vector<std::vector<std::string>>& boards) {

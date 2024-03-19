@@ -1,6 +1,8 @@
 #ifndef VALIDMOVES_H
 #define VALIDMOVES_H
 
+#include "boardUpdate.h"
+#include "playerInput.h"
 #include <climits>
 #include <iostream>
 #include <unistd.h>
@@ -455,6 +457,55 @@ bool boardChange(int playerTurn, std::vector<std::vector<std::string>>& boards, 
      return false;
 }
 
+std::vector<std::string> move(int playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces){
+    bool valid = false;
+    bool jumped = false; //If a piece has jumped
+    bool promotion = false; //If a piece has been promoted
+
+    //Get the player"s move
+    std::string playerStart;
+    std::string playerMove;
+
+    std::vector<std::string> jump = {}; //Possible jump moves
+    std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
+
+    while(!valid){
+        do{
+            jump = jumpPossible(playerTurn, boards);
+            valid = playerInput(playerStart, playerMove, jump, playerTurn, boards);
+            moveSet.push_back(playerStart);
+            moveSet.push_back(playerMove);
+            jumped = pieceJump(playerStart, playerMove, playerTurn, boards);
+            promotion = boardChange(playerTurn, boards, playerStart, playerMove, redPieces, blackPieces);
+            if(moreMoveCheck(jumpPossible(playerTurn, boards), playerMove) && jumped && !promotion){
+                checkerBoard(boards);
+            }
+        } while(moreMoveCheck(jumpPossible(playerTurn, boards), playerMove) && jumped && !promotion);
+    }
+
+    return moveSet;
+}
+
+// Counts the number of pieces on the board
+int pieceCount(std::vector<std::vector<std::string>> boards, int& blackPieces, int& redPieces){
+    int count = 0;
+    int count2 = 0;
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if(boards[i][j] == "R " || boards[i][j] == "RK"){
+                count2++;
+            } else if(boards[i][j] == "B " || boards[i][j] == "BK"){
+                count++;
+            }
+        }
+    }
+
+    redPieces = count2;
+    blackPieces = count;
+
+    return count;
+}
+
 //Gives the board a game score based on the number of pieces and the number of possible moves
 //Used in the alphaBeta function
 int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn){
@@ -462,7 +513,10 @@ int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn)
     int black = 0;
     int red = 0;
     int diff = 0;
-    int random;
+    std::random_device rd;  // Obtain a random number from hardware
+    std::mt19937 eng(rd()); // Seed the generator
+    std::uniform_int_distribution<> distr(0, 10); // Define the range for the random number
+    int random = distr(eng); // Generate a random number
     //Gives score depending on the number of pieces on the board
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
@@ -516,9 +570,6 @@ int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn)
         }
         score *= 1000;
 
-        std::random_device rd;  // Obtain a random number from hardware
-        std::mt19937 eng(rd()); // Seed the generator
-        std::uniform_int_distribution<> distr(0, 10); // Define the range for the random number
         random = distr(eng); // Generate a random number
 
         score += rand()%10;
@@ -545,11 +596,6 @@ int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn)
             score -= 1000;
         }
         score *= 1000;
-
-        std::random_device rd;  // Obtain a random number from hardware
-        std::mt19937 eng(rd()); // Seed the generator
-        std::uniform_int_distribution<> distr(0, 10); // Define the range for the random number
-        random = distr(eng); // Generate a random number
 
         score -= random;
     }

@@ -4,6 +4,29 @@
 #include <iostream>
 #include <vector>
 
+void checkerBoard(std::vector<std::vector<std::string>> boards);
+
+std::vector<std::vector<std::string>> startUp(){
+    std::vector<std::vector<std::string>> boards = {
+        {"  ", "B ", "  ", "B ", "  ", "B ", "  ", "B "},
+        {"B ", "  ", "B ", "  ", "B ", "  ", "B ", "  "},
+        {"  ", "B ", "  ", "B ", "  ", "B ", "  ", "B "},
+        {"1 ", "  ", "1 ", "  ", "1 ", "  ", "1 ", "  "},
+        {"  ", "1 ", "  ", "1 ", "  ", "1 ", "  ", "1 "},
+        {"R ", "  ", "R ", "  ", "R ", "  ", "R ", "  "},
+        {"  ", "R ", "  ", "R ", "  ", "R ", "  ", "R "},
+        {"R ", "  ", "R ", "  ", "R ", "  ", "R ", "  "}
+    };
+
+    //Print the initial board
+    std::cout << "Welcome to Checkers!" << std::endl;
+    std::cout << "Here is the board:" << std::endl;
+    checkerBoard(boards);
+    std::cout << std::endl;
+    return boards;
+}
+
+
 //Prints the board with input given by the vector boards
 void checkerBoard(std::vector<std::vector<std::string>> boards){
     std::cout << " " << " "  << "1"  << "  "        << "2" << "  "         << "3"  << "  "        << "4"  << "  "        << "5"  << "  "        << "6"  << "  "        << "7"  << "  "        << "8"          << std::endl;
