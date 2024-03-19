@@ -10,12 +10,6 @@
 #include <termios.h> // Contains POSIX terminal control definitions
 #include <unistd.h> // write(), read(), close()
 
-
-
-
-
-
-
 bool atmegaCom(char InputNumber){
 
     int serial_port = open("/dev/ttyUSB0", O_RDWR);                     // Her åbner vi serie port forbindelsen

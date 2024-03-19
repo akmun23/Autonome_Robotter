@@ -48,7 +48,9 @@ std::vector<std::string> jumpPossible(int playerTurn, std::vector<std::vector<st
     for(int i = 0; i < 8; i++){
         column = 'a' + i;
         for(int j = 0; j < 8; j++){
-
+            if(boards[i][j] == "1 " || boards[i][j] == "  "){
+                continue;
+            }
     //Normal pieces can only jump forward. For black this means increasing the row number, for red it means decreasing the row number
     //Kings can jump in all directions
             if((i == 0) || (i == 1)){ //checks if the player's piece is close to the edge of the board
@@ -190,6 +192,10 @@ std::vector<std::string> movePossible(int playerTurn, std::vector<std::vector<st
     //If no jump is possible, it goes into this if-statement
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
+
+            if(boards[i][j] == "1 " || boards[i][j] == "  "){
+                continue;
+            }
 
             if(playerTurn == 1 && ((boards[i][j] == "B ") || (boards[i][j] == "BK"))){ //If it is player 1's turn, it checks if the player's piece is able to move
                 if(i < 7){

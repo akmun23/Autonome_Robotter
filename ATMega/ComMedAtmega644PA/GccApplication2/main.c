@@ -24,13 +24,16 @@ void PWM25();*/
 
 
 //Sætter variabler
-double dutyCycle = 0;
+double dutyCycle = 1023;
 char stopcommand[1];
 int main(void)
 {
 
 	UBRR1L = 119;							// UBBR = Freq / (16 * (BaudRate)) – 1
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);	// Tænder for reading og writing
+    InitPWMandADC();
+	DDRD = 0b00000000;
+	PORTD = 0b00000000;
 
 	while (1) {
 		
@@ -81,16 +84,15 @@ int main(void)
 		}
 		if (ReceivedMessage[0] == '5')
 		{
-			//PWM50();
 			swrite(ReceivedMessage[0]);
 		}
 		if (ReceivedMessage[0] == '6')
 		{
-			//PWM25();
-			swrite(ReceivedMessage[0]);
+			PWMStart();
 		}
 		if (ReceivedMessage[0] == '7')
 		{
+			swrite(2 + '0');
 			//PWM(50,100)
 			swrite(ReceivedMessage[0]);
 		}
@@ -206,21 +208,34 @@ void InitPWMandADC(){
 }
 
 void PWMStart(){
-	dutyCycle = 65535;				// Full speed 16 bit
-	_delay_ms(100);
-	while (ADCH < 125) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
+	DDRD = 0b00010000;
+	PORTD = 0b00010000;
+	dutyCycle = 1023;				// Full speed 16 bit
+	_delay_ms(100);	
+	while (!(ADCH < 114)) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
+		
+		//swrite(ADCH); //Outputter spændingen den måler på porten
 	}
-	dutyCycle = 65535/2;			// half speed
+	//swrite(ADCH);
+	//dutyCycle = dutyCycle/2;			// half speed
+	dutyCycle = 0;
+	swrite('7');
+	stopcommand[0] = sread(); // Venter på at den får sendt signal af robot der siger den er hvor der skal slippes
 	
-	while (stopcommand[0] != 8){
-		stopcommand[0] = sread();	// Venter på at den får sendt signal af robot der siger den er hvor der skal slippes
-	}
+	dutyCycle = 1023;
 	PORTC = 0b00001000;				// Vender retningen på strømmen til motoren så den kører baglæns
 	DDRC = 0b00001000;
-	_delay_ms(300);					// Find værdi her der passer med at den er åben
-	dutyCycle = 0;					// half speed
+	_delay_ms(100);					// Find værdi her der passer med at den er åben
+	while (!(ADCH > 140)) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
+		
+		//swrite(ADCH); //Outputter spændingen den måler på porten
+	}				// half speed
+	DDRD = 0b00000000;
+	PORTD = 0b00000000;
 	PORTC = 0b00000000;				// Vender retningen til den anden vej igen og slukker motoren
 	DDRC = 0b00000000;
+	swrite('7');
+
 	
 }
 

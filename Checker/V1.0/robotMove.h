@@ -5,11 +5,11 @@
 #include <string>
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
-#include "AtmegaCom.h"
+//#include "AtmegaCom.h"
 using namespace ur_rtde;
 
-RTDEControlInterface rtde_control("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
-RTDEReceiveInterface rtde_receive("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
+RTDEControlInterface rtde_control("192.168.50.164", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
+RTDEReceiveInterface rtde_receive("192.168.50.164", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
 
 //Function to set up robot and make a plane parallel with table
 std::vector<std::vector<double>> robotStart() {
@@ -26,14 +26,12 @@ std::vector<std::vector<double>> robotStart() {
 
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
 
-
     while(rtde_receive.getActualTCPForce()[2] < 30){
         std::cout << rtde_receive.getActualTCPForce()[2] << std::endl;
     }
         std::cout << rtde_receive.getActualTCPForce()[2] << std::endl;
     double table = rtde_receive.getActualTCPPose()[2]+0.0005;
     rtde_control.speedStop();
-
 
     /*
     rtde_control.teachMode();
@@ -52,7 +50,6 @@ std::vector<std::vector<double>> robotStart() {
     std::vector<double> boardPlane1 = {-0.0842739, -0.305759, table};
     std::vector<double> boardPlane2 =  {0.123559, -0.814958, table};
     std::vector<double> boardPlane3 =  {0.378329, -0.113615, table};
-
 
     vec1.push_back(boardPlane2[0] - boardPlane1[0]);
     vec1.push_back(boardPlane2[1] - boardPlane1[1]);
@@ -102,7 +99,7 @@ void checkerJump(std::vector<std::string> moveSet, std::vector<std::vector<doubl
 
     rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord, ycord, zcord, target[3], target[4], target[5]}, 0.2, 0.05);
-    atmegaCom('6');
+    //atmegaCom('6');
     rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
 
     int gravex = 3 + playerTurn;
@@ -112,6 +109,7 @@ void checkerJump(std::vector<std::string> moveSet, std::vector<std::vector<doubl
     double ycord2 = rotMatrix[1]*gravex*factor + rotMatrix[4]*gravey*factor + rotMatrix[7]*0*factor + boardPlane[1];
 
     rtde_control.moveL({xcord2+0.005, ycord2+0.005, target[2], target[3], target[4], target[5]}, 1, 0.2);
+
 
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){
@@ -123,7 +121,7 @@ void checkerJump(std::vector<std::string> moveSet, std::vector<std::vector<doubl
     rtde_control.moveL({xcord2+0.005, ycord2+0.005, gravez+0.005, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord2, ycord2, gravez+0.005, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord2, ycord2, gravez, target[3], target[4], target[5]}, 0.2, 0.05);
-    atmegaCom('8');
+    //atmegaCom('8');
     rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 1, 0.2);
 }
 
@@ -159,13 +157,13 @@ void promotePiece(std::vector<std::string> moveSet, std::vector<std::vector<doub
     rtde_control.moveL({xcord2+0.005, ycord2+0.005, gravez+0.005, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord2, ycord2, gravez+0.01, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord2, ycord2, gravez-0.005, target[3], target[4], target[5]}, 0.2, 0.05);
-    atmegaCom('6');
-    rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 1, 0.2);
+    //atmegaCom('6');
+    rtde_control.moveL({xcord2, ycord2, zcord + 0.1, target[3], target[4], target[5]}, 1, 0.2);
 
-    rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({xcord, ycord, zcord + 0.1, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord, ycord, zcord+0.005, target[3], target[4], target[5]}, 0.2, 0.05);
-    atmegaCom('8');
-    rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
+    //atmegaCom('8');
+    rtde_control.moveL({xcord, ycord, zcord + 0.1, target[3], target[4], target[5]}, 1, 0.2);
 
 
 }
@@ -203,14 +201,14 @@ void robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>
 
         std::vector<double> target = rtde_receive.getActualTCPPose();
 
-        rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
+        rtde_control.moveL({xcord, ycord, zcord + 0.1, target[3], target[4], target[5]}, 1, 0.2);
         rtde_control.moveL({xcord, ycord, zcord, target[3], target[4], target[5]}, 0.2, 0.05);
-        atmegaCom('6');
-        rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
-        rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 1, 0.2);
+        //atmegaCom('6');
+        rtde_control.moveL({xcord, ycord, zcord + 0.1, target[3], target[4], target[5]}, 1, 0.2);
+        rtde_control.moveL({xcord2, ycord2, zcord + 0.1, target[3], target[4], target[5]}, 1, 0.2);
         rtde_control.moveL({xcord2, ycord2, zcord2, target[3], target[4], target[5]}, 0.2, 0.05);
-        atmegaCom('8');
-        rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 1, 0.2);
+        //atmegaCom('8');
+        rtde_control.moveL({xcord2, ycord2, zcord + 0.1, target[3], target[4], target[5]}, 1, 0.2);
 
         // Remove the jumped piece
         if(moveSet[i][0] - moveSet[i+1][0] == 2 || moveSet[i][0] - moveSet[i+1][0] == -2){

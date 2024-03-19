@@ -17,10 +17,11 @@ int main() {
     int blackPieces = 12; //Initial number of black pieces
     int redPieces = 12; //Initial number of red pieces
     bool gameEnd = false; //If the game has ended
-    int thisTurn = playerTurn; //Which player's turn it is
+    int thisTurn; //Which player's turn it is
+    std::vector<std::vector<std::string>> thisBoard = {}; //The current state of the board
 
 
-//    atmegaCom('8'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
+//   atmegaCom('8'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
 
     std::string player = "AI"; //If the player is human or AI
     std::string player2 = "AI"; //If the player is human or AI
@@ -31,7 +32,7 @@ int main() {
     std::vector<std::vector<std::string>> boards = startUp();
 
     // Set up the robot
-//    std::vector<std::vector<double>> startUpRobot = robotStart();
+//   std::vector<std::vector<double>> startUpRobot = robotStart();
 
     while(true){ //Game loop
 
@@ -59,8 +60,18 @@ int main() {
                 std::cout << "Player " << thisTurn << " moves to: " << moveSet[i+1] << std::endl;
             }
 
+            std::string output;
+
+            for (int i = 0; i < 8; ++i) {
+                for (int j = 0; j < 8; ++j) {
+                    output += boards[i][j];
+                }
+            }
+
+            std::cout << output << std::endl;
+
             // Moves the robot
-//            robotMove(moveSet, startUpRobot, boards);
+            //robotMove(moveSet, startUpRobot, tempBoard);
 
             //Prints data from the state of the game and prints the board
             std::cout << "There are " << redPieces << " red pieces left." << std::endl;

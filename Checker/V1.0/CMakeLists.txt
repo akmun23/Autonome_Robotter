@@ -14,9 +14,3 @@ add_executable(main main.cpp
     AtmegaCom.h)
 
 target_link_libraries(main PRIVATE ur_rtde::rtde)
-
-include(GNUInstallDirs)
-install(TARGETS main
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
