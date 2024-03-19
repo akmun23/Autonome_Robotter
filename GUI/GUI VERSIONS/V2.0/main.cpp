@@ -21,14 +21,30 @@ vector<Rect> rectangles; //Vec consisting of instances of "Rect", as segments of
 vector<int> selected; //Vec consisting of INT, that refer to information of selected Rect.
 vector<string> stringPos; //Vec consisting of selected positions.
 Mat graveyardDownSized;
-Rect graveyardRect(600, 75, 55, 55); //Instance of Rect, used as a graveyard Rect.
-int turnArr[1] = {0}; //Array containing INT representing how many turns have been taken.
+Rect graveyardRect(600, 75, 50, 50); //Instance of Rect, used as a graveyard Rect.
+int turnVal = 0; //Array containing INT representing how many turns have been taken.
 bool startUpMain = true; //Bool, true if code is being run for the first time.
 int redCheckers = 12; //Start amount of red checker pieces.
 int blackCheckers = 12; //Start amount of black checker pieces.
+bool jumpPerformed;
+bool startJump;
+int currentChecker;
+string pos;
 
 Mat3b canvas(500, 1000, Vec3b(255, 255, 255)); //Creates drawing surface, canvas.
 string winName = "Project GUI"; //Sets name of window being used.
+
+void clearVecInt(vector<int>& vector){
+    for(int i = 0; i < vector.size(); i++){
+        vector[i] = 0;
+    }
+
+    vector.resize(0);
+}
+
+void clearVecString(vector<string>& vector){
+    vector.resize(0);
+}
 
 //Updates text displayed, depending player turn.
 void updateText(){
@@ -36,12 +52,8 @@ void updateText(){
     string robot = "Det er robottens tur.";
     string playerTurnString;
 
-    if(turnArr[1]%2 == 0){
-        playerTurnString = spiller;
-    }
-    else{
-        playerTurnString = robot;
-    }
+    ((turnVal%2 == 0) ? playerTurnString = spiller : playerTurnString = robot);
+
     rectangle(canvas, Point(115,0), Point(500,35), Scalar(255,255,255), -1); //Creates a white rectangle, that covers the old text.
     putText(canvas, playerTurnString, Point(115, 25), FONT_HERSHEY_COMPLEX, 1, Scalar(0,0,0), 1); //Prints new text.
 }
@@ -158,7 +170,6 @@ void Draw(bool& startUpMain){
             }
             else{
                 if(lineNum%2){
-                    //angiver felts mørkebrune farve
                     canvas(rectangles[i]) = Vec3b(33,67,101);
                 }
                 else{
@@ -185,6 +196,16 @@ void Draw(bool& startUpMain){
                 break;
             }
         }
+    }
+    for(int j = 0; j < 12; j++){
+        if(rCheckers[j].contains(Point(graveyardRect.x, graveyardRect.y))){
+                circle(canvas, {graveyardRect.x + 25, graveyardRect.y + 25}, 20, Vec3b(14,17,175), -1);
+                break;
+        }
+        if(bCheckers[j].contains(Point(graveyardRect.x, graveyardRect.y))){
+                circle(canvas, {graveyardRect.x + 25, graveyardRect.y + 25}, 20, Vec3b(0,0,0), -1);
+                break;
+            }
     }
 }
 
@@ -229,63 +250,6 @@ bool playerMover(std::string playerStart, std::string playerMove, int playerTurn
     }
 
     //Returns true if none of the if-statements returned false
-    return true;
-}
-
-//Function to get the player's input
-bool playerInput(std::string& playerStart, std::string& playerMove, std::vector<std::string>& playerJump, int playerTurn, std::vector<std::vector<std::string>>& boards) {
-    bool valid = false; //If the move is valid
-    bool check = false; //If the move is a jump
-    bool jumpPossible = false; //If a jump is possible
-
-    if(playerJump.size() > 0){
-        jumpPossible = true;
-    }
-
-    std::string lowerCase; //Variable used to convert the player's input to lowercase
-    std::string lowerCase2; //Variable used to convert the player's input to lowercase
-
-    //Loop to get the player's input until a valid one is given
-    while(!valid){
-
-        //Checks if the input has the correct number of characters
-        if(playerStart.length() != 2 || playerMove.length() != 2) {
-            std::cout << "Invalid move. Please enter a move in the format A3." << std::endl;
-            valid = false;
-        } else {
-            //Checks if the input is a jump while a jump is possible
-            if(jumpPossible && valid){
-                for (int i = 0; i < playerJump.size(); i+=2) {
-                    //Makes it possible to write in both upper and lowerCase
-                    lowerCase = playerJump[i];
-                    lowerCase[0] = tolower(lowerCase[0]);
-                    lowerCase2 = playerJump[i+1];
-                    lowerCase2[0] = tolower(lowerCase2[0]);
-
-                    //Checks if the input is a jump
-                    if(!check){
-                        if((playerStart == playerJump[i] || playerStart == lowerCase) && (playerMove == playerJump[i+1] || playerMove == lowerCase2)){
-                            check = true;
-                            valid = true;
-                        } else {
-                            valid = false;
-                        }
-                    }
-                }
-                if(!valid){
-                    std::cout << "Invalid move. You must jump." << std::endl;
-                } else {
-                    // If the input was a jump, it goes on to check if the move is valid
-                    valid = playerMover(playerStart, playerMove, playerTurn, boards);
-                }
-            } else {
-                //If there were no jumps possible, it checks if the move is valid
-                valid = playerMover(playerStart, playerMove, playerTurn, boards);
-            }
-
-        }
-    }
-    //Returns true if the move is valid, which it must be to break out of the while-loop
     return true;
 }
 
@@ -344,28 +308,83 @@ bool boardChange(int playerTurn, std::vector<std::vector<std::string>>& boards, 
 
 //Checks if a "Rect" contains elements of given vector.
 bool doesRectContainChecker(int x, int y, vector<Circle> enemyCheckerVec){
-        for(int i = 0; i < 12; i++){
-            if(enemyCheckerVec[i].contains(Point(x, y))){
-                return true;
+            for(int i = 0; i < 12; i++){
+                if(enemyCheckerVec[i].contains(Point(x, y))){
+                    return true;
+                }
             }
-        }
+
     return 0;
+}
+
+bool doesPosContainRect(int x, int y){
+    for(int i = 0; i < 64; i++){
+        if(rectangles[i].contains(Point(x, y))){
+            cout << "Rect: " << i << " , indeholder punktet: " << x << "," << y << endl;
+            return true;
+        }
+    }
+
+    return false;
 }
 
 //Checks if a jump is possible for an element of given vector at a given position.
 bool isJumpPossible(int x, int y, vector<Circle> enemyCheckerVec){
 
-    if((doesRectContainChecker(x + 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, enemyCheckerVec)) || (doesRectContainChecker(x - 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x - 100, y - 100, enemyCheckerVec))){
-        return true;
-    }
-    else if((doesRectContainChecker(x + 50, y + 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y + 100, enemyCheckerVec)) || (doesRectContainChecker(x - 50, y + 50, enemyCheckerVec) && !doesRectContainChecker(x - 100, y + 100, enemyCheckerVec))){
-        return true;
+    if(enemyCheckerVec == bCheckers){
+        if((doesRectContainChecker(x + 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, enemyCheckerVec))){
+            cout << "Jump is possible, checking for checker." << endl;
+            if(doesPosContainRect(x + 100, y - 100)){
+                cout << "Jump is possible, x+100, y-100" << endl;
+                return true;
+            }
+        }
+        else if((doesRectContainChecker(x - 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x - 100, y - 100, enemyCheckerVec))){
+            cout << "Jump is possible, checking for checker." << endl;
+            if(doesPosContainRect(x - 100, y - 100)){
+                cout << "Jump is possible, x-100, y-100" << endl;
+                return true;
+            }
+        }
     }
     else{
-        return false;
+        if((doesRectContainChecker(x + 50, y + 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y + 100, enemyCheckerVec))){
+            cout << "Jump is possible, checking for checker." << endl;
+            if(doesPosContainRect(x + 100, y + 100)){
+                cout << "Jump is possible, x+100, y+100" << endl;
+                return true;
+            }
+        }
+        else if((doesRectContainChecker(x - 50, y + 50, enemyCheckerVec) && !doesRectContainChecker(x - 100, y + 100, enemyCheckerVec))){
+            cout << "Jump is possible, checking for checker." << endl;
+            if(doesPosContainRect(x - 100, y + 100)){
+                cout << "Jump is possible, x-100, y+100" << endl;
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool isGameWon(vector<Circle> enemyCheckerVec, int playerTurn){
+    for(int i = 0; i < 64; i++){
+        for(int j = 0; j < 12; j++){
+            if(rectangles[i].contains(Point(enemyCheckerVec[j].x, enemyCheckerVec[j].y)) && movePossible(((turnVal%2 == 0) ? 2 : 1), boards, jumpPossible(((turnVal%2 == 0) ? 2 : 1), boards), false, {}).size() > 0){
+                return false;
+            }
+        }
+        if(i == 64){
+            return true;
+        }
     }
 
     return 0;
+}
+
+void setJumpPerformed(bool& jumpPerformed, bool TrueFalse){
+    jumpPerformed = TrueFalse;
+    cout << "JumpPerformed was updated: " << jumpPerformed << endl;
 }
 
 //callBack function, that runs every time you click.
@@ -377,15 +396,21 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                 
                 //If click is at the same location as previously selected, then deselect.
                 if(rectangles[selected[2]].x == rectangles[i].x && rectangles[selected[2]].y == rectangles[i].y){
-                        Draw(startUpMain); //Draws new game state.    
-                        selected.clear(); //Clears vector selected.    
-                        stringPos.clear(); //Clears stringPos.
+                    Draw(startUpMain); //Draws new game state.    
+                    clearVecInt(selected); //Clears vector selected.
+                    clearVecString(stringPos); 
+                    /*stringPos.clear(); //Clears stringPos.
+                    selected.clear();*/
+                    cout << "Selected ved deselect: "<< selected[3] << endl;
                 }
                 else if(selected[0] == 1){ //If it is player 1's turn, run this code.
+
                     if(selected[3] == 1){ //If there is a single jump possible run this code.
+                        cout << "Hopper i selecetd == 1" << endl;
                         posToStringConvert(rectangles[selected[4]].x, rectangles[selected[4]].y, stringPos);
                     }
                     else if(selected[3] == 2){ //If there is multiple jumps possible, run this code.
+                        cout << "Hopper i selecetd == 2" << endl;
                         if(rectangles[i].x > rectangles[selected[2]].x){ //If "Rect" that was clicked is to the right of the earlier selected "Rect".
                             posToStringConvert(rectangles[selected[4]].x, rectangles[selected[4]].y, stringPos); //Gets string position for possible jump to the right.
                         }
@@ -395,18 +420,23 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                     }
                     else{ //If no jumps possible.
                         posToStringConvert(rectangles[i].x, rectangles[i].y, stringPos);
+                        cout << "stringPos blev opdateret med andet klik" << stringPos[1] << endl;
                     }
-                    
-                    //Checks if move is legal.
-                    if(playerMover(stringPos[0], stringPos[1], ((turnArr[1]%2 == 0) ? 2 : 1), boards)){
-                        //Changes gamestate in board.
-                        boardChange(((turnArr[1]%2 == 0) ? 2 : 1), boards, stringPos[0], stringPos[1], redCheckers, blackCheckers);
-                        //Prints new gamestate to console.
-                        checkerBoard(boards);
 
+                    cout << "stringPos[0]" << stringPos[0] << endl;
+                    cout << "stringPos[1]" << stringPos[1] << endl;
+                    cout << stringPos.size() << endl;
+                    //Checks if move is legal.
+                    if(playerMover(stringPos[0], stringPos[1], ((turnVal%2 == 0) ? 2 : 1), boards)){
+                        
                         //Changes the position of selected checker.
                         rCheckers[selected[1]].x = rectangles[i].x;
                         rCheckers[selected[1]].y = rectangles[i].y;
+                        
+                        //Changes gamestate in board.
+                        boardChange(((turnVal%2 == 0) ? 2 : 1), boards, stringPos[0], stringPos[1], redCheckers, blackCheckers);
+                        //Prints new gamestate to console.
+                        checkerBoard(boards);
 
                         //If a jump has been performed, find and remove the "killed" checker.
                         if(selected[3] == 1 || selected[3] == 2){
@@ -417,13 +447,86 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                                     break;
                                 }
                             }
+                            setJumpPerformed(jumpPerformed, true);
+                            cout << "was set True, JumpPerformed: " << jumpPerformed << endl;
                         }
 
-                        turnArr[1]++;
-                        updateText(); //Updates text.
-                        Draw(startUpMain); //Draws new gamestate.  
-                        selected.clear(); //Clears "selected" vector.    
-                        stringPos.clear(); //Clears "stringPos" vector.
+                        //isGameWon(bCheckers, ((turnArr[1]%2 == 0) ? 2 : 1));
+
+                        cout << "JumpPerformed: " << jumpPerformed << endl;
+
+                        cout << "Is game won: " << isGameWon(bCheckers, ((turnVal%2 == 0) ? 2 : 1)) << endl;
+
+                        if(isJumpPossible(rectangles[i].x, rectangles[i].y, bCheckers) && jumpPerformed){
+                            cout << "It is possible for red to jump multiple times" << endl;
+
+                            Draw(startUpMain);
+
+                            currentChecker = selected[1];
+
+                            clearVecInt(selected); //Clears vector selected.
+                            clearVecString(stringPos);
+
+                            /*selected.clear();
+                            stringPos.clear();*/
+
+                            selected.insert(selected.end(), {1, currentChecker, i});
+                            posToStringConvert(rectangles[i].x, rectangles[i].y, stringPos);
+
+                            canvas(rectangles[i]) = Vec3b(0,0,255); //Highlights the chosen checker.
+                            circle(canvas, {rectangles[i].x + 25, rectangles[i].y + 25}, 20, Vec3b(14,17,175), -1);
+
+                            if(isJumpPossible(rectangles[i].x, rectangles[i].y, bCheckers)){ //Checks if there is a jump possible for a checker at the given position, where the enemy is given also.
+                                cout << "Jump is possible." << endl;
+                                //Checks if there is a checker across from the selected checker - Both right and left.
+                                if((doesRectContainChecker(rectangles[i].x + 50, rectangles[i].y - 50, bCheckers) && !doesRectContainChecker(rectangles[i].x + 100, rectangles[i].y - 100, bCheckers)) && (doesRectContainChecker(rectangles[i].x - 50, rectangles[i].y - 50, bCheckers) && !doesRectContainChecker(rectangles[i].x - 100, rectangles[i].x - 100, bCheckers))){
+                                    
+                                    if(rectangles[i-14].contains(Point(rectangles[i].x + 100,rectangles[i].y - 100))){
+                                        canvas(rectangles[i-14]) = Vec3b(14,17,175); //Highlights the possible jump locations.
+                                    }
+                                    if(rectangles[i-18].contains(Point(rectangles[i].x - 100,rectangles[i].y - 100))){
+                                    canvas(rectangles[i-18]) = Vec3b(14,17,175);
+                                    }
+                                    
+                                    selected.push_back(2); //Represents multiple jumps possible.
+                                    selected.push_back(i-14); //Right rectangle ID.
+                                    selected.push_back(i-18); //Left rectangle ID.
+                                }
+                                //Checks if there is a checker across from the selected checker - Right.
+                                else if(doesRectContainChecker(rectangles[i].x + 50, rectangles[i].y - 50, bCheckers) && !doesRectContainChecker(rectangles[i].x + 100, rectangles[i].y - 100, bCheckers)){
+                                    if(rectangles[i-14].contains(Point(rectangles[i].x + 100,rectangles[i].y - 100))){
+                                        canvas(rectangles[i-14]) = Vec3b(14,17,175); //Highlights.
+                                    }
+                                    
+                                    selected.push_back(1); //Represents one jump possible.
+                                    selected.push_back(i-14); //Pushes ID for right rectangle.
+                                }
+                                //Checks if there is a checker across from the selected checker - Left.
+                                else{
+                                    if(rectangles[i-18].contains(Point(rectangles[i].x - 100,rectangles[i].y - 100))){
+                                    canvas(rectangles[i-18]) = Vec3b(14,17,175);
+                                    }
+                                    selected.push_back(1);
+                                    selected.push_back(i-18);
+                                }
+                            }
+                            else{
+                                cout << "jump not possible" << endl;
+                            }
+                        }
+                        else{
+                            cout << "JumpPerformed, after red move: " << jumpPerformed << endl;
+                            Draw(startUpMain); //Draws new gamestate.
+                            turnVal++;
+                            setJumpPerformed(jumpPerformed, false);
+                            updateText(); //Updates text.
+                            clearVecInt(selected); //Clears vector selected.
+                            clearVecString(stringPos);
+                            /*selected.clear(); //Clears "selected" vector.    
+                            stringPos.clear(); //Clears "stringPos" vector.*/
+                            cout << "Selected[3] værdi efter clear" << selected[3] << endl;
+                            cout << "------ RED" << endl;
+                        }
                     }
                     else{
                         stringPos.pop_back(); //If the move is invalid, remove invalid position.
@@ -431,32 +534,39 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                 }
                 else if(selected[0] == 0){ //If it is player 2's turn, run this code - To see code explaination see previous section, as they are basically identical.
                     
+                    cout << "JumpPerformed, black selected: " << jumpPerformed << endl;
+
                     if(selected[3] == 1){
                         posToStringConvert(rectangles[selected[4]].x, rectangles[selected[4]].y, stringPos);
+                        cout << "Hopper i selecetd == 1, sort" << endl;
                     }
                     else if(selected[3] == 2){
-                        cout << "Multiple possible jumps" << endl;
+                        cout << "Hopper i selecetd == 2, sort" << endl;
                         if(rectangles[i].x > rectangles[selected[2]].x){
                             posToStringConvert(rectangles[selected[4]].x, rectangles[selected[4]].y, stringPos);
-                            selected.push_back(1);
                         }
                         else{
                             posToStringConvert(rectangles[selected[5]].x, rectangles[selected[5]].y, stringPos);
-                            selected.push_back(2);
                         }
                     }
                     else{
+                        cout << "hopper i ingen hop muligt" << endl;
                         posToStringConvert(rectangles[i].x, rectangles[i].y, stringPos);
-                        cout << stringPos[stringPos.size()-1] << endl;
                     }
                     
-                    if(playerMover(stringPos[0], stringPos[1], ((turnArr[1]%2 == 0) ? 2 : 1), boards)){
+                    cout << "JumpPerformed, before move approval: " << jumpPerformed << endl;
+                    cout << stringPos[0] << endl;
+                    cout << stringPos[1] << endl;
+                    cout << stringPos.size() << endl;
+                    if(playerMover(stringPos[0], stringPos[1], ((turnVal%2 == 0) ? 2 : 1), boards)){
 
-                        boardChange(((turnArr[1]%2 == 0) ? 2 : 1), boards, stringPos[0], stringPos[1], redCheckers, blackCheckers);
-                        checkerBoard(boards);
+                        cout << "JumpPerformed, after move approval: " << jumpPerformed << endl;
 
                         bCheckers[selected[1]].x = rectangles[i].x;
                         bCheckers[selected[1]].y = rectangles[i].y;
+
+                        boardChange(((turnVal%2 == 0) ? 2 : 1), boards, stringPos[0], stringPos[1], redCheckers, blackCheckers);
+                        checkerBoard(boards);
 
                         if(selected[3] == 1 || selected[3] == 2){
                             for(int j = 0; j < 12; j++){
@@ -466,13 +576,69 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                                     break;
                                 }
                             }
+                            setJumpPerformed(jumpPerformed, true);
+                            cout << "was set True, JumpPerformed: " << jumpPerformed << endl;
                         }
 
-                        turnArr[1]++;
-                        updateText();
-                        Draw(startUpMain);
-                        selected.clear();    
-                        stringPos.clear();
+                        //isGameWon(rCheckers, ((turnArr[1]%2 == 0) ? 2 : 1));
+                        cout << "JumpPerformed: " << jumpPerformed << endl;
+                        
+                        //isJumpPossible skal tjækkes som turen starter.
+                        if(isJumpPossible(rectangles[i].x, rectangles[i].y, rCheckers) && jumpPerformed){
+                            Draw(startUpMain);
+                            cout << "It is possible for black to jump twice" << endl;
+
+                            currentChecker = selected[1];
+
+                            clearVecInt(selected); //Clears vector selected.
+                            clearVecString(stringPos); 
+
+                            selected.insert(selected.end(), {0, currentChecker, i});
+                            posToStringConvert(rectangles[i].x, rectangles[i].y, stringPos); //Problem her
+
+                            canvas(rectangles[i]) = Vec3b(0,0,255); //Highlights the chosen checker.
+                            circle(canvas, {rectangles[i].x + 25, rectangles[i].y + 25}, 20, Vec3b(0,0,0), -1); //Redraws the checker, as the highlighting (previous line of code) draws over it.
+
+                            if((doesRectContainChecker(rectangles[i].x + 50, rectangles[i].y + 50, rCheckers) && !doesRectContainChecker(rectangles[i].x + 100, rectangles[i].y + 100, rCheckers)) && (doesRectContainChecker(rectangles[i].x - 50, rectangles[i].x + 50, rCheckers) && !doesRectContainChecker(rectangles[i].x - 100, rectangles[i].y + 100, rCheckers))){
+                                if(rectangles[i+14].contains(Point(rectangles[i].x - 100,rectangles[i].y + 100))){
+                                    canvas(rectangles[i+14]) = Vec3b(14,17,175);
+                                }
+                                if(rectangles[i+18].contains(Point(rectangles[i].x + 100,rectangles[i].y + 100))){
+                                canvas(rectangles[i+18]) = Vec3b(14,17,175);
+                                }
+                                selected.push_back(2);
+                                selected.push_back(i+18); //Right
+                                selected.push_back(i+14); //Left
+                            }
+                            else if(doesRectContainChecker(rectangles[i].x + 50, rectangles[i].y + 50, rCheckers) && !doesRectContainChecker(rectangles[i].x + 100, rectangles[i].y + 100, rCheckers)){
+                                if(rectangles[i+18].contains(Point(rectangles[i].x + 100,rectangles[i].y + 100))){
+                                canvas(rectangles[i+18]) = Vec3b(14,17,175);
+                                }
+                                selected.push_back(1);
+                                selected.push_back(i+18);
+                            }
+                            else{
+                                if(rectangles[i+14].contains(Point(rectangles[i].x - 100,rectangles[i].y + 100))){
+                                    canvas(rectangles[i+14]) = Vec3b(14,17,175);
+                                }
+                                selected.push_back(1);
+                                selected.push_back(i+14);
+                            }
+                        }
+                        else{
+                            Draw(startUpMain); //Draws new gamestate.
+                            turnVal++;
+                            updateText(); //Updates text. 
+                            /*selected.clear(); //Clears "selected" vector.
+                            stringPos.clear(); //Clears "stringPos" vector.*/
+                            clearVecInt(selected); //Clears vector selected.
+                            clearVecString(stringPos);
+                            cout << "Selected[3] værdi efter clear" << selected[3] << endl;  
+                            setJumpPerformed(jumpPerformed, false);
+                            cout << stringPos[0] << stringPos[1] << endl;
+                            cout << "StringPos er cleared" << endl;
+                            cout << "------ BLACK" << endl;
+                        }
                     }
                     else{
                         stringPos.pop_back();
@@ -484,8 +650,9 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
     else if(event == EVENT_LBUTTONDOWN){ //If left mouse button is clicked and no checker was previously selected, run this code.
         for(int i = 0; i < 64; i++){
             if(rectangles[i].contains(Point(userX,userY))){ //Checks if click is inside game board.
+                cout << "Rect: " << rectangles[i] << endl;
                     for(int j = 0; j < 12; j++){
-                        if(rCheckers[j].contains(Point(userX, userY)) && turnArr[1]%2 == 0){ //Checks if there is a checker on the Rect, corresponding to the which players turn it is.
+                        if(rCheckers[j].contains(Point(userX, userY)) && turnVal%2 == 0){ //Checks if there is a checker on the Rect, corresponding to the which players turn it is.
                             canvas(rectangles[i]) = Vec3b(0,0,255); //Highlights the chosen checker.
                             circle(canvas, {rectangles[i].x + 25, rectangles[i].y + 25}, 20, Vec3b(14,17,175), -1); //Redraws the checker, as the highlighting (previous line of code) draws over it.
 
@@ -494,60 +661,85 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                             selected.push_back(1); //Represents color of checker.
                             selected.push_back(j); //Vector ID of checker in rCheckers[].
                             selected.push_back(i); //Vector ID of rect in rectangles[].
-
+                            
                                 if(isJumpPossible(rCheckers[j].x, rCheckers[j].y, bCheckers)){ //Checks if there is a jump possible for a checker at the given position, where the enemy is given also.
+                                    cout << "Jump is possible." << endl;
                                     //Checks if there is a checker across from the selected checker - Both right and left.
                                     if((doesRectContainChecker(rCheckers[j].x + 50, rCheckers[j].y - 50, bCheckers) && !doesRectContainChecker(rCheckers[j].x + 100, rCheckers[j].y - 100, bCheckers)) && (doesRectContainChecker(rCheckers[j].x - 50, rCheckers[j].y - 50, bCheckers) && !doesRectContainChecker(rCheckers[j].x - 100, rCheckers[j].y - 100, bCheckers))){
-                                        canvas(rectangles[i-14]) = Vec3b(14,17,175); //Highlights the possible jump locations.
+                                        
+                                        if(rectangles[i-14].contains(Point(rectangles[i].x + 100,rectangles[i].y - 100))){
+                                            canvas(rectangles[i-14]) = Vec3b(14,17,175); //Highlights the possible jump locations.
+                                        }
+                                        if(rectangles[i-18].contains(Point(rectangles[i].x - 100,rectangles[i].y - 100))){
                                         canvas(rectangles[i-18]) = Vec3b(14,17,175);
+                                        }
+                                        
                                         selected.push_back(2); //Represents multiple jumps possible.
                                         selected.push_back(i-14); //Right rectangle ID.
                                         selected.push_back(i-18); //Left rectangle ID.
                                     }
                                     //Checks if there is a checker across from the selected checker - Right.
                                     else if(doesRectContainChecker(rCheckers[j].x + 50, rCheckers[j].y - 50, bCheckers) && !doesRectContainChecker(rCheckers[j].x + 100, rCheckers[j].y - 100, bCheckers)){
-                                        canvas(rectangles[i-14]) = Vec3b(14,17,175); //Highlights.
+                                        if(rectangles[i-14].contains(Point(rectangles[i].x + 100,rectangles[i].y - 100))){
+                                            canvas(rectangles[i-14]) = Vec3b(14,17,175); //Highlights.
+                                        }
+                                        
                                         selected.push_back(1); //Represents one jump possible.
                                         selected.push_back(i-14); //Pushes ID for right rectangle.
                                     }
                                     //Checks if there is a checker across from the selected checker - Left.
                                     else{
+                                        if(rectangles[i-18].contains(Point(rectangles[i].x - 100,rectangles[i].y - 100))){
                                         canvas(rectangles[i-18]) = Vec3b(14,17,175);
+                                        }
                                         selected.push_back(1);
                                         selected.push_back(i-18);
-                                        cout << "Pushede coordinater til i-18" << endl;
                                     }
                                 }
+                                else{
+                                    cout << "jump not possible" << endl;
+                                }
                         }
-                        else if(bCheckers[j].contains(Point(userX, userY)) && turnArr[1]%2 == 1){ //Same as for the previous section.
+                        else if(bCheckers[j].contains(Point(userX, userY)) && turnVal%2 == 1){ //Same as for the previous section.
                             canvas(rectangles[i]) = Vec3b(0,0,255);
                             circle(canvas, {rectangles[i].x + 25, rectangles[i].y + 25}, 20, Vec3b(0,0,0), -1);
 
                             posToStringConvert(rectangles[i].x, rectangles[i].y, stringPos);
-                            cout << stringPos[stringPos.size()-1] << endl;
 
                             selected.push_back(0);
                             selected.push_back(j);
                             selected.push_back(i);
-
+                            
                             if(isJumpPossible(bCheckers[j].x, bCheckers[j].y, rCheckers)){
+                                cout << "Jump is possible" << endl;
                                 if((doesRectContainChecker(bCheckers[j].x + 50, bCheckers[j].y + 50, rCheckers) && !doesRectContainChecker(bCheckers[j].x + 100, bCheckers[j].y + 100, rCheckers)) && (doesRectContainChecker(bCheckers[j].x - 50, bCheckers[j].y + 50, rCheckers) && !doesRectContainChecker(bCheckers[j].x - 100, bCheckers[j].y + 100, rCheckers))){
-                                    canvas(rectangles[i+14]) = Vec3b(14,17,175);
+                                    if(rectangles[i+14].contains(Point(rectangles[i].x - 100,rectangles[i].y + 100))){
+                                        canvas(rectangles[i+14]) = Vec3b(14,17,175);
+                                    }
+                                    if(rectangles[i+18].contains(Point(rectangles[i].x + 100,rectangles[i].y + 100))){
                                     canvas(rectangles[i+18]) = Vec3b(14,17,175);
+                                    }
                                     selected.push_back(2);
                                     selected.push_back(i+18); //Right
                                     selected.push_back(i+14); //Left
                                 }
                                 else if(doesRectContainChecker(bCheckers[j].x + 50, bCheckers[j].y + 50, rCheckers) && !doesRectContainChecker(bCheckers[j].x + 100, bCheckers[j].y + 100, rCheckers)){
+                                    if(rectangles[i+18].contains(Point(rectangles[i].x + 100,rectangles[i].y + 100))){
                                     canvas(rectangles[i+18]) = Vec3b(14,17,175);
+                                    }
                                     selected.push_back(1);
                                     selected.push_back(i+18);
                                 }
                                 else{
-                                    canvas(rectangles[i+14]) = Vec3b(14,17,175);
+                                    if(rectangles[i+14].contains(Point(rectangles[i].x - 100,rectangles[i].y + 100))){
+                                        canvas(rectangles[i+14]) = Vec3b(14,17,175);
+                                    }
                                     selected.push_back(1);
                                     selected.push_back(i+14);
                                 }
+                            }
+                            else{
+                                cout << "jump not possible" << endl;
                             }
                         }
                     }
@@ -562,7 +754,6 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
 }
 
 int main(int argc, char** argv){
-
     Draw(startUpMain);
     updateText();
 
