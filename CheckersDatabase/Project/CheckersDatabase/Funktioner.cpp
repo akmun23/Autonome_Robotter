@@ -19,6 +19,7 @@ void printBoardStates(){
     }
 }
 
+
 void AddBoard(std::string BoardStateInputtet){
 
     QSqlDatabase db = QSqlDatabase::database("QMYSQL");
@@ -47,7 +48,7 @@ void AddBoard(std::string BoardStateInputtet){
 
         for (int i = 0; i <= OldBoardState.size(); i++) {
             if (BoardStateInputtet == OldBoardState[i]) {
-                std::cout << "BoardState is already stored" << std::endl << std::endl;
+                AddMove(BoardStateInputtet);
                 return;
 
             }
@@ -59,6 +60,67 @@ void AddBoard(std::string BoardStateInputtet){
                               "VALUES (:board_id, :BoardState)");
                 query.bindValue(":board_id", newBoardID);
                 query.bindValue(":BoardState", BoardStateInputtet.c_str());
+                query.exec();
+            }
+        }
+    }
+
+}
+
+void AddMove(std::string BoardStateInputtet){
+
+    //Declare variables
+    int BoardID = 0;
+
+
+    QSqlDatabase db = QSqlDatabase::database("QMYSQL");
+
+    QSqlQuery query = QSqlQuery(db);
+
+    query.exec("SELECT board_id FROM UniqueBoard WHERE BoardState = '" + QString::fromStdString(BoardStateInputtet) + "'");
+    while (query.next()) {
+        BoardID = query.value(0).toInt();
+    }
+
+    std::cout << "BoardID: " << BoardID << std::endl;
+
+    std::string str2;
+    std::cout << "What is the move u want to save";
+    std::cin >> str2;
+
+    std::vector<std::string> OldMoves;
+    OldMoves.clear();
+
+    query.exec("SELECT Move FROM Moves WHERE board_id = " + QString::number(BoardID));
+    while (query.next()) {
+        std::string BoardState = query.value(0).toString().toStdString();
+        OldMoves.push_back(BoardState);
+    }
+
+
+    if (OldMoves.size() == 0){
+        query.prepare("INSERT INTO Moves ( board_id, Move) "
+                      "VALUES (:board_id, :Move)");
+        query.bindValue(":board_id", BoardID);
+        query.bindValue(":Move", str2.c_str());
+        query.exec();
+    }
+
+    else{
+
+        for (int i = 0; i <= OldMoves.size(); i++) {
+            if (str2 == OldMoves[i]) {
+                std::cout << "Move is already stored" << std::endl << std::endl;
+                return;
+
+            }
+
+            else if (i == OldMoves.size()){
+
+                query.prepare("INSERT INTO Moves ( board_id, Move) "
+                              "VALUES (:board_id, :Move)");
+                query.bindValue(":board_id", BoardID);
+                query.bindValue(":Move", str2.c_str());
                 query.exec();
             }
         }
