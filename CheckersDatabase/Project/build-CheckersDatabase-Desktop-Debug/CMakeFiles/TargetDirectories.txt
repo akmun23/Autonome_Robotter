@@ -1,0 +1,3 @@
+/home/pascal/Desktop/SoftwareUdvikling/CheckersDatabase/Project/build-CheckersDatabase-Desktop-Debug/CMakeFiles/MainTest.dir
+/home/pascal/Desktop/SoftwareUdvikling/CheckersDatabase/Project/build-CheckersDatabase-Desktop-Debug/CMakeFiles/edit_cache.dir
+/home/pascal/Desktop/SoftwareUdvikling/CheckersDatabase/Project/build-CheckersDatabase-Desktop-Debug/CMakeFiles/rebuild_cache.dir
