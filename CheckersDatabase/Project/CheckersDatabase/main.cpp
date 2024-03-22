@@ -5,6 +5,10 @@
 #include <string>
 #include "Funktioner.h"
 
+void printBoardStates();
+void AddMove(int TempBoardID);
+void AddBoard(int TempBoardID);
+
 int main()
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");

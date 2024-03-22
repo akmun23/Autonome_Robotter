@@ -8,99 +8,154 @@
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
 //#include "AtmegaCom.h"
+#include "CheckersDatabase.h"
 
 
 using namespace ur_rtde;
 
+
 int main() {
-    int playerTurn = 1; //Which player's turn it is
-    int blackPieces = 12; //Initial number of black pieces
-    int redPieces = 12; //Initial number of red pieces
-    bool gameEnd = false; //If the game has ended
-    int thisTurn; //Which player's turn it is
-    std::vector<std::vector<std::string>> thisBoard = {}; //The current state of the board
+
+    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
+    db.setHostName("localhost");
+    db.setDatabaseName("CheckersDatabase");
+    db.setUserName("Indsæt Navn");  // Change to username
+    db.setPassword("Indsæt Password!");  // Change to password
+    db.open();
+
+    QSqlQuery query;
+
+    for (int i = 0; i < 1; ++i) {
 
 
-//   atmegaCom('8'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
 
-    std::string player = "AI"; //If the player is human or AI
-    std::string player2 = "AI"; //If the player is human or AI
+        query.exec("DELETE FROM Temp WHERE tempBoard_id >= 0");
+        /*
+        query.exec("DELETE FROM Moves WHERE board_id >= 0");
+        query.exec("DELETE FROM UniqueBoard WHERE board_id >= 0");*/
+        int CounterForTempTable = 1;
 
-    std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
+        int playerTurn = 1; //Which player's turn it is
+        int blackPieces = 12; //Initial number of black pieces
+        int redPieces = 12; //Initial number of red pieces
+        bool gameEnd = false; //If the game has ended
+        int thisTurn; //Which player's turn it is
+        int DrawChecker = 1; //When this equal 200 the game is called draw
+        std::vector<std::vector<std::string>> thisBoard = {}; //The current state of the board
 
-    // Construct initial board
-    std::vector<std::vector<std::string>> boards = startUp();
 
-    // Set up the robot
-//   std::vector<std::vector<double>> startUpRobot = robotStart();
+//       atmegaCom('8'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
 
-    while(true){ //Game loop
+        std::string player = "AI"; //If the player is human or AI
+        std::string player2 = "AI"; //If the player is human or AI
 
-        thisTurn = playerTurn; //Which player's turn it is
+        std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
 
-        //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
-        if(((movePossible(playerTurn, boards, jumpPossible(playerTurn, boards), false, {}).size())/2) > 0 && redPieces > 0 && blackPieces > 0){
+        // Construct initial board
+        std::vector<std::vector<std::string>> boards = startUp();
 
-            std::cout << "Player " << playerTurn << "'s turn:" << std::endl; //Prints which player's turn it is
-            std::vector<std::vector<std::string>> tempBoard = boards; // To be used in robotMove
+        // Set up the robot
+//       std::vector<std::vector<double>> startUpRobot = robotStart();
 
-            if((playerTurn == 1 && player == "p") || (playerTurn == 2 && player2 == "p")){
-
-                moveSet = move(playerTurn, boards, redPieces, blackPieces); //Player's move
-
-            } else {
-
-                alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
-
+        while(true){ //Game loop
+            thisTurn = playerTurn; //Which player's turn it is
+            if (DrawChecker == 200){
+                std::cout << "The game is a draw!" << std::endl;
+                break;
             }
+            //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
+            if(((movePossible(playerTurn, boards, jumpPossible(playerTurn, boards), false, {}).size())/2) > 0 && redPieces > 0 && blackPieces > 0){
 
-            //Prints the moves made by the AI
-            for (int i = 0; i < moveSet.size(); i += 2) {
-                std::cout << "Player " << thisTurn << "  moves from: " << moveSet[i] << std::endl;
-                std::cout << "Player " << thisTurn << " moves to: " << moveSet[i+1] << std::endl;
-            }
+                std::cout << "Player " << playerTurn << "'s turn:" << std::endl; //Prints which player's turn it is
+                std::vector<std::vector<std::string>> tempBoard = boards; // To be used in robotMove
 
-            std::string output;
+                if((playerTurn == 1 && player == "p") || (playerTurn == 2 && player2 == "p")){
 
-            for (int i = 0; i < 8; ++i) {
-                for (int j = 0; j < 8; ++j) {
-                    output += boards[i][j];
+                    moveSet = move(playerTurn, boards, redPieces, blackPieces); //Player's move
+
+                } else {
+
+                    alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+
                 }
+                std::string MoveMade;
+                //Prints the moves made by the AI
+                for (int i = 0; i < moveSet.size(); i += 2) {
+                    std::cout << "Player " << thisTurn << "  moves from: " << moveSet[i] << std::endl;
+                    std::cout << "Player " << thisTurn << " moves to: " << moveSet[i+1] << std::endl;
+                    MoveMade = moveSet[i] + moveSet[i+1];
+                }
+
+                std::string output;
+
+                for (int i = 0; i < 8; ++i) {
+                    for (int j = 0; j < 8; ++j) {
+                        if(boards[i][j] == "1 "){
+                            output += "1";
+                        } else if(boards[i][j] == "B "){
+                            output += "2";
+                        } else if(boards[i][j] == "BK"){
+                            output += "3";
+                        } else if(boards[i][j] == "R "){
+                            output += "4";
+                        } else if(boards[i][j] == "RK"){
+                            output += "5";
+                        }
+                    }
+                }
+
+                std::string* outputPtr = &output;
+                std::string* MoveMadePtr = &MoveMade;
+
+                InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);
+                DrawChecker++;
+
+                // Moves the robot
+                //robotMove(moveSet, startUpRobot, tempBoard);
+
+                std::cout << "It is game nr: " << i << std::endl;
+                std::cout << "It is turn: " << DrawChecker << std::endl;
+                //Prints data from the state of the game and prints the board
+                std::cout << "There are " << redPieces << " red pieces left." << std::endl;
+                std::cout << "There are " << blackPieces << " black pieces left." << std::endl;
+                std::cout << std::endl;
+                checkerBoard(boards);
+                std::cout << "Game score is: " << giveBoardScore(boards, playerTurn, blackPieces, redPieces) << std::endl;
+                std::cout << std::endl;
+
+            } else { //If no valid moves, or no more pieces on the board
+                gameEnd = true; //Game has ended
+                break;
             }
 
-            std::cout << output << std::endl;
-
-            // Moves the robot
-            //robotMove(moveSet, startUpRobot, tempBoard);
-
-            //Prints data from the state of the game and prints the board
-            std::cout << "There are " << redPieces << " red pieces left." << std::endl;
-            std::cout << "There are " << blackPieces << " black pieces left." << std::endl;
-            std::cout << std::endl;
-            checkerBoard(boards);
-            std::cout << "Game score is: " << giveBoardScore(boards, playerTurn, blackPieces, redPieces) << std::endl;
-            std::cout << std::endl;
-
-        } else { //If no valid moves, or no more pieces on the board
-            gameEnd = true; //Game has ended
-            break;
         }
 
-    }
 
-
-    //Prints the winner of the game
-    if(gameEnd){
-        if(redPieces == 0){
-            std::cout << "Player 1 wins! No more red pieces" << std::endl;
-        } else if(blackPieces == 0){
-            std::cout << "Player 2 wins! No more black pieces" << std::endl;
-        } else if(playerTurn == 1){
-            std::cout << "Player 2 wins! No more moves for black" << std::endl;
-        } else if(playerTurn == 2){
-            std::cout << "Player 1 wins! No more moves for red" << std::endl;
+        //Prints the winner of the game
+        if(gameEnd){
+            if(redPieces == 0){
+                query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 1");
+                query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 2");
+                std::cout << "Player 1 wins! No more red pieces" << std::endl;
+            } else if(blackPieces == 0){
+                query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 2");
+                query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 1");
+                std::cout << "Player 2 wins! No more black pieces" << std::endl;
+            } else if (DrawChecker == 200){
+                query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 2");
+                query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 1");
+                std::cout << "The game is a draw!" << std::endl;
+            } else if(playerTurn == 1){
+                query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 2");
+                query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 1");
+                std::cout << "Player 2 wins! No more moves for black" << std::endl;
+            } else if(playerTurn == 2){
+                query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 1");
+                query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 2");
+                std::cout << "Player 1 wins! No more moves for red" << std::endl;
+            }
         }
+        UpdateDatabaseFromTemp();
     }
-
     return 0;
 }
