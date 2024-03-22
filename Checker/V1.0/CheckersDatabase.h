@@ -7,8 +7,8 @@
 #include <string>
 
 
-void AddMove(int TempBoardID);
-void AddBoard(int TempBoardID);
+void AddMove(int& TempBoardID);
+void AddBoard(int &TempBoardID);
 void UpdateDatabaseFromTemp();
 void InsertToTemp(std::string& BoardState, std::string& Move, int& Counter, int PlayerId);
 //qDebug() << "SqLite error:" << query.lastError().text() << ", SqLite error code:" << query.lastError().number(); // debug komando

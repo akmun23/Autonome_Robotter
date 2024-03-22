@@ -25,9 +25,8 @@ void UpdateDatabaseFromTemp()
     for (int i = 0; i < TempBoardID.size(); i++) {
         AddBoard(TempBoardID[i]);
     }
-
+    // Clear temp
     query.exec("DELETE FROM Temp WHERE tempBoard_id >= 0");
-
 
 
 
@@ -38,7 +37,7 @@ void UpdateDatabaseFromTemp()
 
 
 
-void AddBoard(int TempBoardID){
+void AddBoard(int& TempBoardID){
 
     QSqlDatabase db = QSqlDatabase::database("QMYSQL");
 
@@ -74,7 +73,7 @@ void AddBoard(int TempBoardID){
         // Det er her den dør Pt
         for (int i = 0; i <= OldBoardState.size(); i++) {
             if (BoardStateInputtet == OldBoardState[i]) {
-                AddMove(TempBoardID-1);
+                AddMove(TempBoardID);
                 return;
 
             }
@@ -87,14 +86,14 @@ void AddBoard(int TempBoardID){
                 query.bindValue(":board_id", newBoardID);
                 query.bindValue(":BoardState", QString::fromStdString(BoardStateInputtet));
                 query.exec();
-                AddMove(TempBoardID-1);
+                AddMove(TempBoardID);
             }
         }
     }
 
 }
 
-void AddMove(int TempBoardID){
+void AddMove(int& TempBoardID){
 
 
     //Declare variables
@@ -108,12 +107,11 @@ void AddMove(int TempBoardID){
 
     QSqlQuery query = QSqlQuery(db);
 
-    //BoardStateInputtet sæt den her lig noget
-    if (TempBoardID == 0){
+    if (TempBoardID == 1){
         return;
     }
 
-    query.exec("Select BoardState FROM Temp WHERE tempBoard_id = " + QString::number(TempBoardID));
+    query.exec("Select BoardState FROM Temp WHERE tempBoard_id = " + QString::number(TempBoardID-1));
     while (query.next()) {
         BoardStateInputtet = query.value(0).toString().toStdString();
     }
@@ -127,7 +125,7 @@ void AddMove(int TempBoardID){
 
     std::string MoveToCheck;
 
-    query.exec("Select Move FROM Temp WHERE tempBoard_id = " + QString::number(TempBoardID+1));
+    query.exec("Select Move FROM Temp WHERE tempBoard_id = " + QString::number(TempBoardID));
     while (query.next()) {
         MoveToCheck = query.value(0).toString().toStdString();
     }
@@ -141,7 +139,7 @@ void AddMove(int TempBoardID){
         OldMoves.push_back(Move);
     }
 
-    query.exec("Select WinOrLoss FROM Temp WHERE tempBoard_id = " + QString::number(TempBoardID+1));
+    query.exec("Select WinOrLoss FROM Temp WHERE tempBoard_id = " + QString::number(TempBoardID));
     while (query.next()) {
         WinChecker = query.value(0).toInt();
     }

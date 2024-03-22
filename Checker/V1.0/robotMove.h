@@ -5,7 +5,7 @@
 #include <string>
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
-//#include "AtmegaCom.h"
+#include "AtmegaCom.h"
 using namespace ur_rtde;
 
 RTDEControlInterface rtde_control("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
@@ -27,10 +27,10 @@ std::vector<std::vector<double>> robotStart() {
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
 
     while(rtde_receive.getActualTCPForce()[2] < 30){
-        std::cout << rtde_receive.getActualTCPForce()[2] << std::endl;
+        //std::cout << rtde_receive.getActualTCPForce()[2] << std::endl;
     }
-        std::cout << rtde_receive.getActualTCPForce()[2] << std::endl;
-    double table = rtde_receive.getActualTCPPose()[2]+0.0005;
+        //std::cout << rtde_receive.getActualTCPForce()[2] << std::endl;
+    double table = rtde_receive.getActualTCPPose()[2]+0.0015;
     rtde_control.speedStop();
 
     /*
@@ -98,14 +98,14 @@ void checkerJump(std::vector<std::string> moveSet, std::vector<std::vector<doubl
 
     rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord, ycord, zcord, target[3], target[4], target[5]}, 0.2, 0.05);
-    //atmegaCom('6');
+    atmegaCom('6');
     rtde_control.moveL({xcord, ycord, target[2], target[3], target[4], target[5]}, 1, 0.2);
 
     int gravex;
     if(playerTurn == 1){
         gravex = 1;
     } else {
-        gravex = 8;
+        gravex = 7;
     }
 
     int gravey = -3;
@@ -118,15 +118,15 @@ void checkerJump(std::vector<std::string> moveSet, std::vector<std::vector<doubl
 
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){
-        std::cout << rtde_receive.getActualTCPForce()[2] << std::endl;
+        //std::cout << rtde_receive.getActualTCPForce()[2] << std::endl;
     }
     double gravez = rtde_receive.getActualTCPPose()[2]+0.0005;
     rtde_control.speedStop();
 
     rtde_control.moveL({xcord2+0.005, ycord2+0.005, gravez+0.005, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord2, ycord2, gravez+0.005, target[3], target[4], target[5]}, 1, 0.2);
-    rtde_control.moveL({xcord2, ycord2, gravez, target[3], target[4], target[5]}, 0.2, 0.05);
-    //atmegaCom('8');
+    rtde_control.moveL({xcord2, ycord2, gravez+0.001, target[3], target[4], target[5]}, 0.2, 0.05);
+    atmegaCom('8');
     rtde_control.moveL({xcord2, ycord2, target[2], target[3], target[4], target[5]}, 1, 0.2);
 }
 
@@ -146,42 +146,40 @@ void promotePiece(std::vector<std::string> moveSet, std::vector<std::vector<doub
 
     int gravex;
     if(playerTurn == 1){
-        gravex = 1;
+        gravex = 7;
     } else {
-        gravex = 8;
+        gravex = 1;
     }
 
-    int gravey = -2;
+    int gravey = -3;
     double xcord2 = rotMatrix[0]*gravex*factor + rotMatrix[3]*gravey*factor + rotMatrix[6]*0*factor + boardPlane[0];
     double ycord2 = rotMatrix[1]*gravex*factor + rotMatrix[4]*gravey*factor + rotMatrix[7]*0*factor + boardPlane[1];
 
     rtde_control.moveL({xcord2+0.005, ycord2+0.005, target[2], target[3], target[4], target[5]}, 1, 0.2);
-
+    atmegaCom('6');
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){
-        std::cout << rtde_receive.getActualTCPForce()[2] << std::endl;
+        //std::cout << rtde_receive.getActualTCPForce()[2] << std::endl;
     }
     double gravez = rtde_receive.getActualTCPPose()[2]+0.0005;
     rtde_control.speedStop();
 
     rtde_control.moveL({xcord2+0.005, ycord2+0.005, gravez+0.005, target[3], target[4], target[5]}, 1, 0.2);
+    atmegaCom('8');
     rtde_control.moveL({xcord2, ycord2, gravez+0.01, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord2, ycord2, gravez-0.005, target[3], target[4], target[5]}, 0.2, 0.05);
-    //atmegaCom('6');
+    atmegaCom('6');
     rtde_control.moveL({xcord2, ycord2, zcord + 0.1, target[3], target[4], target[5]}, 1, 0.2);
 
     rtde_control.moveL({xcord, ycord, zcord + 0.1, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord, ycord, zcord+0.005, target[3], target[4], target[5]}, 0.2, 0.05);
-    //atmegaCom('8');
+    atmegaCom('8');
     rtde_control.moveL({xcord, ycord, zcord + 0.1, target[3], target[4], target[5]}, 1, 0.2);
-
-
 }
 
 //Function to move the robot
-int robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>> startUp, std::vector<std::vector<std::string>> boards){
-    double factor = 0.05;
-    int playerTurn = 1;
+bool robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>> startUp, std::vector<std::vector<std::string>> boards, int playerTurn){
+    double factor = 0.03;
     for (int i = 0; i < moveSet.size(); i += 2) {
         double xcord = 0;
         double ycord = 0;
@@ -213,11 +211,11 @@ int robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>>
 
         rtde_control.moveL({xcord, ycord, zcord + 0.1, target[3], target[4], target[5]}, 1, 0.2);
         rtde_control.moveL({xcord, ycord, zcord, target[3], target[4], target[5]}, 0.2, 0.05);
-        //atmegaCom('6');
+        atmegaCom('6');
         rtde_control.moveL({xcord, ycord, zcord + 0.1, target[3], target[4], target[5]}, 1, 0.2);
         rtde_control.moveL({xcord2, ycord2, zcord + 0.1, target[3], target[4], target[5]}, 1, 0.2);
         rtde_control.moveL({xcord2, ycord2, zcord2, target[3], target[4], target[5]}, 0.2, 0.05);
-        //atmegaCom('8');
+        atmegaCom('8');
         rtde_control.moveL({xcord2, ycord2, zcord + 0.1, target[3], target[4], target[5]}, 1, 0.2);
 
         // Remove the jumped piece
@@ -226,21 +224,13 @@ int robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>>
         }
 
         // Promotes piece
-        if(((playerTurn == 1) && (moveSet[i+1][1] == '8') && (boards[column][row] == "B ")) || ((playerTurn == 2) && (moveSet[i+1][1] == '1') && (boards[column][row] == "R "))){
+        if(((playerTurn == 1) && (moveSet[i+1][0] == 'h') && (boards[column][row] == "B ")) || ((playerTurn == 2) && (moveSet[i+1][0] == 'a') && (boards[column][row] == "R "))){
             promotePiece({moveSet[i], moveSet[i+1]}, startUp, boards, playerTurn, factor);
         }
 
-
-        // Switch player's turn
-        if(playerTurn == 1){
-            playerTurn = 2;
-        } else {
-            playerTurn = 1;
-        }
-
         rtde_control.moveL(target, 1, 0.1);
-        return 1;
     }
+    return true;
 }
 
 #endif // ROBOTMOVE_H
