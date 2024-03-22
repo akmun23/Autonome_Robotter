@@ -2,8 +2,9 @@
 #include<vector>
 #include<string>
 #include "boardUpdate.h"
-#include "validMoves.h"
+//#include "validMoves.h"
 //#include "robotMove.h"
+#include "validMoves.h"
 #include <unistd.h>
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
@@ -15,7 +16,6 @@ using namespace ur_rtde;
 
 
 int main() {
-
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
     db.setDatabaseName("CheckersDatabase");
@@ -42,20 +42,16 @@ int main() {
         int thisTurn; //Which player's turn it is
         int DrawChecker = 1; //When this equal 200 the game is called draw
         std::vector<std::vector<std::string>> thisBoard = {}; //The current state of the board
-
-
-//       atmegaCom('8'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
-
         std::string player = "AI"; //If the player is human or AI
-        std::string player2 = "AI"; //If the player is human or AI
+		std::string player2 = "AI"; //If the player is human or AI
+		std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
+		std::vector<std::vector<double>> startUpRobot; //The initial position of the robot
+		int i = 0;
 
-        std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
+		// atmegaCom('8'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
 
         // Construct initial board
         std::vector<std::vector<std::string>> boards = startUp();
-
-        // Set up the robot
-//       std::vector<std::vector<double>> startUpRobot = robotStart();
 
         while(true){ //Game loop
             thisTurn = playerTurn; //Which player's turn it is
@@ -63,19 +59,23 @@ int main() {
                 std::cout << "The game is a draw!" << std::endl;
                 break;
             }
+            
+            std::vector<std::string> jumps = jumpPossible(playerTurn, boards);
+		    bool moreMove = false;
+		    std::string moveTo = "";
+            
             //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
-            if(((movePossible(playerTurn, boards, jumpPossible(playerTurn, boards), false, {}).size())/2) > 0 && redPieces > 0 && blackPieces > 0){
+			if(((movePossible(playerTurn, boards, jumps, moreMove, moveTo).size())/2) > 0 && redPieces > 0 && blackPieces > 0){
+				std::cout << "Player " << playerTurn << "'s turn:" << std::endl; //Prints which player's turn it is
+				std::vector<std::vector<std::string>> tempBoard = boards; // To be used in robotMove
 
-                std::cout << "Player " << playerTurn << "'s turn:" << std::endl; //Prints which player's turn it is
-                std::vector<std::vector<std::string>> tempBoard = boards; // To be used in robotMove
+				if((playerTurn == 1 && player == "p") || (playerTurn == 2 && player2 == "p")){
 
-                if((playerTurn == 1 && player == "p") || (playerTurn == 2 && player2 == "p")){
+				    move(playerTurn, boards, redPieces, blackPieces); //Player's move
 
-                    moveSet = move(playerTurn, boards, redPieces, blackPieces); //Player's move
+				} else {
 
-                } else {
-
-                    alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+				    alphaBeta(boards, 9, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
 
                 }
                 std::string MoveMade;
@@ -123,13 +123,20 @@ int main() {
                 std::cout << "Game score is: " << giveBoardScore(boards, playerTurn, blackPieces, redPieces) << std::endl;
                 std::cout << std::endl;
 
+				// Moves the robot
+		        if(i == 0){
+		            // Set up the robot
+		            startUpRobot = robotStart();
+		        } else {
+		            std::thread thisMove(robotMove(moveSet, startUpRobot, tempBoard));
+		        }	
+		        		
+		        i++;	
+				
             } else { //If no valid moves, or no more pieces on the board
                 gameEnd = true; //Game has ended
                 break;
             }
-
-        }
-
 
         //Prints the winner of the game
         if(gameEnd){
