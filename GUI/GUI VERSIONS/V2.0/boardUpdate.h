@@ -4,31 +4,6 @@
 #include <iostream>
 #include <vector>
 
-std::vector<std::vector<std::string>> boards = {
-        {"  ", "B ", "  ", "B ", "  ", "B ", "  ", "B "},
-        {"B ", "  ", "B ", "  ", "B ", "  ", "B ", "  "},
-        {"  ", "B ", "  ", "B ", "  ", "B ", "  ", "B "},
-        {"1 ", "  ", "1 ", "  ", "1 ", "  ", "1 ", "  "},
-        {"  ", "1 ", "  ", "1 ", "  ", "1 ", "  ", "1 "},
-        {"R ", "  ", "R ", "  ", "R ", "  ", "R ", "  "},
-        {"  ", "R ", "  ", "R ", "  ", "R ", "  ", "R "},
-        {"R ", "  ", "R ", "  ", "R ", "  ", "R ", "  "}
-    };
-
-/*void checkerBoard(std::vector<std::vector<std::string>> boards){
-};*/
-
-/*std::vector<std::vector<std::string>> startUp(){
-
-    //Print the initial board
-    std::cout << "Welcome to Checkers!" << std::endl;
-    std::cout << "Here is the board:" << std::endl;
-    checkerBoard(boards);
-    std::cout << std::endl;
-    return boards;
-}*/
-
-
 //Prints the board with input given by the vector boards
 void checkerBoard(std::vector<std::vector<std::string>> boards){
     std::cout << " " << " "  << "1"  << "  "        << "2" << "  "         << "3"  << "  "        << "4"  << "  "        << "5"  << "  "        << "6"  << "  "        << "7"  << "  "        << "8"          << std::endl;
@@ -41,5 +16,27 @@ void checkerBoard(std::vector<std::vector<std::string>> boards){
     std::cout << "G" << " "  << boards[6][0] << " " << boards[6][1] << " " << boards[6][2] << " " << boards[6][3] << " " << boards[6][4] << " " << boards[6][5] << " " << boards[6][6] << " " << boards[6][7] << std::endl;
     std::cout << "H" << " "  << boards[7][0] << " " << boards[7][1] << " " << boards[7][2] << " " << boards[7][3] << " " << boards[7][4] << " " << boards[7][5] << " " << boards[7][6] << " " << boards[7][7] << std::endl;
 }
+
+// Initializes the board
+std::vector<std::vector<std::string>> startUp(){
+    std::vector<std::vector<std::string>> boards = {
+        {"  ", "B ", "  ", "B ", "  ", "B ", "  ", "B "},
+        {"B ", "  ", "B ", "  ", "B ", "  ", "B ", "  "},
+        {"  ", "B ", "  ", "B ", "  ", "B ", "  ", "B "},
+        {"1 ", "  ", "1 ", "  ", "1 ", "  ", "1 ", "  "},
+        {"  ", "1 ", "  ", "1 ", "  ", "1 ", "  ", "1 "},
+        {"R ", "  ", "R ", "  ", "R ", "  ", "R ", "  "},
+        {"  ", "R ", "  ", "R ", "  ", "R ", "  ", "R "},
+        {"R ", "  ", "R ", "  ", "R ", "  ", "R ", "  "}
+    };
+
+    //Print the initial board
+    std::cout << "Welcome to Checkers!" << std::endl;
+    std::cout << "Here is the board:" << std::endl;
+    checkerBoard(boards);
+    std::cout << std::endl;
+    return boards;
+}
+
 
 #endif // BOARDUPDATE_H

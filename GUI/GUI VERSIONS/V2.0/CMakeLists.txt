@@ -4,7 +4,10 @@ project(Project_GUI VERSION 0.1.0 LANGUAGES C CXX)
 include(CTest)
 enable_testing()
 
-add_executable(Project_GUI main.cpp)
+add_executable(Project_GUI main.cpp
+                validMoves.h
+                boardUpdate.h
+                gui.h gui.cpp)
 
 find_package( OpenCV REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )

@@ -179,9 +179,8 @@ void promotePiece(std::vector<std::string> moveSet, std::vector<std::vector<doub
 }
 
 //Function to move the robot
-int robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>> startUp, std::vector<std::vector<std::string>> boards){
+bool robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>> startUp, std::vector<std::vector<std::string>> boards, int playerTurn){
     double factor = 0.05;
-    int playerTurn = 1;
     for (int i = 0; i < moveSet.size(); i += 2) {
         double xcord = 0;
         double ycord = 0;
@@ -230,17 +229,10 @@ int robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>>
             promotePiece({moveSet[i], moveSet[i+1]}, startUp, boards, playerTurn, factor);
         }
 
-
-        // Switch player's turn
-        if(playerTurn == 1){
-            playerTurn = 2;
-        } else {
-            playerTurn = 1;
-        }
-
         rtde_control.moveL(target, 1, 0.1);
-        return 1;
+
     }
+    return true;
 }
 
 #endif // ROBOTMOVE_H
