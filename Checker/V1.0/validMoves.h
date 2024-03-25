@@ -342,6 +342,8 @@ bool boardChange(int& playerTurn, std::vector<std::vector<std::string>>& boards,
          boards[column3][row3] = "1 ";
      }
 
+     pieceCount(boards, blackPieces, redPieces);
+
      //Checks if the piece is able to promote and changes it to a king if it is
      //Returns true if the piece has been promoted
      if(promotion(boards, playerTurn)){
@@ -352,8 +354,6 @@ bool boardChange(int& playerTurn, std::vector<std::vector<std::string>>& boards,
          }
          return true;
      }
-
-    pieceCount(boards, blackPieces, redPieces);
 
      //If no promotion has been made, it returns false
      return false;
@@ -412,7 +412,7 @@ bool move(int& playerTurn, std::vector<std::vector<std::string>>& boards, int& r
 
 //Gives the board a game score based on the number of pieces and the number of possible moves
 //Used in the alphaBeta function
-int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTurn, int& black, int& red){
+int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTurn, int& black, int& red, int& depth){
     int score = 0;
 
     std::random_device rd;  // Obtain a random number from hardware
@@ -504,6 +504,8 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
         if(red == 0 || movePossible(2, boards, jump2, moreMove, move).empty()){
             score += 10000;
         }
+        score += depth*10;
+
         score *= 1000;
 
         score += random;
@@ -525,6 +527,9 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
         if(black == 0 || movePossible(1, boards, jump1, moreMove, move).empty()){
             score -= 10000;
         }
+
+        score -= depth*10;
+
         score *= 1000;
 
         score -= random;
@@ -560,7 +565,7 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
 
     //If the depth is 0, the game is in a winning state, or no moves are possible, it returns the score of the board
     if( depth == 0 || posMove.empty() || tempRed == 0 || tempBlack == 0) {
-        return giveBoardScore(boards, tempPlayer, blackPieces, redPieces);
+        return giveBoardScore(boards, tempPlayer, blackPieces, redPieces, depth);
     }
 
     //If it is player 1's turn, it checks all the possible moves and returns the best move
@@ -583,6 +588,7 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
 
             //Checks if the piece has been promoted
             promotion = boardChange(tempPlayer, tempBoard, playerStart, playerMove, tempRed, tempBlack);
+            bool promotion2 = promotion;
 
             //If the piece is able to jump again the turn doesnt change
             jumps = jumpPossible(tempPlayer, tempBoard);
@@ -600,7 +606,7 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
                 bestBlack = tempBlack;
                 bestRed = tempRed;
                 alpha = eval;
-                if(moreMoveCheck(jumps, playerMove) && jumped && !promotion){
+                if(moreMoveCheck(jumps, playerMove) && jumped && !promotion2){
                     bestPlayer = 1;
                 } else {
                     bestPlayer = 2;
@@ -640,6 +646,8 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
             moves.push_back(playerMove);
             jumped = pieceJump(playerStart, playerMove, tempPlayer, tempBoard);
             promotion = boardChange(tempPlayer, tempBoard, playerStart, playerMove, tempRed, tempBlack);
+            bool promotion2 = promotion;
+
 
             //If the piece is able to jump again, it finds all possible moves
             jumps = jumpPossible(tempPlayer, tempBoard);
@@ -656,7 +664,7 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
                 bestRed = tempRed;
                 beta = eval;
 
-                if(moreMoveCheck(jumps, playerMove) && jumped && !promotion){
+                if(moreMoveCheck(jumps, playerMove) && jumped && !promotion2){
                     bestPlayer = 2;
                 } else {
                     bestPlayer = 1;
