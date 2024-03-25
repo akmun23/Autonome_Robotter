@@ -2,13 +2,13 @@
 #include<vector>
 #include<string>
 #include "boardUpdate.h"
-#include "robotMove.h"
+//#include "robotMove.h"
 #include "validMoves.h"
 #include <unistd.h>
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
 #include "CheckersDatabase.h"
-#include <future>
+//#include <future>
 
 using namespace ur_rtde;
 
@@ -16,23 +16,18 @@ int main() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
     db.setDatabaseName("CheckersDatabase");
-    db.setUserName("Pascal");  // Change to username
-    db.setPassword("Superbror22!");  // Change to password
+    db.setUserName("Indsæt Brugernavn");  // Change to username
+    db.setPassword("Indsæt Password!");  // Change to password
     db.open();
 
     QSqlQuery query;
+    /*
+    //Det her er er til vis man vil reset dataen i databasen
+    query.exec("DELETE FROM Moves WHERE board_id >= 0");
+    query.exec("DELETE FROM UniqueBoard WHERE board_id >= 0");
+    query.exec("ALTER TABLE UniqueBoard AUTO_INCREMENT = 1");*/
+    for (int ii = 1; ii <= 100; ++ii) {
 
-    for (int ii = 0; ii < 1; ++ii) {
-
-
-            //Clear Temp og sætter start board ind
-            query.exec("DELETE FROM Temp WHERE tempBoard_id >= 0");
-            query.exec("INSERT INTO Temp (tempBoard_id, BoardState) "
-                       "VALUES (1, '22222222222111121111444444444444')");
-
-            /*
-            query.exec("DELETE FROM Moves WHERE board_id >= 0");
-            query.exec("DELETE FROM UniqueBoard WHERE board_id >= 0");*/
             int CounterForTempTable = 1;
 
             int playerTurn = 1; //Which player's turn it is
@@ -49,13 +44,24 @@ int main() {
             std::future<bool> fut;
             int i = 0;
 
+            //Clear Temp og sætter start board ind
+            query.exec("DELETE FROM Temp WHERE tempBoard_id >= 0");
+            query.prepare(  "INSERT INTO Temp (tempBoard_id, BoardState, PlayerID) "
+                            "VALUES (0, '22222222222211111111444444444444', :StartingPlayer)");
+            query.bindValue(":StartingPlayer", playerTurn);
+            query.exec();
+
+
+
 
             // Construct initial board
             std::vector<std::vector<std::string>> boards = startUp();
 
             while(true){ //Game loop
                 thisTurn = playerTurn; //Which player's turn it is
-                if (DrawChecker == 200){
+
+                if (DrawChecker == 175){ // Tjekker om der er gået 175 træk uden en vinder
+                    query.exec("UPDATE Temp SET WinOrLoss = 0.5"); // Sætter en halv ind i wincase for uafgjort
                     std::cout << "The game is a draw!" << std::endl;
                     break;
                 }
@@ -78,6 +84,8 @@ int main() {
                         alphaBeta(boards, 8, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
                         std::cout << "Kører loopet" << std::endl;
                     }
+
+                    /*
                     if (i > 0){
                         fut.get();
                     }
@@ -95,7 +103,7 @@ int main() {
                     } else {
                         fut = std::async(robotMove, moveSet, startUpRobot, tempBoard, thisTurn);
                     }
-
+                    */
 
                     std::string MoveMade;
                     //Prints the moves made by the AI
@@ -126,12 +134,16 @@ int main() {
                     std::string* outputPtr = &output;
                     std::string* MoveMadePtr = &MoveMade;
 
+                    // Indsætter værdierne i Temp tabellen
                     InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);
                     DrawChecker++;
+
+
                     int depth = 8;
+
+                    //Prints data from the state of the game and prints the board
                     std::cout << "It is game nr: " << ii << std::endl;
                     std::cout << "It is turn: " << DrawChecker << std::endl;
-                    //Prints data from the state of the game and prints the board
                     std::cout << "There are " << redPieces << " red pieces left." << std::endl;
                     std::cout << "There are " << blackPieces << " black pieces left." << std::endl;
                     std::cout << std::endl;
@@ -146,33 +158,29 @@ int main() {
                     gameEnd = true; //Game has ended
                     break;
                 }
-
-            //Prints the winner of the game
-            if(gameEnd){
-                if(redPieces == 0){
-                    query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 1");
-                    query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 2");
-                    std::cout << "Player 1 wins! No more red pieces" << std::endl;
-                } else if(blackPieces == 0){
-                    query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 2");
-                    query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 1");
-                    std::cout << "Player 2 wins! No more black pieces" << std::endl;
-                } else if (DrawChecker == 200){
-                    query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 2");
-                    query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 1");
-                    std::cout << "The game is a draw!" << std::endl;
-                } else if(playerTurn == 1){
-                    query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 2");
-                    query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 1");
-                    std::cout << "Player 2 wins! No more moves for black" << std::endl;
-                } else if(playerTurn == 2){
-                    query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 1");
-                    query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 2");
-                    std::cout << "Player 1 wins! No more moves for red" << std::endl;
-                }
-            }
         }
 
+
+        //Prints the winner of the game
+        if(gameEnd){
+            if(redPieces == 0){
+                query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 1");
+                query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 2");
+                std::cout << "Player 1 wins! No more red pieces" << std::endl;
+            } else if(blackPieces == 0){
+                query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 2");
+                query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 1");
+                std::cout << "Player 2 wins! No more black pieces" << std::endl;
+            } else if(playerTurn == 1){
+                query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 2");
+                query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 1");
+                std::cout << "Player 2 wins! No more moves for black" << std::endl;
+            } else if(playerTurn == 2){
+                query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 1");
+                query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 2");
+                std::cout << "Player 1 wins! No more moves for red" << std::endl;
+            }
+        }
         UpdateDatabaseFromTemp();
 
 
