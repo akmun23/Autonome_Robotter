@@ -45,11 +45,7 @@ int main() {
             int i = 0;
 
             //Clear Temp og sætter start board ind
-            query.exec("DELETE FROM Temp WHERE tempBoard_id >= 0");
-            query.prepare(  "INSERT INTO Temp (tempBoard_id, BoardState, PlayerID) "
-                            "VALUES (0, '22222222222211111111444444444444', :StartingPlayer)");
-            query.bindValue(":StartingPlayer", playerTurn);
-            query.exec();
+            RefreshTemp(playerTurn);
 
 
 

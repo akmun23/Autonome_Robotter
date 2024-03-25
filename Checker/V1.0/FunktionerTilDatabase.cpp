@@ -226,3 +226,20 @@ void UpdateMoveWinrate(int& BoardID,                                            
     query.bindValue(":Move", MoveToCheck.c_str());
     query.exec();
 }
+
+
+void RefreshTemp(int& playerTurn){                                              // Funktion til at slette Temp og indsætte start board i Temp
+
+    QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
+    QSqlQuery query = QSqlQuery(db);
+
+
+    query.exec("DELETE FROM Temp "                                              // Sletter alle rækker i Temp
+               "WHERE tempBoard_id >= 0");
+    query.prepare(  "INSERT INTO Temp "                                         // Indsætter start board i Temp
+                  "(tempBoard_id, BoardState, PlayerID) "
+                  "VALUES "
+                  "(0, '22222222222211111111444444444444', :StartingPlayer)");
+    query.bindValue(":StartingPlayer", playerTurn);
+    query.exec();
+}
