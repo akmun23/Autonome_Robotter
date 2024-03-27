@@ -16,8 +16,8 @@ int main() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
     db.setDatabaseName("CheckersDatabase");
-    db.setUserName("Indsæt Brugernavn");  // Change to username
-    db.setPassword("Indsæt Password!");  // Change to password
+    db.setUserName("Pascal");  // Change to username
+    db.setPassword("Superbror22!");  // Change to password
     db.open();
 
     QSqlQuery query;
@@ -44,6 +44,7 @@ int main() {
             std::vector<std::vector<double>> startUpRobot; //The initial position of the robot
             std::future<bool> fut;
             std::string MoveMade; // Stores the move made to put it in the database
+            bool DatabaseMoveMade = false;
 
             int TestCounterForDatabase = 0;
 
@@ -95,6 +96,7 @@ int main() {
                                 DB_move(playerTurn, boards, redPieces, blackPieces, DBmoveFrom, DBmoveTo); //Database AI's move
                                 MoveMade = DBmove;
                                 TestCounterForDatabase++;
+                                DatabaseMoveMade = true;
 
                             }
                         }
@@ -126,11 +128,15 @@ int main() {
                     */
 
                     //Prints the moves made by the AI
-                    for (int i = 0; i < moveSet.size(); i += 2) {
-                        std::cout << "Player " << thisTurn << "  moves from: " << moveSet[i] << std::endl;
-                        std::cout << "Player " << thisTurn << " moves to: " << moveSet[i+1] << std::endl;
-                        MoveMade = moveSet[i] + moveSet[i+1];
+                    if(!DatabaseMoveMade){
+                        for (int i = 0; i < moveSet.size(); i += 2) {
+                            std::cout << "Player " << thisTurn << "  moves from: " << moveSet[i] << std::endl;
+                            std::cout << "Player " << thisTurn << " moves to: " << moveSet[i+1] << std::endl;
+                            MoveMade = moveSet[i] + moveSet[i+1];
+                        }
                     }
+                    DatabaseMoveMade = false;
+
 
                     std::string output;
 
