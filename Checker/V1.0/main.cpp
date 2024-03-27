@@ -26,7 +26,7 @@ int main() {
     query.exec("DELETE FROM Moves WHERE board_id >= 0");
     query.exec("DELETE FROM UniqueBoard WHERE board_id >= 0");
     query.exec("ALTER TABLE UniqueBoard AUTO_INCREMENT = 1");*/
-    for (int ii = 1; ii <= 100; ++ii) {
+    for (int ii = 1; ii <= 200; ++ii) {
 
             int CounterForTempTable = 1;
 
@@ -77,7 +77,7 @@ int main() {
 
                     } else {
 
-                        alphaBeta(boards, 8, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                        alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
                         std::cout << "Kører loopet" << std::endl;
                     }
 
@@ -135,7 +135,7 @@ int main() {
                     DrawChecker++;
 
 
-                    int depth = 8;
+                    int depth = 7;
 
                     //Prints data from the state of the game and prints the board
                     std::cout << "It is game nr: " << ii << std::endl;

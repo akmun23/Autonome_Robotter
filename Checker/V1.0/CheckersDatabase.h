@@ -13,6 +13,8 @@ void UpdateDatabaseFromTemp();
 void InsertToTemp(std::string& BoardState, std::string& Move, int& Counter, int PlayerId);
 void InsertToMove(int& BoardID, std::string& MoveToCheck, double& WinChecker);
 void UpdateMoveWinrate(int& BoardID, std::string& MoveToCheck, double &WinChecker);
+void RefreshTemp(int& playerTurn);
+
 
 //qDebug() << "SqLite error:" << query.lastError().text() << ", SqLite error code:" << query.lastError().number(); // debug komando
 
