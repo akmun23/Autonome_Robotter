@@ -410,6 +410,54 @@ bool move(int& playerTurn, std::vector<std::vector<std::string>>& boards, int& r
     }
 }
 
+
+bool DB_move(int& playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces, std::string playerStart, std::string playerMove){ // MoveFunction for database input
+    bool valid = false;
+    bool jumped = false; //If a piece has jumped
+    bool promotion = false; //If a piece has been promoted
+
+    std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
+    std::vector<std::string> jumps = jumpPossible(playerTurn, boards); //Checks all possible jumps
+    bool moreMove = moreMoveCheck(jumps, playerMove); //If the player is able to jump again
+
+    //Checks all possible moves
+    std::vector<std::string> moves = movePossible(playerTurn, boards, jumps, moreMove, playerMove);
+
+    while(!valid){
+        for (int i = 0; i < moves.size(); i += 2) {
+            if(playerStart == moves[i] && playerMove == moves[i+1]){
+                jumped = pieceJump(playerStart, playerMove, playerTurn, boards);
+                promotion = boardChange(playerTurn, boards, playerStart, playerMove, redPieces, blackPieces);
+                moveSet.push_back(playerStart);
+                moveSet.push_back(playerMove);
+                valid = true;
+                break;
+            }
+        }
+
+        if(!valid){
+            std::cout << "Move not valid. Please enter a new move." << std::endl;
+            return false;
+        }
+    }
+
+    //If the player is able to jump again, it returns true without changing the playerTurn
+    jumps = jumpPossible(playerTurn, boards);
+    moreMove = moreMoveCheck(jumps, playerMove);
+    if(moreMove && jumped && !promotion){
+        return true;
+    } else {
+        if(playerTurn == 1){
+            playerTurn = 2;
+        } else {
+            playerTurn = 1;
+        }
+        return true;
+    }
+}
+
+
+
 //Gives the board a game score based on the number of pieces and the number of possible moves
 //Used in the alphaBeta function
 int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTurn, int& black, int& red, int& depth){

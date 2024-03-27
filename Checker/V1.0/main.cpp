@@ -21,12 +21,13 @@ int main() {
     db.open();
 
     QSqlQuery query;
-    /*
+
     //Det her er er til vis man vil reset dataen i databasen
+    /*
     query.exec("DELETE FROM Moves WHERE board_id >= 0");
     query.exec("DELETE FROM UniqueBoard WHERE board_id >= 0");
     query.exec("ALTER TABLE UniqueBoard AUTO_INCREMENT = 1");*/
-    for (int ii = 1; ii <= 100; ++ii) {
+    for (int ii = 1; ii <= 1; ++ii) {
 
             int CounterForTempTable = 1;
 
@@ -42,14 +43,13 @@ int main() {
             std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
             std::vector<std::vector<double>> startUpRobot; //The initial position of the robot
             std::future<bool> fut;
+            std::string MoveMade; // Stores the move made to put it in the database
+
+            int TestCounterForDatabase = 0;
+
             int i = 0;
 
-            //Clear Temp og sætter start board ind
-            query.exec("DELETE FROM Temp WHERE tempBoard_id >= 0");
-            query.prepare(  "INSERT INTO Temp (tempBoard_id, BoardState, PlayerID) "
-                            "VALUES (0, '22222222222211111111444444444444', :StartingPlayer)");
-            query.bindValue(":StartingPlayer", playerTurn);
-            query.exec();
+            RefreshTempTable(playerTurn); // Refreshes the Temp table
 
 
 
@@ -80,8 +80,28 @@ int main() {
                         move(playerTurn, boards, redPieces, blackPieces); //Player's move
 
                     } else {
+                        if (playerTurn == 1){
 
-                        alphaBeta(boards, 8, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                            std::string DBmove = MovePlayer(boards, playerTurn); // Database best move on current board
+
+                            if (DBmove == "No moves"){
+                                std::cout << "No moves found" << std::endl;
+                                alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                            }
+                            else{
+                                std::cout << "AI move from database: " << DBmove << std::endl;
+                                std::string DBmoveFrom = DBmove.substr(0,2);
+                                std::string DBmoveTo = DBmove.substr(2,2);
+                                DB_move(playerTurn, boards, redPieces, blackPieces, DBmoveFrom, DBmoveTo); //Database AI's move
+                                MoveMade = DBmove;
+                                TestCounterForDatabase++;
+
+                            }
+                        }
+                        else {
+                            alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                        }
+
                         std::cout << "Kører loopet" << std::endl;
                     }
 
@@ -105,7 +125,6 @@ int main() {
                     }
                     */
 
-                    std::string MoveMade;
                     //Prints the moves made by the AI
                     for (int i = 0; i < moveSet.size(); i += 2) {
                         std::cout << "Player " << thisTurn << "  moves from: " << moveSet[i] << std::endl;
@@ -182,7 +201,7 @@ int main() {
             }
         }
         UpdateDatabaseFromTemp();
-
+        std::cout << "Moves made by database: " << TestCounterForDatabase << std::endl;
 
     }
     return 0;
