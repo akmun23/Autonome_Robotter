@@ -533,53 +533,54 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
 
     //Gives score depending on the jumps that are possible
     //And if the game is in a winning state
-    if(playerTurn == 1){
-       if(jump2.empty()){
-            score += 20;
-            if(!(jump1.empty())){
-                score += 50;
-            }
+
+   if(jump2.empty()){
+        score += 20;
+        if(!(jump1.empty())){
+            score += 50;
         }
-
-        if(jump1.empty()){
-            score -= 10;
-            if(!(jump2.empty())){
-                score -= 80;
-            }
-        }
-
-
-        if(red == 0 || movePossible(2, boards, jump2, moreMove, move).empty()){
-            score += 10000;
-        }
-        score += depth*10;
-
-        score *= 1000;
-
-        score += random;
-
-    } else if(playerTurn == 2) {
-        if(jump1.empty()){
-            score -= 20;
-            if(!jump2.empty()){
-                score -= 50;
-            }
-        }
-
-        if(jump2.empty()){
-            score += 10;
-            if(!(jump1.empty())){
-                score += 80;
-            }
     }
-        if(black == 0 || movePossible(1, boards, jump1, moreMove, move).empty()){
-            score -= 10000;
+
+    if(jump1.empty()){
+        score -= 10;
+        if(!(jump2.empty())){
+            score -= 80;
         }
+    }
 
+    if(red == 0 || movePossible(2, boards, jump2, moreMove, move).empty()){
+        score += 10000;
+    }
+
+    if(jump1.empty()){
+        score -= 20;
+        if(!jump2.empty()){
+            score -= 50;
+        }
+    }
+
+    if(jump2.empty()){
+        score += 10;
+        if(!(jump1.empty())){
+            score += 80;
+        }
+    }
+
+    if(black == 0 || movePossible(1, boards, jump1, moreMove, move).empty()){
+        score -= 10000;
+    }
+
+    if(playerTurn == 1){
+        score += depth*10;
+    } else {
         score -= depth*10;
+    }
 
-        score *= 1000;
+    score *= 1000;
 
+    if(playerTurn == 1){
+        score += random;
+    } else {
         score -= random;
     }
 
