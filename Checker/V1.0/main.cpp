@@ -16,8 +16,8 @@ int main() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
     db.setDatabaseName("CheckersDatabase");
-    db.setUserName("Pascal");  // Change to username
-    db.setPassword("Superbror22!");  // Change to password
+    db.setUserName("Indsæt Brugernavn");  // Change to username
+    db.setPassword("Indsæt Password!");  // Change to password
     db.open();
 
     QSqlQuery query;
@@ -27,7 +27,7 @@ int main() {
     query.exec("DELETE FROM Moves WHERE board_id >= 0");
     query.exec("DELETE FROM UniqueBoard WHERE board_id >= 0");
     query.exec("ALTER TABLE UniqueBoard AUTO_INCREMENT = 1");*/
-    for (int ii = 1; ii <= 1; ++ii) {
+    for (int ii = 1; ii <= 500; ++ii) {
 
             int CounterForTempTable = 1;
 
@@ -45,6 +45,7 @@ int main() {
             std::future<bool> fut;
             std::string MoveMade; // Stores the move made to put it in the database
             bool DatabaseMoveMade = false;
+
 
             int TestCounterForDatabase = 0;
 
@@ -85,7 +86,7 @@ int main() {
 
                             std::string DBmove = MovePlayer(boards, playerTurn); // Database best move on current board
 
-                            if (DBmove == "No moves"){
+                            if (DBmove == "No moves" || player == "AI"){
                                 std::cout << "No moves found" << std::endl;
                                 alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
                             }
@@ -159,12 +160,14 @@ int main() {
                     std::string* outputPtr = &output;
                     std::string* MoveMadePtr = &MoveMade;
 
-                    // Indsætter værdierne i Temp tabellen
-                    InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);
+
+                    if (CheckDuplicateMoves(output, MoveMade, thisTurn)){
+                        InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
+                    }
                     DrawChecker++;
 
 
-                    int depth = 8;
+                    int depth = 7;
 
                     //Prints data from the state of the game and prints the board
                     std::cout << "It is game nr: " << ii << std::endl;

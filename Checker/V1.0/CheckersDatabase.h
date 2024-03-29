@@ -15,6 +15,7 @@ void InsertToMove(int& BoardID, std::string& MoveToCheck, double& WinChecker, in
 void UpdateMoveWinrate(int& BoardID, std::string& MoveToCheck, double &WinChecker, int& PlayerId);
 std::string MovePlayer(std::vector<std::vector<std::string>>& BoardState,int& PlayerTurn);
 void RefreshTempTable(int& PlayerTurn);
+bool CheckDuplicateMoves(std::string& BoardState, std::string& MoveToCheck, int& PlayerId);
 
 //qDebug() << "SqLite error:" << query.lastError().text() << ", SqLite error code:" << query.lastError().number(); // debug komando
 

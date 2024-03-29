@@ -316,3 +316,26 @@ void RefreshTempTable(int& playerTurn){
     return;
 }
 
+bool CheckDuplicateMoves(std::string& BoardState, std::string& MoveToCheck, int& PlayerId){
+
+    QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
+    QSqlQuery query = QSqlQuery(db);
+
+    query.prepare(" SELECT count(tempboard_id) "                                // Tjekker om trækket allerede er lavet i det her spil
+                  " FROM Temp "
+                  " WHERE Move = :MoveMade"
+                  " AND BoardState = :board"
+                  " AND PlayerID = :PlayerId");
+    query.bindValue(":MoveMade", QString::fromStdString(MoveToCheck));
+    query.bindValue(":board", QString::fromStdString(BoardState));
+    query.bindValue(":PlayerId", PlayerId);
+    query.exec();
+
+    query.first();
+    if (query.value(0).toInt() == 0){
+        return true;                                                            // Hvis trækket ikke er lavet i det her spil
+    }
+    else{
+        return false;                                                           // Hvis trækket er lavet i det her spil
+    }
+}
