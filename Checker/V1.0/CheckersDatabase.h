@@ -7,8 +7,8 @@
 #include <string>
 
 
-void AddMove(int& TempBoardID);
-void AddBoard(int TempBoardID);
+void AddMove(int& TempBoardID, std::string& OldBoardState);
+void AddBoard(int TempBoardID, std::string& OldBoardState);
 void UpdateDatabaseFromTemp();
 void InsertToTemp(std::string& BoardState, std::string& Move, int& Counter, int PlayerId);
 void InsertToMove(int& BoardID, std::string& MoveToCheck, double& WinChecker, int& PlayerId);
