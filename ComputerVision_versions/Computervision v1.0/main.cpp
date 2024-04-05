@@ -4,6 +4,7 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/calib3d.hpp"
+#include "opencv2/imgcodecs.hpp"
 #include <cmath>
 
 using namespace cv;
@@ -12,6 +13,7 @@ using namespace std;
 //Code for detecting and drawing chessboard corners
 
 // String array with images, if more than 1 picture needs to be processed.
+
 string images[1] = {"/home/emil/chessboard.jpg"};
 
 bool detectAndDrawChessboardCorners()
@@ -55,10 +57,10 @@ bool detectAndDrawChessboardCorners()
 
     moveWindow("result",resize_down.cols/2,100);
 
-    // Define the offset of where the table the checkers board can be placed on starts. Also the scale of cm per pixel. These have to be defined when camera is setup.
+    // Define the offset of where the table the checkers board can be placed on starts. Also the scale of cm per pixel. These have to be defined when camera is set up.
     int offsetx = 155;
     int offsety = 55;
-    float pixToMeters = (0.17);
+    float pixToMeters = (0.03 / sqrt(pow((corners[1].x - corners[0].x),2) + pow((corners[1].y - corners[0].y),2)));
 
     for(int i = 0; i <= corners.size(); i++){
         corners[i].x = (corners[i].x - offsetx)* pixToMeters;
@@ -75,7 +77,6 @@ bool detectAndDrawChessboardCorners()
 
 
 
-
     }
     waitKey(0);
 
@@ -84,10 +85,13 @@ bool detectAndDrawChessboardCorners()
 }
 
 
+
+
 #if QA_MULTI_DEMO
 
 int main( int argc, char** argv )
 {
     detectAndDrawChessboardCorners();
+
 }
 #endif
