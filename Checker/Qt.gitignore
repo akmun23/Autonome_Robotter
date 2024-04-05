@@ -53,8 +53,8 @@ compile_commands.json
 
 *_qmlcache.qrc
 
-**/.build
-**/build
+**/.build*
+**/build*
 build*/
 /build*/
 /build/
