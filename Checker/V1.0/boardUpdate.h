@@ -8,14 +8,14 @@ void checkerBoard(std::vector<std::vector<std::string>> boards);
 
 std::vector<std::vector<std::string>> startUp(){
     std::vector<std::vector<std::string>> boards = {
-        {"  ", "B ", "  ", "B ", "  ", "B ", "  ", "B "},
         {"B ", "  ", "B ", "  ", "B ", "  ", "B ", "  "},
         {"  ", "B ", "  ", "B ", "  ", "B ", "  ", "B "},
-        {"1 ", "  ", "1 ", "  ", "1 ", "  ", "1 ", "  "},
+        {"B ", "  ", "B ", "  ", "B ", "  ", "B ", "  "},
         {"  ", "1 ", "  ", "1 ", "  ", "1 ", "  ", "1 "},
-        {"R ", "  ", "R ", "  ", "R ", "  ", "R ", "  "},
+        {"1 ", "  ", "1 ", "  ", "1 ", "  ", "1 ", "  "},
         {"  ", "R ", "  ", "R ", "  ", "R ", "  ", "R "},
-        {"R ", "  ", "R ", "  ", "R ", "  ", "R ", "  "}
+        {"R ", "  ", "R ", "  ", "R ", "  ", "R ", "  "},
+        {"  ", "R ", "  ", "R ", "  ", "R ", "  ", "R "}
     };
 
     //Print the initial board
