@@ -14,27 +14,27 @@ using namespace std;
 
 // String array with images, if more than 1 picture needs to be processed.
 
-string images[1] = {"/home/emil/chessboard.jpg"};
+string images[1] = {"/home/emil/blackSquaresNoBackground.jpg"};
 
 bool detectAndDrawChessboardCorners()
 {
     for (int i = 0; i < 1; i++){
         Mat img = imread(images[i]);
-        int down_width = 800;
+        /* int down_width = 800;
         int down_height = 600;
-        Mat resize_down;
+        Mat resize_down; */
 
         // Resizing the image to a standard scale. Variables should change depending on camera. Right now scales from Iphone 8 camera.
 
-        resize(img, resize_down, Size(down_width, down_height), INTER_LINEAR);
+        //resize(img, resize_down, Size(down_width, down_height), INTER_LINEAR);
 
 
-    imshow("image",resize_down);
+    imshow("image",img);
     moveWindow("image",40,40);
 
     Size patternsize(7,7); // The interior number of corners in a checkers board
     Mat gray;
-    cvtColor(resize_down,gray,COLOR_BGR2GRAY);
+    cvtColor(img,gray,COLOR_BGR2GRAY);
     vector<Point2f> corners; // Array will be filled by the detected corners
 
     //CALIB_CB_FAST_CHECK saves a lot of time on images (Removed for better accuracy)
@@ -44,18 +44,19 @@ bool detectAndDrawChessboardCorners()
 
     cout << "Corners:  " << corners << endl;
     cout << "Pattern: " << patternfound << endl;
-    cout << "Numb of cha: " << resize_down.channels() << endl;
+    cout << "Numb of cha: " << img.channels() << endl;
 
     if(patternfound){
         cornerSubPix(gray, corners, Size(11, 11), Size(-1, -1),
                      TermCriteria(TermCriteria::MAX_ITER|TermCriteria::EPS, 30, 0.1));
     } // Subpixels are also considered increasing accuracy
 
-    drawChessboardCorners(resize_down, patternsize, Mat(corners), patternfound); // Corners er visualized.
+    drawChessboardCorners(img, patternsize, Mat(corners), patternfound); // Corners er visualized.
 
-    imshow("result",resize_down);
-
-    moveWindow("result",resize_down.cols/2,100);
+    namedWindow("detected board", WINDOW_NORMAL);
+    imshow("detected board", img);
+    resizeWindow("detected board", 1000, 1300);
+    moveWindow("detected board",img.cols/2,100);
 
     // Define the offset of where the table the checkers board can be placed on starts. Also the scale of cm per pixel. These have to be defined when camera is set up.
     int offsetx = 155;
@@ -65,7 +66,7 @@ bool detectAndDrawChessboardCorners()
     for(int i = 0; i <= corners.size(); i++){
         corners[i].x = (corners[i].x - offsetx)* pixToMeters;
         corners[i].y = (corners[i].y - offsety) * pixToMeters;
-    } // Corners er redefined with coordinates in cm instead of pixels.
+    } // Corners er redefined with coordinates in m instead of pixels.
 
     cout << "New corners:  " << corners << endl;
 
