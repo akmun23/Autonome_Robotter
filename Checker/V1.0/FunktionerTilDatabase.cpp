@@ -144,7 +144,7 @@ void InsertToMove(int& BoardID,                                                 
                   "(:board_id, :Move, :WinRate, :WinCases, 0, :Player)");
     query.bindValue(":board_id", BoardID);
     query.bindValue(":Move", MoveToCheck.c_str());
-    query.bindValue(":WinRate", 0);
+    query.bindValue(":WinRate", 50);
     query.bindValue(":WinCases", 0);
     query.bindValue(":Player", PlayerID);
     query.exec();

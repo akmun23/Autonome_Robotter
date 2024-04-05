@@ -16,8 +16,8 @@ int main() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
     db.setDatabaseName("CheckersDatabase");
-    db.setUserName("Indsæt Brugernavn");  // Change to username
-    db.setPassword("Indsæt Password!");  // Change to password
+    db.setUserName("Indsætbrugernavn");  // Change to username
+    db.setPassword("Indsæt password!");  // Change to password
     db.open();
 
     QSqlQuery query;
@@ -26,8 +26,10 @@ int main() {
     /*
     query.exec("DELETE FROM Moves WHERE board_id >= 0");
     query.exec("DELETE FROM UniqueBoard WHERE board_id >= 0");
-    query.exec("ALTER TABLE UniqueBoard AUTO_INCREMENT = 1");*/
-    for (int ii = 1; ii <= 1; ++ii) {
+    query.exec("ALTER TABLE UniqueBoard AUTO_INCREMENT = 1");
+    query.exec("INSERT INTO UniqueBoard (board_state) VALUES ('22222222222211111111444444444444')");
+    */
+    for (int ii = 1; ii <= 10000; ++ii) {
 
             int CounterForTempTable = 1;
 
@@ -102,7 +104,7 @@ int main() {
                             }
                         }
                         else {
-                            alphaBeta(boards, 5, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                            alphaBeta(boards, 2, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
                         }
 
                         std::cout << "Kører loopet" << std::endl;
@@ -215,7 +217,7 @@ int main() {
                 std::cout << "Player 1 wins! No more moves for red" << std::endl;
             }
         }
-        UpdateMoveWinrate(CounterForTempTable);
+        //UpdateMoveWinrate(CounterForTempTable);
         std::cout << "Moves made by database: " << TestCounterForDatabase << std::endl;
     }
     return 0;
