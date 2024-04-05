@@ -55,7 +55,7 @@ compile_commands.json
 
 **/.build*
 **/build*
-build*/
+**/build*/
 /build*/
 /build/
 /Checker/build*
