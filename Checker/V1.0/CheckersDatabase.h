@@ -8,12 +8,11 @@
 
 
 void AddMove(int& TempBoardID, std::string& OldBoardState);
-void AddBoard(int TempBoardID, std::string& OldBoardState);
-void UpdateDatabaseFromTemp();
+void AddBoard(std::string& NewBoardState, std::string& OldBoardState, int& TempBoardID);
 void InsertToTemp(std::string& BoardState, std::string& Move, int& Counter, int PlayerId);
-void InsertToMove(int& BoardID, std::string& MoveToCheck, double& WinChecker, int& PlayerId);
-void UpdateMoveWinrate(int& BoardID, std::string& MoveToCheck, double &WinChecker, int& PlayerId);
-std::string MovePlayer(std::vector<std::vector<std::string>>& BoardState,int& PlayerTurn);
+void InsertToMove(int& BoardID, std::string& MoveToCheck, int& PlayerId);
+void UpdateMoveWinrate(int& AmountOfMoves);
+std::string MovePlayer(std::string& BoardState,int& PlayerTurn);
 void RefreshTempTable(int& PlayerTurn);
 bool CheckDuplicateMoves(std::string& BoardState, std::string& MoveToCheck, int& PlayerId);
 

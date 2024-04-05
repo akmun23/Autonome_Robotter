@@ -16,8 +16,8 @@ int main() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
     db.setDatabaseName("CheckersDatabase");
-    db.setUserName("Indsæt brugernavn");  // Change to username
-    db.setPassword("Indsæt password!");  // Change to password
+    db.setUserName("Indsæt Brugernavn");  // Change to username
+    db.setPassword("Indsæt Password!");  // Change to password
     db.open();
 
     QSqlQuery query;
@@ -45,7 +45,7 @@ int main() {
             std::future<bool> fut;
             std::string MoveMade; // Stores the move made to put it in the database
             bool DatabaseMoveMade = false;
-
+            std::string OldBoard = "22222222222211111111444444444444";
 
             int TestCounterForDatabase = 0;
 
@@ -62,7 +62,7 @@ int main() {
             while(true){ //Game loop
                 thisTurn = playerTurn; //Which player's turn it is
 
-                if (DrawChecker == 250){ // Tjekker om der er gået 175 træk uden en vinder
+                if (DrawChecker == 175){ // Tjekker om der er gået 175 træk uden en vinder
                     query.exec("UPDATE Temp SET WinOrLoss = 0.5"); // Sætter en halv ind i wincase for uafgjort
                     std::cout << "The game is a draw!" << std::endl;
                     break;
@@ -84,11 +84,11 @@ int main() {
                     } else {
                         if (playerTurn == 1 && player == "DB" || playerTurn == 2 && player2 == "DB"){
 
-                            std::string DBmove = MovePlayer(boards, playerTurn); // Database best move on current board
+                            std::string DBmove = MovePlayer(OldBoard, playerTurn); // Database best move on current board
 
-                            if (DBmove == "No moves" || DrawChecker == 1){
+                            if (DBmove == "No moves"){
                                 std::cout << "No moves found" << std::endl;
-                                alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                                alphaBeta(boards, 5, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
                             }
                             else{
                                 std::cout << "AI move from database: " << DBmove << std::endl;
@@ -102,7 +102,7 @@ int main() {
                             }
                         }
                         else {
-                            alphaBeta(boards, 2, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                            alphaBeta(boards, 5, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
                         }
 
                         std::cout << "Kører loopet" << std::endl;
@@ -163,7 +163,13 @@ int main() {
 
                     if (CheckDuplicateMoves(output, MoveMade, thisTurn)){
                         InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
+                        AddBoard(output, OldBoard,CounterForTempTable);
+                        CounterForTempTable++;
                     }
+
+                    OldBoard = output;
+
+
                     DrawChecker++;
 
 
@@ -209,7 +215,7 @@ int main() {
                 std::cout << "Player 1 wins! No more moves for red" << std::endl;
             }
         }
-        UpdateDatabaseFromTemp();
+        UpdateMoveWinrate(CounterForTempTable);
         std::cout << "Moves made by database: " << TestCounterForDatabase << std::endl;
     }
     return 0;
