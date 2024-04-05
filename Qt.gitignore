@@ -60,4 +60,7 @@ compile_commands.json
 /build*/
 /build/
 /Checker/build*
-
+Checker/build*
+**/Checker/build*
+**/build*/*
+**/Checker/build*/*
