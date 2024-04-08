@@ -410,7 +410,6 @@ bool move(int& playerTurn, std::vector<std::vector<std::string>>& boards, int& r
     }
 }
 
-
 bool DB_move(int& playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces, std::string playerStart, std::string playerMove){ // MoveFunction for database input
     bool valid = false;
     bool jumped = false; //If a piece has jumped
@@ -455,8 +454,6 @@ bool DB_move(int& playerTurn, std::vector<std::vector<std::string>>& boards, int
         return true;
     }
 }
-
-
 
 //Gives the board a game score based on the number of pieces and the number of possible moves
 //Used in the alphaBeta function
