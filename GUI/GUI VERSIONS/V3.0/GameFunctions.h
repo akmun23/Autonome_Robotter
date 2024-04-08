@@ -46,7 +46,7 @@ void setBool(bool& boolean, bool TF){
 void posToStringConvert(int x, int y, vector<string>& stringPos){
     int boardOffSetX = 100;
     int boardOffSetY = 75;
-    string alphabetArr[8] = {"A", "B", "C", "D", "E", "F", "G", "H"};
+    string alphabetArr[8] = {"a", "b", "c", "d", "e", "f", "g", "h"};
     string numArr[8] = {"1", "2", "3", "4", "5", "6", "7", "8"};
     string col, row;
 
@@ -61,7 +61,7 @@ void stringToPosConvert(string stringPosValue, vector<int>& outputVector){
     int x, y;
     int boardOffSetX = 100;
     int boardOffSetY = 75;
-    string alphabetArr[8] = {"A", "B", "C", "D", "E", "F", "G", "H"};
+    string alphabetArr[8] = {"a", "b", "c", "d", "e", "f", "g", "h"};
     string numArr[8] = {"1", "2", "3", "4", "5", "6", "7", "8"};
 
     //string alphabetString = string str(stringPosValue[0]);
