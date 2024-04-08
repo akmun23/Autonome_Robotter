@@ -2,12 +2,11 @@
 #define VALIDMOVES_H
 
 #include "boardUpdate.h"
-#include "playerInput.h"
 #include <climits>
 #include <iostream>
 #include <unistd.h>
-#include<vector>
-#include<string>
+#include <vector>
+#include <string>
 #include <stdlib.h>
 #include <random>
 
@@ -404,59 +403,6 @@ bool playerMover(std::string playerStart, std::string playerMove, int playerTurn
     return true;
 }
 
-//Changes the board according to the player's move
-/*bool boardChange(int playerTurn, std::vector<std::vector<std::string>>& boards, std::string playerStart, std::string playerMove, int& redPieces, int& blackPieces){
-     std::string piece;
-     int row = playerStart[1] - '1'; //Starting row
-     int row2 = playerMove[1] - '1'; //Ending row
-     int row3 = row2 + (row-row2)/2; //Middle row if jump
-     char lowerCase = tolower(playerStart[0]); //Makes it possible fo input to be lowerCase
-     char lowerCase2 = tolower(playerMove[0]); //Makes it possible fo input to be lowerCase
-     int column = lowerCase - 'a'; //Starting column
-     int column2 = lowerCase2 - 'a'; //Ending column
-     int column3 = column - (column-column2)/2; //Middle column if jump
-
-     //Changes the board according to the player's move and what piece has been moved
-     piece = boards[column][row];
-     boards[column][row] = "1 ";
-     boards[column2][row2] = piece;
-
-     //Checks if the piece has jumped
-     if(pieceJump(playerStart, playerMove, playerTurn, boards)){
-         //Sets the middle position to empty
-         boards[column3][row3] = "1 ";
-         int count = 0;
-         int count2 = 0;
-         //Counts the number of pieces on the board
-         for (int i = 0; i < 8; ++i) {
-             for (int j = 0; j < 8; ++j) {
-                 if(boards[i][j] == "R " || boards[i][j] == "RK"){
-                     count2++;
-                 } else if(boards[i][j] == "B " || boards[i][j] == "BK"){
-                     count++;
-                 }
-             }
-         }
-         //Sets the number of pieces on the board
-         redPieces = count2;
-         blackPieces = count;
-     }
-
-     //Checks if the piece is able to promote and changes it to a king if it is
-     //Returns true if the piece has been promoted
-     if(promotion(boards, playerTurn)){
-         if(playerTurn == 1){
-             boards[column2][row2] = "BK";
-         } else {
-             boards[column2][row2] = "RK";
-         }
-         return true;
-     }
-
-     //If no promotion has been made, it returns false
-     return false;
-}*/
-
 /*std::vector<std::string> move(int playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces){
     bool valid = false;
     bool jumped = false; //If a piece has jumped
@@ -484,104 +430,6 @@ bool playerMover(std::string playerStart, std::string playerMove, int playerTurn
     }
 
     return moveSet;
-}*/
-
-//Gives the board a game score based on the number of pieces and the number of possible moves
-//Used in the alphaBeta function
-/*int giveBoardScore(std::vector<std::vector<std::string>> boards, int playerTurn){
-    int score = 0;
-    int black = 0;
-    int red = 0;
-    int diff = 0;
-    std::random_device rd;  // Obtain a random number from hardware
-    std::mt19937 eng(rd()); // Seed the generator
-    std::uniform_int_distribution<> distr(0, 10); // Define the range for the random number
-    int random = distr(eng); // Generate a random number
-    //Gives score depending on the number of pieces on the board
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            if(boards[i][j] == "B "){
-                score += 6;
-                black++;
-                diff++;
-            }
-            else if(boards[i][j] == "BK"){
-                score += 10;
-                black++;
-                diff++;
-            }
-            else if(boards[i][j] == "R "){
-                score -= 6;
-                red++;
-                diff--;
-            }
-            else if(boards[i][j] == "RK"){
-                score -= 10;
-                red++;
-                diff--;
-            }
-        }
-    }
-    score += diff;
-
-    //Gives score depending on the jumps that are possible
-    //And if the game is in a winning state
-    if(playerTurn == 1){
-       if(jumpPossible(2, boards).empty()){
-            score += 15;
-            if(!(jumpPossible(1, boards).empty())){
-                score += 25;
-            }
-        }
-        if(!(jumpPossible(1, boards).empty())){
-            score += 15;
-            if(!(jumpPossible(2, boards).empty())){
-                score -= 15;
-            }
-        }
-        if(jumpPossible(1, boards).empty()){
-            score -= 20;
-            if(!(jumpPossible(2, boards).empty())){
-                score -= 50;
-            }
-        }
-        if(red == 0 || movePossible(2, boards, jumpPossible(2, boards), false, "").empty()){
-            score += 1000;
-        }
-        score *= 1000;
-
-        random = distr(eng); // Generate a random number
-
-        score += rand()%10;
-    } else if(playerTurn == 2) {
-      if(jumpPossible(1, boards).empty()){
-                score -= 15;
-            if(!(jumpPossible(2, boards).empty())){
-                score -= 25;
-            }
-        }
-        if(!(jumpPossible(2, boards).empty())){
-                score -= 5;
-                if(!(jumpPossible(1, boards).empty())){
-                    score += 20;
-                }
-        }
-        if(jumpPossible(2, boards).empty()){
-            score += 20;
-            if(!(jumpPossible(1, boards).empty())){
-                score += 50;
-        }
-    }
-        if(black == 0 || movePossible(1, boards, jumpPossible(1, boards), false, "").empty()){
-            score -= 1000;
-        }
-        score *= 1000;
-
-        score -= random;
-    }
-
-    //Returns the score
-    return score;
 }*/
 
 int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTurn, int& black, int& red, int& depth){
@@ -740,7 +588,7 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
     }
 
     //If it is player 2's turn, it checks all the possible moves and returns the best move
-    if(tempPlayer == 2){
+    if(tempPlayer == 2 || tempPlayer == 1){
         maxEval = INT_MIN; //Set the maxEval to the lowest possible value
 
         //Iterates through all possible moves

@@ -13,20 +13,7 @@ std::vector<std::vector<std::string>> boards = {
         {"R ", "  ", "R ", "  ", "R ", "  ", "R ", "  "},
         {"  ", "R ", "  ", "R ", "  ", "R ", "  ", "R "},
         {"R ", "  ", "R ", "  ", "R ", "  ", "R ", "  "}
-    };
-
-/*void checkerBoard(std::vector<std::vector<std::string>> boards){
-};*/
-
-/*std::vector<std::vector<std::string>> startUp(){
-
-    //Print the initial board
-    std::cout << "Welcome to Checkers!" << std::endl;
-    std::cout << "Here is the board:" << std::endl;
-    checkerBoard(boards);
-    std::cout << std::endl;
-    return boards;
-}*/
+};
 
 
 //Prints the board with input given by the vector boards
