@@ -3,10 +3,11 @@
 #include <opencv4/opencv2/core.hpp>
 #include <opencv4/opencv2/imgcodecs.hpp>
 #include <opencv4/opencv2/highgui.hpp>
+#include "boardUpdate.h"
 #include "validMoves.h"
-//#include "boardUpdate.h"
 #include "GameFunctions.h"
 #include "DrawFunctions.h"
+
 //#include "robotMove.h"
 //#include <unistd.h>
 //#include <ur_rtde/rtde_control_interface.h>
@@ -29,7 +30,7 @@ int redPieces = 12; //Initial number of red pieces
 int latestScores[5];
 int currentChecker;
 int turnVal = 0; //Array containing INT representing how many turns have been taken.
-int depth = 5;
+int depth = 7;
 
 bool jumpPerformed = false;
 bool gameEnd = false;
@@ -86,14 +87,12 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                         posToStringConvert(rectangles[i].x, rectangles[i].y, stringPos);
 
                         //Checks if move is legal.
-                        if(playerMover(stringPos[0], stringPos[1], thisTurn, boards)){
+                        if(move(thisTurn, boards, redPieces, blackPieces, stringPos[0], stringPos[1])){
                             
                             //Changes the position of selected checker.
                             rCheckers[selected[1]].x = rectangles[i].x;
                             rCheckers[selected[1]].y = rectangles[i].y;
-                            
-                            //Changes gamestate in board.
-                            boardChange(thisTurn, boards, stringPos[0], stringPos[1], redPieces, blackPieces);
+
                             //Prints new gamestate to console.
                             checkerBoard(boards);
 
@@ -137,7 +136,6 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                                 setBool(jumpPerformed, false);
 
                                 turnVal++;
-                                thisTurn = (turnVal%2 == 0 ? 1 : 2);
                                 updateText(img, turnVal); //Updates text.
                                 promotionGUI(rCheckers);
                                 Draw(img, startUpMain); //Draws new gamestate.
@@ -160,12 +158,11 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
 
                         posToStringConvert(rectangles[i].x, rectangles[i].y, stringPos);
 
-                        if(playerMover(stringPos[0], stringPos[1], thisTurn, boards)){
+                        if(move(thisTurn, boards, redPieces, blackPieces, stringPos[0], stringPos[1])){
 
                             bCheckers[selected[1]].x = rectangles[i].x;
                             bCheckers[selected[1]].y = rectangles[i].y;
 
-                            boardChange(thisTurn, boards, stringPos[0], stringPos[1], redPieces, blackPieces);
                             checkerBoard(boards);
 
                             if(selected[3] != 0 && selected[3] < 5){
@@ -206,7 +203,6 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                                 setBool(jumpPerformed, false);
 
                                 turnVal++;
-                                thisTurn = (turnVal%2 == 0 ? 1 : 2);
                                 updateText(img, turnVal); //Updates text.
                                 promotionGUI(bCheckers);
                                 Draw(img, startUpMain); //Draws new gamestate.
@@ -331,7 +327,6 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
             rCheckers[selected[selected.size()-1]].x = intPos[intPos.size()-2];
             rCheckers[selected[selected.size()-1]].y = intPos[intPos.size()-1];
 
-            boardChange(thisTurn, boards, moveSet[moveSet.size()-2], moveSet[moveSet.size()-1], redPieces, blackPieces);
             checkerBoard(boards);
             Draw(img, startUpMain);
 
@@ -347,7 +342,6 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
         setBool(jumpPerformed, false);
 
         turnVal++;
-        thisTurn = (turnVal%2 == 0 ? 1 : 2);
         updateText(img, turnVal);
         promotionGUI(rCheckers);
         Draw(img, startUpMain); //Draws new gamestate.
@@ -378,7 +372,7 @@ int main(){
             imshow(winName, img);
 
             latestScores[0] = 0;
-            thisTurn = (turnVal%2 == 0 ? 1 : 2);
+            thisTurn = 1;
         }
 
         //Creates window, and shows image on it.

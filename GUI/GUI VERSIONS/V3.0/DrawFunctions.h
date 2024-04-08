@@ -1,3 +1,5 @@
+#include "boardUpdate.h"
+#include "validMoves.h"
 #include <iostream>
 #include <opencv4/opencv2/opencv.hpp>
 #include <opencv4/opencv2/core.hpp>
@@ -102,7 +104,7 @@ void Draw(Mat img, bool& startUpMain){
         }
 
         //Loads graveyard segment image, and resizes it to fit inside rect.
-        resize(imread("/home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt/graveyard.jpg"), graveyardDownSized, Size(50, 50), INTER_LINEAR);
+        resize(imread("/home/aksel/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.0/graveyard.jpg"), graveyardDownSized, Size(50, 50), INTER_LINEAR);
         graveyardDownSized.copyTo(img(blackGraveyardRect)); //Draws graveyard onto img.
         graveyardDownSized.copyTo(img(redGraveyardRect));
 
@@ -335,12 +337,15 @@ void promotionGUI(vector<Circle> checkerVector){
 }
 
 bool isGameWon(vector<Circle> checkerVec, vector<Circle> enemyCheckerVec, int turn){
+    std::vector<std::string> jumps = jumpPossible(turn, boards);
+    bool moreMove = false;
+    std::string move = "";
 
     if(checkerVec == rCheckers){
         if(piecesLeft(rectangles, enemyCheckerVec) < 1){
             return true;
         }
-        else if(movePossible(turn, boards, jumpPossible(turn, boards), false, "").size() < 1){
+        else if(movePossible(turn, boards, jumps, moreMove, move).size() < 1){
             return true;
         }
         else{
@@ -351,7 +356,7 @@ bool isGameWon(vector<Circle> checkerVec, vector<Circle> enemyCheckerVec, int tu
         if(piecesLeft(rectangles, enemyCheckerVec) < 1){
             return true;
         }
-        else if(movePossible(turn, boards, jumpPossible(turn, boards), false, "").size() < 1){
+        else if(movePossible(turn, boards, jumps, moreMove, move).size() < 1){
             return true;
         }
         else{
