@@ -20,14 +20,6 @@ bool detectAndDrawChessboardCorners(Mat src)
 {
     for (int i = 0; i < 1; i++){
         Mat img = src;
-        /* int down_width = 800;
-        int down_height = 600;
-        Mat resize_down; */
-
-        // Resizing the image to a standard scale. Variables should change depending on camera. Right now scales from Iphone 8 camera.
-
-        //resize(img, resize_down, Size(down_width, down_height), INTER_LINEAR);
-
         Size patternsize(7,7); // The interior number of corners in a checkers board
     Mat gray;
     cvtColor(img,gray,COLOR_BGR2GRAY);
@@ -81,7 +73,7 @@ bool detectAndDrawChessboardCorners(Mat src)
 
 #if QA_MULTI_DEMO
 
-int main( int argc, char** argv )
+int main(int argc, char** argv )
 {
     //![load]
     const char* filename = argc >=2 ? argv[1] : "/home/aksel/Downloads/boards4.jpg";
