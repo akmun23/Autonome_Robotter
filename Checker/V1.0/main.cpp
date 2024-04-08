@@ -29,7 +29,7 @@ int main() {
     query.exec("ALTER TABLE UniqueBoard AUTO_INCREMENT = 1");
     query.exec("INSERT INTO UniqueBoard (board_state) VALUES ('22222222222211111111444444444444')");
     */
-    for (int ii = 1; ii <= 10000; ++ii) {
+    for (int ii = 1; ii <= 1; ++ii) {
 
             int CounterForTempTable = 1;
 
@@ -105,7 +105,7 @@ int main() {
                             }
                         }
                         else {
-                            alphaBeta(boards, 2, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                            alphaBeta(boards, 3, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
                         }
                         std::cout << "Kører loopet" << std::endl;
                     }
