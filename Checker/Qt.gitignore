@@ -29,6 +29,7 @@ ui_*.h
 *.jsc
 Makefile*
 *build-*
+/build-*
 *.qm
 *.prl
 
@@ -52,3 +53,13 @@ compile_commands.json
 *creator.user*
 
 *_qmlcache.qrc
+
+**/.build*
+**/build*
+**/build*/
+/build*/
+/build/
+/Checker/build*
+Checker/build*
+**/Checker/build*
+**/build*/*

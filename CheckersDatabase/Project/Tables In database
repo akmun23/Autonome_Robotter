@@ -1,0 +1,23 @@
+CREATE TABLE UniqueBoard{
+  board_id INT AUTO_INCREMENT PRIMARY KEY,
+  BoardState char[100]  
+}
+
+CREATE TABLE Moves{
+  board_id INT,
+  Move char[20],
+  WinRate DOUBLE,
+  WinCases DOUBLE,
+  UseCases INT,
+  Player INT,
+  FOREIGN KEY (board_id) REFERENCES UniqueBoard(board_id)
+}
+
+CREATE TABLE Temp{
+  tempboard_id INT,
+  BoardState char[100],
+  Move char[20],
+  WinOrLoss DOUBLE,
+  PlayerID INT
+}
+
