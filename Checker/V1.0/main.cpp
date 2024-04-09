@@ -3,16 +3,26 @@
 #include<string>
 #include "boardUpdate.h"
 //#include "robotMove.h"
+#include "computerPos.h"
+#include "qa.hpp"
 #include "validMoves.h"
+#include "CheckersDatabase.h"
+#include "computerVision.h"
+
 #include <unistd.h>
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
-#include "CheckersDatabase.h"
-//#include <future>
+#include <opencv2/opencv.hpp>
+#include "opencv2/imgproc.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/calib3d.hpp"
+#include "opencv2/imgcodecs.hpp"
+#include <future>
 
 using namespace ur_rtde;
 
 int main() {
+
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
     db.setDatabaseName("CheckersDatabase");
@@ -29,6 +39,7 @@ int main() {
     query.exec("ALTER TABLE UniqueBoard AUTO_INCREMENT = 1");
     query.exec("INSERT INTO UniqueBoard (board_state) VALUES ('22222222222211111111444444444444')");
     */
+
     for (int ii = 1; ii <= 1; ++ii) {
 
             int CounterForTempTable = 1;
@@ -220,5 +231,10 @@ int main() {
         //UpdateMoveWinrate(CounterForTempTable);
         std::cout << "Moves made by database: " << TestCounterForDatabase << std::endl;
     }
+
+    cv::Mat src = detectAndDrawCentersOfCircles();
+    std::vector<cv::Point2f> axis = detectAndDrawChessboardCorners(src);
+    boardCorners(axis);
+
     return 0;
 }

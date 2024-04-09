@@ -1,7 +1,9 @@
 #ifndef COMPUTERPOS_H
 #define COMPUTERPOS_H
 
+#include "computerVision.h"
 #include <vector>
+#include <opencv2/opencv.hpp>
 
 double tableCorner(){
     // Orego for plane parallel with table
@@ -17,8 +19,38 @@ double tableCorner(){
     return z;
 }
 
-double boardCorners() {
+double boardCorners(std::vector<cv::Point2f> axis){
+    std::vector<double> vec1;
+    std::vector<double> vec2;
+    std::vector<double> unit1;
+    std::vector<double> unit2;
 
+    cv::Point2f orego = axis[1];
+    cv::Point2f pos1 = axis[2];
+    cv::Point2f pos2 = axis[0];
+
+    vec1.push_back(pos1.x - orego.x);
+    vec1.push_back(pos1.y - orego.y);
+    vec2.push_back(pos2.x - orego.x);
+    vec2.push_back(pos2.y - orego.y);
+
+    double length1 = sqrt(pow(vec1[0], 2) + pow(vec1[1], 2));
+    double length2 = sqrt(pow(vec2[0], 2) + pow(vec2[1], 2));
+
+    unit1.push_back(vec1[0] / length1);
+    unit1.push_back(vec1[1] / length1);
+    unit2.push_back(vec2[0] / length2);
+    unit2.push_back(vec2[1] / length2);
+
+    double pointx = (offsetx*pixToMeters-orego.x);
+    double pointy = (offsety*pixToMeters-orego.y);
+
+    double refx = pointx*unit1[0] + pointy*unit1[1];
+    double refy = pointx*unit2[0] + pointy*unit2[1];
+
+    std::cout << "Refx: " << refx << std::endl;
+    std::cout << "Refy: " << refy << std::endl;
 }
+
 
 #endif // COMPUTERPOS_H
