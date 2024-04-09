@@ -156,9 +156,9 @@ void InsertToMove(int& BoardID,                                                 
     QSqlQuery query = QSqlQuery(db);
     std::cout << "Move: " << MoveToCheck << std::endl;
     query.prepare(  " INSERT INTO " + QString::fromStdString(PlayerMoveDB) +                                          // Tilføjer et move til tabellen ud fra inputtet
-                    " (board_id, Move, WinRate, WinCases, UseCases, Player) "
+                    " (board_id, Move, WinRate, WinCases, UseCases) "
                     " VALUES "
-                    " (:board_id, :Move, :WinRate, :WinCases, 0, :Player)");
+                    " (:board_id, :Move, :WinRate, :WinCases, 0)");
     query.bindValue(":board_id", BoardID);
     query.bindValue(":Move", MoveToCheck.c_str());
     query.bindValue(":WinRate", 50);

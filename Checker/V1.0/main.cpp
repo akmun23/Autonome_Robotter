@@ -27,17 +27,18 @@ int main() {
     db.setHostName("localhost");
     db.setDatabaseName("CheckersDatabase");
     db.setUserName("Indsætbrugernavn");  // Change to username
-    db.setPassword("Indsæt password!");  // Change to password
+    db.setPassword("IndsætPassword!");  // Change to password
     db.open();
 
     QSqlQuery query;
 
     //Det her er er til vis man vil reset dataen i databasen
     /*
-    query.exec("DELETE FROM Moves WHERE board_id >= 0");
+    query.exec("DELETE FROM MovesP1 WHERE board_id >= 0");
+    query.exec("DELETE FROM MovesP2 WHERE board_id >= 0");
     query.exec("DELETE FROM UniqueBoard WHERE board_id >= 0");
     query.exec("ALTER TABLE UniqueBoard AUTO_INCREMENT = 1");
-    query.exec("INSERT INTO UniqueBoard (board_state) VALUES ('22222222222211111111444444444444')");
+    query.exec("INSERT INTO UniqueBoard (BoardState) VALUES ('22222222222211111111444444444444')");
     */
 
     for (int ii = 1; ii <= 1; ++ii) {
