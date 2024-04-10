@@ -13,9 +13,12 @@
 using namespace cv;
 using namespace std;
 
-int offsetx = 837;
-int offsety = 1267;
+double offsetx = 837;
+double offsety = 1267;
+double robotBasex = 1436;
+double robotBasey = 856;
 double pixToMeters;
+vector<Vec3f> circles;
 
 //Code for detecting and drawing chessboard corners
 
@@ -23,7 +26,6 @@ double pixToMeters;
 
 cv::Mat detectAndDrawCentersOfCircles(){
     //![load]
-    // Loads an image
     Mat src = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards4.jpg");
     //![load]
 
@@ -37,14 +39,12 @@ cv::Mat detectAndDrawCentersOfCircles(){
     //![reduce_noise]
 
     //![houghcircles]
-    vector<Vec3f> circles;
     HoughCircles(gray, circles, HOUGH_GRADIENT, 1,
                  gray.rows/50,  // change this value to detect circles with different distances to each other
                  100, 30, 20, 21 // change the last two parameters
                  // (min_radius & max_radius) to detect larger circles
                  );
     //![houghcircles]
-
 
     //![draw]
     for( size_t i = 0; i < circles.size(); i++ )
@@ -57,8 +57,6 @@ cv::Mat detectAndDrawCentersOfCircles(){
         int radius = c[2];
         circle(src, center, radius+5, Scalar(0,0,0), -1, LINE_AA);
     }
-
-    //![draw]
 
     return src;
 }
@@ -86,13 +84,13 @@ std::vector<cv::Point2f> detectAndDrawChessboardCorners(cv::Mat src) {
         pixToMeters = (0.03 / sqrt(pow((corners[1].x - corners[0].x),2) + pow((corners[1].y - corners[0].y),2)));
 
         circle(img, Point(offsetx, offsety), 10, Scalar(255, 255, 255), 3);
-        circle(img, corners[0], 10, Scalar(255, 255, 255), -1);
+        circle(img, corners[6], 10, Scalar(255, 255, 255), -1);
         circle(img, corners[42], 10, Scalar(255, 255, 255), -1);
         circle(img, corners[48], 10, Scalar(255, 255, 255), -1);
-        arrowedLine(img, corners[42], corners[0], Scalar(255, 255, 255), 3);
-        arrowedLine(img, corners[42], corners[48], Scalar(255, 255, 255), 3);
-        cv::putText(img, "x-akse", corners[48], FONT_HERSHEY_COMPLEX, 2, Scalar(255, 255, 255), 2);
-        cv::putText(img, "y-akse", corners[0], FONT_HERSHEY_COMPLEX, 2, Scalar(255, 255, 255), 2);
+        arrowedLine(img, corners[0], corners[42], Scalar(255, 255, 255), 3);
+        arrowedLine(img, corners[0], corners[6], Scalar(255, 255, 255), 3);
+        cv::putText(img, "x-akse", corners[42], FONT_HERSHEY_COMPLEX, 2, Scalar(255, 255, 255), 2);
+        cv::putText(img, "y-akse", corners[6], FONT_HERSHEY_COMPLEX, 2, Scalar(255, 255, 255), 2);
 
         namedWindow("detected board", WINDOW_NORMAL);
         imshow("detected board", img);
@@ -105,10 +103,6 @@ std::vector<cv::Point2f> detectAndDrawChessboardCorners(cv::Mat src) {
         } // Corners er redefined with coordinates in m instead of pixels.
 
         // Draw the corners of the board and offset
-
-        cout << "New corners:  " << endl;
-        cout << corners << endl;
-
         float boardSize;
         int exponent = 2;
         boardSize = sqrt((pow(corners[1].x - corners[0].x,exponent)) + (pow(corners[1].y - corners[0].y,exponent)));
@@ -117,7 +111,7 @@ std::vector<cv::Point2f> detectAndDrawChessboardCorners(cv::Mat src) {
     }
     waitKey(0);
 
-    std::vector<cv::Point2f> axis = {corners[0], corners[42], corners[48]};
+    std::vector<cv::Point2f> axis = {corners[0], corners[6], corners[42], corners[48]};
 
     return axis;
 }
