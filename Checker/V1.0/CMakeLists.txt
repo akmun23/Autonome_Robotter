@@ -23,6 +23,8 @@ add_executable(main main.cpp
     computerPos.h
     FunktionerTilDatabase.cpp
     computerVision.h
-    qa.hpp)
+    qa.hpp
+    matrix.cpp
+    matrix.h)
 
 target_link_libraries(main PRIVATE ur_rtde::rtde Qt5::Core Qt5::Sql opencv_core opencv_highgui opencv_imgcodecs ${OpenCV_LIBS})

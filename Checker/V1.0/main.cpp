@@ -8,6 +8,7 @@
 #include "validMoves.h"
 #include "CheckersDatabase.h"
 #include "computerVision.h"
+#include "matrix.h"
 
 #include <unistd.h>
 #include <ur_rtde/rtde_control_interface.h>
@@ -20,6 +21,14 @@
 #include <future>
 
 using namespace ur_rtde;
+
+void setMatrixValues(Matrix& m, std::vector<double> v){
+    for(int r=0; r<m.getRows(); r++){
+        for(int c=0; c<m.getCols(); c++){
+            m.at(r,c) = v[r*m.getCols() + c];
+        }
+    }
+}
 
 int main() {
 
@@ -234,8 +243,76 @@ int main() {
     }
 
     cv::Mat src = detectAndDrawCentersOfCircles();
-    std::vector<cv::Point2f> axis = detectAndDrawChessboardCorners(src);
-    boardCorners(axis);
+
+    std::vector<cv::Point2f> allAxis = detectAndDrawChessboardCorners(src);
+    std::vector<cv::Point2f> axis = {allAxis[0], allAxis[2], allAxis[3]};
+
+    /*
+    Matrix robotBase(2, 1);
+    setMatrixValues(robotBase, {-robotBasex, -robotBasey});
+    Matrix point(2, 1);
+    setMatrixValues(point, {offsetx, offsety});
+    Matrix add = robotBase+point;
+    */
+
+    /*
+    std::vector<double> tableCorners = tableCorner();
+    Matrix robotCoord(2, 1);
+    setMatrixValues(robotCoord, {tableCorners[0], tableCorners[1]});
+    Matrix robot(3, 3);
+    setMatrixValues(robot, {1, 0 , tableCorners[0], 0, 1, tableCorners[1], 0, 0, 1});
+    std::vector<std::vector<double>> unitVecs = calcUnitVec2D(axis);
+    Matrix chessRot(2,2);
+    setMatrixValues(chessRot, {-unitVecs[0][0], -unitVecs[1][0], -unitVecs[0][1], -unitVecs[1][1]});
+    chessRot.transpose();
+    std::vector<double> coordPoint = findCoordFrame(axis, cv::Point2f(offsetx*pixToMeters, offsety*pixToMeters));
+    Matrix chessCoord(2,1);
+    setMatrixValues(chessCoord, {coordPoint[0], coordPoint[1]});
+    Matrix multiply = chessRot.multiply(chessCoord);
+    setMatrixValues(chessRot, {unitVecs[0][0], unitVecs[1][0], unitVecs[0][1], unitVecs[1][1]});
+    chessRot.transpose();
+    Matrix chess(3, 3);
+    setMatrixValues(chess, {chessRot.at(0,0), chessRot.at(0,1), multiply.at(0,0), chessRot.at(1,0), chessRot.at(1,1), multiply.at(1,0), 0, 0, 1});
+    multiply = chess.multiply(robot);
+    //simpleMove(multiply.at(0,2), multiply.at(1,2), 0.02);
+    */
+
+    while(1){
+        int xcheck = 0;
+        int ycheck = 0;
+        bool orego = false;
+        bool pos1 = false;
+        bool pos2 = false;
+        std::vector<double> init = findCoordFrame(axis, cv::Point2f(circles[0][0]*pixToMeters, circles[0][1]*pixToMeters));
+        for (int i = 0; i < circles.size(); i++) {
+            std::vector<cv::Point2f> newCorners = newChessCorners(axis);
+            std::vector<double> circleChecked = findCoordFrame(axis, cv::Point2f(circles[i][0]*pixToMeters, circles[i][1]*pixToMeters));
+            if(((circleChecked[0] - 0.005) < init[0]) && ((circleChecked[0] + 0.005) > init[0])){
+                std::cout << "Circle is alligned on the x-axis: " << i+1 << std::endl;
+                xcheck++;
+            }
+            if(((circleChecked[1] - 0.005) < init[1]) && ((circleChecked[1] + 0.005) > init[1])){
+                std::cout << "Circle is alligned on the y-axis: " << i+1 << std::endl;
+                ycheck++;
+            }
+
+            if(-0.005 < circleChecked[0] && 0.005 > circleChecked[0] && -0.005 < circleChecked[1] && 0.005 > circleChecked[1]){
+                orego = true;
+            } else if (newCorners[1].x-newCorners[2].x-0.005 < circleChecked[0] && newCorners[1].x-newCorners[2].x+0.005 > circleChecked[0] && newCorners[1].y-newCorners[2].y-0.005 < circleChecked[1] && newCorners[1].y-newCorners[2].y+0.005 > circleChecked[1]){
+                pos2 = true;
+            } else if (newCorners[0].x-newCorners[1].x-0.005 < circleChecked[0] && newCorners[0].x-newCorners[1].x+0.005 > circleChecked[0] && newCorners[0].y-newCorners[1].y-0.005 < circleChecked[1] && newCorners[0].y-newCorners[1].y+0.005 > circleChecked[1]){
+                pos1 = true;
+            }
+        }
+        if(orego){
+            break;
+        } else if(false){
+            axis = {allAxis[1], allAxis[0], allAxis[2]};
+        } else if(pos2){
+            axis = {allAxis[2], allAxis[3], allAxis[1]};
+        }
+        std::cout << "-------------------" <<std::endl;
+    }
 
     return 0;
 }
