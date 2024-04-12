@@ -2,9 +2,10 @@
 #include<vector>
 #include<string>
 #include "boardUpdate.h"
-//#include "robotMove.h"
+#include "robotMove.h"
 #include "computerPos.h"
 #include "qa.hpp"
+#include "robotMove.h"
 #include "validMoves.h"
 #include "CheckersDatabase.h"
 #include "computerVision.h"
@@ -242,59 +243,72 @@ int main() {
         std::cout << "Moves made by database: " << TestCounterForDatabase << std::endl;
     }
 
-    cv::Mat img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards4.jpg");
-    std::vector<std::vector<Vec3f>> colorsAndCircles = detectAndDrawCentersOfCircles(img);
-    std::vector<Vec3f> circles = colorsAndCircles[0];
-    std::vector<Vec3f> colors = colorsAndCircles[1];
+    cv::Mat img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/visionTest4.jpg");
+    std::vector<std::vector<Vec3f>> circlesAndcolors = detectAndDrawCentersOfCircles(img);
     std::vector<cv::Point2f> allAxis = detectAndDrawChessboardCorners(img);
     axis = {allAxis[0], allAxis[2], allAxis[3]};
     std::vector<cv::Point2f> newCorners = newChessCorners(axis);
-    std::vector<double> init = findCoordFrame(newCorners, cv::Point2f(circles[0][0]*pixToMeters, circles[0][1]*pixToMeters));
 
-    /*
-    Matrix robotBase(2, 1);
-    setMatrixValues(robotBase, {-robotBasex, -robotBasey});
-    Matrix point(2, 1);
-    setMatrixValues(point, {offsetx, offsety});
-    Matrix add = robotBase+point;
-    */
-
-    /*
-    std::vector<double> tableCorners = tableCorner();
-    Matrix robotCoord(2, 1);
-    setMatrixValues(robotCoord, {tableCorners[0], tableCorners[1]});
-    Matrix robot(3, 3);
-    setMatrixValues(robot, {1, 0 , tableCorners[0], 0, 1, tableCorners[1], 0, 0, 1});
-    std::vector<std::vector<double>> unitVecs = calcUnitVec2D(axis);
-    Matrix chessRot(2,2);
-    setMatrixValues(chessRot, {-unitVecs[0][0], -unitVecs[1][0], -unitVecs[0][1], -unitVecs[1][1]});
-    chessRot.transpose();
-    std::vector<double> coordPoint = findCoordFrame(axis, cv::Point2f(offsetx*pixToMeters, offsety*pixToMeters));
-    Matrix chessCoord(2,1);
-    setMatrixValues(chessCoord, {coordPoint[0], coordPoint[1]});
-    Matrix multiply = chessRot.multiply(chessCoord);
-    setMatrixValues(chessRot, {unitVecs[0][0], unitVecs[1][0], unitVecs[0][1], unitVecs[1][1]});
-    chessRot.transpose();
-    Matrix chess(3, 3);
-    setMatrixValues(chess, {chessRot.at(0,0), chessRot.at(0,1), multiply.at(0,0), chessRot.at(1,0), chessRot.at(1,1), multiply.at(1,0), 0, 0, 1});
-    multiply = chess.multiply(robot);
-    //simpleMove(multiply.at(0,2), multiply.at(1,2), 0.02);
-    */
-    int playerTurn = 2;
     std::vector<std::vector<std::string>> chessBoard;
-    std::vector<Vec3b> colours = firstLoop(allAxis, newCorners, img, circles, colors, chessBoard);
-    Vec3b black = colours[0];
-    Vec3b red = colours[1];
+    std::vector<Vec3b> colours = firstLoop(allAxis, newCorners, img, circlesAndcolors[0], circlesAndcolors[1], chessBoard);
+
+
+    // Robot movement
+    std::vector<cv::Point2f> calibrate = calibrationCircles(circlesAndcolors);
+
+    std::cout << calibrate[0] << std::endl;
+    std::cout << calibrate[1] << std::endl;
+    std::cout << calibrate[2] << std::endl;
+
+    cv::Point2f xaxis = meanPoints(xaxis1, xaxis2, xaxis3);
+    cv::Point2f yaxis = meanPoints(yaxis1, yaxis2, yaxis3);
+    cv::Point2f orego = meanPoints(orego1, orego2, orego3);
+    cv::Point2f oregoPicture = Point2f(calibrate[0].x*pixToMeters, calibrate[0].y*pixToMeters);
+    cv::Point2f xaxisPicture = Point2f(calibrate[1].x*pixToMeters, calibrate[1].y*pixToMeters);
+    cv::Point2f yaxisPicture = Point2f(calibrate[2].x*pixToMeters, calibrate[2].y*pixToMeters);
+
+    std::vector<std::vector<double>> unitVecRobot = calcUnitVec2D({yaxis, orego, xaxis});
+    std::vector<std::vector<double>> unitVecCamera = calcUnitVec2D({yaxisPicture, oregoPicture, xaxisPicture});
+    std::vector<std::vector<double>> unitVecChess = calcUnitVec2D({newCorners[0], newCorners[1], newCorners[2]});
+
+    Matrix Robot(4,4);
+    setMatrixValues(Robot, {unitVecRobot[0][0], unitVecRobot[1][0], 0, orego.x, unitVecRobot[0][1], unitVecRobot[1][1], 0, orego.y, 0, 0, 1, 0, 0, 0, 0, 1});
+    Matrix Camera(4, 4);
+    setMatrixValues(Camera, {unitVecCamera[0][0], unitVecCamera[1][0], 0, 0, unitVecCamera[0][1], unitVecCamera[1][1], 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
+    Matrix Chess(4, 4);
+    setMatrixValues(Chess, {unitVecChess[0][0], unitVecChess[1][0], 0, newCorners[1].x-oregoPicture.x, unitVecChess[0][1], unitVecChess[1][1], 0, newCorners[1].y-oregoPicture.y, 0, 0, 1, 0, 0, 0, 0, 1});
+    Matrix CamToChess = Camera*Chess;
+    Matrix Translation(4, 1);
+    setMatrixValues(Translation, {CamToChess.at(0,3), CamToChess(1,3) , 0.0, 1});
+    Matrix RobotToChessTransformation = Robot*Translation;
+
+    simpleMove(RobotToChessTransformation.at(0,0), RobotToChessTransformation.at(1,0), 0.02);
+
+    for(int i = 0; i < 8; i++){
+        for(int j = 0; j < 8; j++){
+            setMatrixValues(Chess, {unitVecChess[0][0], unitVecChess[1][0], 0, newCorners[1].x-oregoPicture.x, unitVecChess[0][1], unitVecChess[1][1], 0, newCorners[1].y-oregoPicture.y, 0, 0, 1, 0, 0, 0, 0, 1});
+            CamToChess = Camera*Chess;
+
+            Matrix piece(4, 4);
+            setMatrixValues(piece, {1, 0, 0, i*0.03, 0, 1, 0, j*0.03, 0, 0, 1, 0, 0, 0, 0, 1});
+
+            Matrix pieceLocation = CamToChess*piece;
+
+            setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3) , 0.0, 1});
+            RobotToChessTransformation = Robot*Translation;
+
+            simpleMove(RobotToChessTransformation.at(0,0), RobotToChessTransformation.at(1,0), 0.02);
+        }
+    }
+
+    int playerTurn = 2;
     img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards5.jpg");
-    std::vector<std::vector<std::string>> prevBoard = chessBoard;
-    chessBoard = boardLoop(black, red, newCorners, img);
-    std::vector<std::string> move = findMove(prevBoard, chessBoard, playerTurn);
+    std::vector<std::string> move = boardLoop(colours[0], colours[1], newCorners, img, chessBoard, playerTurn);
     std::cout << move[0] << " " << move[1] << std::endl;
+
     playerTurn = 1;
     img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards6.jpg");
-    prevBoard = chessBoard;
-    chessBoard = boardLoop(black, red, newCorners, img);
-    move = findMove(prevBoard, chessBoard, playerTurn);
+    move = boardLoop(colours[0], colours[1], newCorners, img, chessBoard, playerTurn);
     std::cout << move[0] << " " << move[1] << std::endl;
     return 0;
 }

@@ -13,12 +13,13 @@
 using namespace cv;
 using namespace std;
 
-double offsetx = 837;
-double offsety = 1267;
-double robotBasex = 1436;
-double robotBasey = 856;
+double offsetx = 249;
+double offsety = 639;
 double pixToMeters;
 std::vector<cv::Point2f> axis;
+Vec3b green = {101, 179, 168};
+Vec3b yellow = {74, 224, 255};
+Vec3b magenta = {173, 122, 179};
 
 std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
     vector<Vec3f> circles;
@@ -35,7 +36,7 @@ std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
     //![houghcircles]
     HoughCircles(gray, circles, HOUGH_GRADIENT, 1,
                  gray.rows/50,  // change this value to detect circles with different distances to each other
-                 100, 30, 18, 32 // change the last two parameters
+                 100, 30, 16, 32 // change the last two parameters
                  // (min_radius & max_radius) to detect larger circles
                  );
     //![houghcircles]
@@ -50,9 +51,13 @@ std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
         circle(src, center, 1, Scalar(0,100,100), 3, LINE_AA);
         // circle outline
         int radius = c[2];
-        circle(src, center, radius+5, Scalar(0,0,0), -1, LINE_AA);
+        circle(src, center, radius+3, Scalar(0,0,0), -1, LINE_AA);
     }
-    imshow("detected circles", src);
+    namedWindow("detected board", WINDOW_NORMAL);
+    imshow("detected board", src);
+    resizeWindow("detected board", 1000, 1300);
+    moveWindow("detected board",src.cols/2,100);
+    waitKey();
     return {circles, colors};
 }
 
@@ -89,7 +94,7 @@ std::vector<cv::Point2f> detectAndDrawChessboardCorners(cv::Mat src) {
         // The length of the individual squares of the board are calculated to calibrate the game program.
         cout << "Boardsize: " << boardSize << endl;
     }
-
+    imshow("Chessboard", src);
     std::vector<cv::Point2f> axis = {corners[0], corners[6], corners[42], corners[48]};
     return axis;
 }

@@ -236,7 +236,7 @@ bool robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>
 void simpleMove(double x, double y, double z){
     rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, 0}, 1, 0.1);
     std::vector<double> target = rtde_receive.getActualTCPPose();
-    rtde_control.moveL({-x-0.250, -y+0.130, z, target[3], target[4], target[5]}, 0.5, 0.05);
+    rtde_control.moveL({x, y, z, target[3], target[4], target[5]}, 0.5, 0.05);
 }
 
 #endif // ROBOTMOVE_H
