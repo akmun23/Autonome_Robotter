@@ -3,16 +3,35 @@
 #include<string>
 #include "boardUpdate.h"
 //#include "robotMove.h"
+#include "computerPos.h"
+#include "qa.hpp"
 #include "validMoves.h"
+#include "CheckersDatabase.h"
+#include "computerVision.h"
+#include "matrix.h"
+
 #include <unistd.h>
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
-#include "CheckersDatabase.h"
-//#include <future>
+#include <opencv2/opencv.hpp>
+#include "opencv2/imgproc.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/calib3d.hpp"
+#include "opencv2/imgcodecs.hpp"
+#include <future>
 
 using namespace ur_rtde;
 
+void setMatrixValues(Matrix& m, std::vector<double> v){
+    for(int r=0; r<m.getRows(); r++){
+        for(int c=0; c<m.getCols(); c++){
+            m.at(r,c) = v[r*m.getCols() + c];
+        }
+    }
+}
+
 int main() {
+
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
     db.setDatabaseName("CheckersDatabase");
@@ -31,6 +50,7 @@ int main() {
     query.exec("ALTER TABLE UniqueBoard AUTO_INCREMENT = 1");
     query.exec("INSERT INTO UniqueBoard (BoardState) VALUES ('22222222222211111111444444444444')");
     */
+
     for (int ii = 1; ii <= 1; ++ii) {
 
             int CounterForTempTable = 1;
@@ -239,5 +259,60 @@ int main() {
         //UpdateMoveWinrate(CounterForTempTable);
         std::cout << "Moves made by database: " << TestCounterForDatabase << std::endl;
     }
+
+    cv::Mat img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards4.jpg");
+    std::vector<std::vector<Vec3f>> colorsAndCircles = detectAndDrawCentersOfCircles(img);
+    std::vector<Vec3f> circles = colorsAndCircles[0];
+    std::vector<Vec3f> colors = colorsAndCircles[1];
+    std::vector<cv::Point2f> allAxis = detectAndDrawChessboardCorners(img);
+    axis = {allAxis[0], allAxis[2], allAxis[3]};
+    std::vector<cv::Point2f> newCorners = newChessCorners(axis);
+    std::vector<double> init = findCoordFrame(newCorners, cv::Point2f(circles[0][0]*pixToMeters, circles[0][1]*pixToMeters));
+
+    /*
+    Matrix robotBase(2, 1);
+    setMatrixValues(robotBase, {-robotBasex, -robotBasey});
+    Matrix point(2, 1);
+    setMatrixValues(point, {offsetx, offsety});
+    Matrix add = robotBase+point;
+    */
+
+    /*
+    std::vector<double> tableCorners = tableCorner();
+    Matrix robotCoord(2, 1);
+    setMatrixValues(robotCoord, {tableCorners[0], tableCorners[1]});
+    Matrix robot(3, 3);
+    setMatrixValues(robot, {1, 0 , tableCorners[0], 0, 1, tableCorners[1], 0, 0, 1});
+    std::vector<std::vector<double>> unitVecs = calcUnitVec2D(axis);
+    Matrix chessRot(2,2);
+    setMatrixValues(chessRot, {-unitVecs[0][0], -unitVecs[1][0], -unitVecs[0][1], -unitVecs[1][1]});
+    chessRot.transpose();
+    std::vector<double> coordPoint = findCoordFrame(axis, cv::Point2f(offsetx*pixToMeters, offsety*pixToMeters));
+    Matrix chessCoord(2,1);
+    setMatrixValues(chessCoord, {coordPoint[0], coordPoint[1]});
+    Matrix multiply = chessRot.multiply(chessCoord);
+    setMatrixValues(chessRot, {unitVecs[0][0], unitVecs[1][0], unitVecs[0][1], unitVecs[1][1]});
+    chessRot.transpose();
+    Matrix chess(3, 3);
+    setMatrixValues(chess, {chessRot.at(0,0), chessRot.at(0,1), multiply.at(0,0), chessRot.at(1,0), chessRot.at(1,1), multiply.at(1,0), 0, 0, 1});
+    multiply = chess.multiply(robot);
+    //simpleMove(multiply.at(0,2), multiply.at(1,2), 0.02);
+    */
+    int playerTurn = 2;
+    std::vector<std::vector<std::string>> chessBoard;
+    std::vector<Vec3b> colours = firstLoop(allAxis, newCorners, img, circles, colors, chessBoard);
+    Vec3b black = colours[0];
+    Vec3b red = colours[1];
+    img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards5.jpg");
+    std::vector<std::vector<std::string>> prevBoard = chessBoard;
+    chessBoard = boardLoop(black, red, newCorners, img);
+    std::vector<std::string> move = findMove(prevBoard, chessBoard, playerTurn);
+    std::cout << move[0] << " " << move[1] << std::endl;
+    playerTurn = 1;
+    img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards6.jpg");
+    prevBoard = chessBoard;
+    chessBoard = boardLoop(black, red, newCorners, img);
+    move = findMove(prevBoard, chessBoard, playerTurn);
+    std::cout << move[0] << " " << move[1] << std::endl;
     return 0;
 }

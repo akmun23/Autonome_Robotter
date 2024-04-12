@@ -14,9 +14,9 @@ using namespace std;
 
 // String array with images, if more than 1 picture needs to be processed.
 
-string images[1] = {"/home/aksel/Downloads/boards4.jpg"};
+string images[1] = {"/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards4.jpg"};
 
-bool detectAndDrawChessboardCorners(Mat src)
+std::vector<cv::Point2f> detectAndDrawChessboardCorners(Mat src)
 {
     for (int i = 0; i < 1; i++){
         Mat img = src;
@@ -76,7 +76,7 @@ bool detectAndDrawChessboardCorners(Mat src)
 int main(int argc, char** argv )
 {
     //![load]
-    const char* filename = argc >=2 ? argv[1] : "/home/aksel/Downloads/boards4.jpg";
+    const char* filename = argc >=2 ? argv[1] : "/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards4.jpg";
 
     // Loads an image
     Mat src = imread( samples::findFile( filename ), IMREAD_COLOR );
