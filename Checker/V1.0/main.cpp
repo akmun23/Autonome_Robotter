@@ -242,10 +242,14 @@ int main() {
         std::cout << "Moves made by database: " << TestCounterForDatabase << std::endl;
     }
 
-    cv::Mat src = detectAndDrawCentersOfCircles();
-
-    std::vector<cv::Point2f> allAxis = detectAndDrawChessboardCorners(src);
-    std::vector<cv::Point2f> axis = {allAxis[0], allAxis[2], allAxis[3]};
+    cv::Mat img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards4.jpg");
+    std::vector<std::vector<Vec3f>> colorsAndCircles = detectAndDrawCentersOfCircles(img);
+    std::vector<Vec3f> circles = colorsAndCircles[0];
+    std::vector<Vec3f> colors = colorsAndCircles[1];
+    std::vector<cv::Point2f> allAxis = detectAndDrawChessboardCorners(img);
+    axis = {allAxis[0], allAxis[2], allAxis[3]};
+    std::vector<cv::Point2f> newCorners = newChessCorners(axis);
+    std::vector<double> init = findCoordFrame(newCorners, cv::Point2f(circles[0][0]*pixToMeters, circles[0][1]*pixToMeters));
 
     /*
     Matrix robotBase(2, 1);
@@ -276,43 +280,21 @@ int main() {
     multiply = chess.multiply(robot);
     //simpleMove(multiply.at(0,2), multiply.at(1,2), 0.02);
     */
-
-    while(1){
-        int xcheck = 0;
-        int ycheck = 0;
-        bool orego = false;
-        bool pos1 = false;
-        bool pos2 = false;
-        std::vector<double> init = findCoordFrame(axis, cv::Point2f(circles[0][0]*pixToMeters, circles[0][1]*pixToMeters));
-        for (int i = 0; i < circles.size(); i++) {
-            std::vector<cv::Point2f> newCorners = newChessCorners(axis);
-            std::vector<double> circleChecked = findCoordFrame(axis, cv::Point2f(circles[i][0]*pixToMeters, circles[i][1]*pixToMeters));
-            if(((circleChecked[0] - 0.005) < init[0]) && ((circleChecked[0] + 0.005) > init[0])){
-                std::cout << "Circle is alligned on the x-axis: " << i+1 << std::endl;
-                xcheck++;
-            }
-            if(((circleChecked[1] - 0.005) < init[1]) && ((circleChecked[1] + 0.005) > init[1])){
-                std::cout << "Circle is alligned on the y-axis: " << i+1 << std::endl;
-                ycheck++;
-            }
-
-            if(-0.005 < circleChecked[0] && 0.005 > circleChecked[0] && -0.005 < circleChecked[1] && 0.005 > circleChecked[1]){
-                orego = true;
-            } else if (newCorners[1].x-newCorners[2].x-0.005 < circleChecked[0] && newCorners[1].x-newCorners[2].x+0.005 > circleChecked[0] && newCorners[1].y-newCorners[2].y-0.005 < circleChecked[1] && newCorners[1].y-newCorners[2].y+0.005 > circleChecked[1]){
-                pos2 = true;
-            } else if (newCorners[0].x-newCorners[1].x-0.005 < circleChecked[0] && newCorners[0].x-newCorners[1].x+0.005 > circleChecked[0] && newCorners[0].y-newCorners[1].y-0.005 < circleChecked[1] && newCorners[0].y-newCorners[1].y+0.005 > circleChecked[1]){
-                pos1 = true;
-            }
-        }
-        if(orego){
-            break;
-        } else if(false){
-            axis = {allAxis[1], allAxis[0], allAxis[2]};
-        } else if(pos2){
-            axis = {allAxis[2], allAxis[3], allAxis[1]};
-        }
-        std::cout << "-------------------" <<std::endl;
-    }
-
+    int playerTurn = 2;
+    std::vector<std::vector<std::string>> chessBoard;
+    std::vector<Vec3b> colours = firstLoop(allAxis, newCorners, img, circles, colors, chessBoard);
+    Vec3b black = colours[0];
+    Vec3b red = colours[1];
+    img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards5.jpg");
+    std::vector<std::vector<std::string>> prevBoard = chessBoard;
+    chessBoard = boardLoop(black, red, newCorners, img);
+    std::vector<std::string> move = findMove(prevBoard, chessBoard, playerTurn);
+    std::cout << move[0] << " " << move[1] << std::endl;
+    playerTurn = 1;
+    img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards6.jpg");
+    prevBoard = chessBoard;
+    chessBoard = boardLoop(black, red, newCorners, img);
+    move = findMove(prevBoard, chessBoard, playerTurn);
+    std::cout << move[0] << " " << move[1] << std::endl;
     return 0;
 }

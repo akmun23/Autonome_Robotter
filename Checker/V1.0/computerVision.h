@@ -18,17 +18,11 @@ double offsety = 1267;
 double robotBasex = 1436;
 double robotBasey = 856;
 double pixToMeters;
-vector<Vec3f> circles;
+std::vector<cv::Point2f> axis;
 
-//Code for detecting and drawing chessboard corners
-
-// String array with images, if more than 1 picture needs to be processed.
-
-cv::Mat detectAndDrawCentersOfCircles(){
-    //![load]
-    Mat src = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards4.jpg");
-    //![load]
-
+std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
+    vector<Vec3f> circles;
+    vector<Vec3f> colors;
     //![convert_to_gray]
     Mat gray;
     cvtColor(src, gray, COLOR_BGR2GRAY);
@@ -41,7 +35,7 @@ cv::Mat detectAndDrawCentersOfCircles(){
     //![houghcircles]
     HoughCircles(gray, circles, HOUGH_GRADIENT, 1,
                  gray.rows/50,  // change this value to detect circles with different distances to each other
-                 100, 30, 20, 21 // change the last two parameters
+                 100, 30, 18, 32 // change the last two parameters
                  // (min_radius & max_radius) to detect larger circles
                  );
     //![houghcircles]
@@ -51,23 +45,23 @@ cv::Mat detectAndDrawCentersOfCircles(){
     {
         Vec3i c = circles[i];
         Point center = Point(c[0], c[1]);
+        colors.push_back(src.at<Vec3b>(center));
         // circle center
-        circle( src, center, 1, Scalar(0,100,100), 3, LINE_AA);
+        circle(src, center, 1, Scalar(0,100,100), 3, LINE_AA);
         // circle outline
         int radius = c[2];
         circle(src, center, radius+5, Scalar(0,0,0), -1, LINE_AA);
     }
-
-    return src;
+    imshow("detected circles", src);
+    return {circles, colors};
 }
 
 std::vector<cv::Point2f> detectAndDrawChessboardCorners(cv::Mat src) {
     vector<Point2f> corners; // Array will be filled by the detected corners
     for (int i = 0; i < 1; i++){
-        Mat img = src;
         Size patternsize(7,7); // The interior number of corners in a checkers board
         Mat gray;
-        cvtColor(img,gray,COLOR_BGR2GRAY);
+        cvtColor(src,gray,COLOR_BGR2GRAY);
 
         //CALIB_CB_FAST_CHECK saves a lot of time on images (Removed for better accuracy)
         bool patternfound = findChessboardCorners(gray, patternsize, corners, 0 +
@@ -78,24 +72,10 @@ std::vector<cv::Point2f> detectAndDrawChessboardCorners(cv::Mat src) {
                          TermCriteria(TermCriteria::MAX_ITER|TermCriteria::EPS, 30, 0.1));
         } // Subpixels are also considered increasing accuracy
 
-        drawChessboardCorners(img, patternsize, Mat(corners), patternfound); // Corners er visualized.
+        drawChessboardCorners(src, patternsize, Mat(corners), patternfound); // Corners er visualized.
 
         // Define the offset of where the table the checkers board can be placed on starts. Also the scale of cm per pixel. These have to be defined when camera is set up.
         pixToMeters = (0.03 / sqrt(pow((corners[1].x - corners[0].x),2) + pow((corners[1].y - corners[0].y),2)));
-
-        circle(img, Point(offsetx, offsety), 10, Scalar(255, 255, 255), 3);
-        circle(img, corners[6], 10, Scalar(255, 255, 255), -1);
-        circle(img, corners[42], 10, Scalar(255, 255, 255), -1);
-        circle(img, corners[48], 10, Scalar(255, 255, 255), -1);
-        arrowedLine(img, corners[0], corners[42], Scalar(255, 255, 255), 3);
-        arrowedLine(img, corners[0], corners[6], Scalar(255, 255, 255), 3);
-        cv::putText(img, "x-akse", corners[42], FONT_HERSHEY_COMPLEX, 2, Scalar(255, 255, 255), 2);
-        cv::putText(img, "y-akse", corners[6], FONT_HERSHEY_COMPLEX, 2, Scalar(255, 255, 255), 2);
-
-        namedWindow("detected board", WINDOW_NORMAL);
-        imshow("detected board", img);
-        resizeWindow("detected board", 1000, 1300);
-        moveWindow("detected board",img.cols/2,100);
 
         for(int i = 0; i <= corners.size(); i++){
             corners[i].x = (corners[i].x)* pixToMeters;
@@ -109,10 +89,8 @@ std::vector<cv::Point2f> detectAndDrawChessboardCorners(cv::Mat src) {
         // The length of the individual squares of the board are calculated to calibrate the game program.
         cout << "Boardsize: " << boardSize << endl;
     }
-    waitKey(0);
 
     std::vector<cv::Point2f> axis = {corners[0], corners[6], corners[42], corners[48]};
-
     return axis;
 }
 
