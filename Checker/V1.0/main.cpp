@@ -22,6 +22,7 @@ int main() {
 
     QSqlQuery query;
 
+
     //Det her er er til vis man vil reset dataen i databasen
     /*
     query.exec("DELETE FROM MovesP1 WHERE board_id >= 0");
@@ -30,7 +31,7 @@ int main() {
     query.exec("ALTER TABLE UniqueBoard AUTO_INCREMENT = 1");
     query.exec("INSERT INTO UniqueBoard (BoardState) VALUES ('22222222222211111111444444444444')");
     */
-    for (int ii = 1; ii <= 10000; ++ii) {
+    for (int ii = 1; ii <= 1; ++ii) {
 
             int CounterForTempTable = 1;
 
@@ -71,10 +72,11 @@ int main() {
                     std::cout << "The game is a draw!" << std::endl;
                     break;
                 }
-
                 std::vector<std::string> jumps = jumpPossible(playerTurn, boards);
                 bool moreMove = false;
                 std::string moveTo = "";
+
+
 
                 //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
                 if(((movePossible(playerTurn, boards, jumps, moreMove, moveTo).size())/2) > 0 && redPieces > 0 && blackPieces > 0){
@@ -106,9 +108,25 @@ int main() {
                             }
                         }
                         else {
-                            alphaBeta(boards, 3, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                            //alphaBeta(boards, 3, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                            std::vector<std::string> MovesToPickFrom;
+                            std::vector<std::string> PossibleJumps = movePossible(playerTurn, boards, jumps, moreMove, moveTo);
+                            for(int i = 0; i < PossibleJumps.size(); i+=2){
+                                MovesToPickFrom.push_back(PossibleJumps[i] + PossibleJumps[i+1]);
+                            }
+
+                            std::random_device rd;  // Obtain a random number from hardware
+                            std::mt19937 eng(rd()); // Seed the generator
+                            std::uniform_int_distribution<> distr(0, MovesToPickFrom.size()-1); // Define the range for the random number
+                            int RandomNumber = distr(eng); // Generate a random number
+                            std::string ChosenMove = MovesToPickFrom[RandomNumber]; // Generate a random number
+                            std::cout << "Chosen move: " << ChosenMove << std::endl;
+                            std::string moveFrom = ChosenMove.substr(0,2);
+                            std::string moveTo = ChosenMove.substr(2,2);
+                            DB_move(playerTurn, boards, redPieces, blackPieces, moveFrom, moveTo);
+                            MoveMade = ChosenMove;
+                            DatabaseMoveMade = true;
                         }
-                        std::cout << "Kører loopet" << std::endl;
                     }
 
                     /*
@@ -128,8 +146,8 @@ int main() {
                         fut = std::async(robotMove, moveSet, startUpRobot, tempBoard, thisTurn);
                     } else {
                         fut = std::async(robotMove, moveSet, startUpRobot, tempBoard, thisTurn);
-                    }
-                    */
+                    }*/
+
 
                     //Prints the moves made by the AI
                     if(!DatabaseMoveMade){
@@ -166,7 +184,6 @@ int main() {
 
                     if (CheckDuplicateMoves(output, MoveMade, thisTurn)){
                         InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
-                        AddBoard(output, OldBoard,CounterForTempTable);
                         CounterForTempTable++;
                     }
 
@@ -218,6 +235,7 @@ int main() {
                 std::cout << "Player 1 wins! No more moves for red" << std::endl;
             }
         }
+        UploadTempToDatabase(); // Uploads the temp table to the database
         //UpdateMoveWinrate(CounterForTempTable);
         std::cout << "Moves made by database: " << TestCounterForDatabase << std::endl;
     }
