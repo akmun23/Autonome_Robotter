@@ -42,13 +42,13 @@ int main() {
     QSqlQuery query;
 
 
+
     //Det her er er til vis man vil reset dataen i databasen
     /*
     query.exec("DELETE FROM MovesP1 WHERE board_id >= 0");
     query.exec("DELETE FROM MovesP2 WHERE board_id >= 0");
     query.exec("DELETE FROM UniqueBoard WHERE board_id >= 0");
     query.exec("ALTER TABLE UniqueBoard AUTO_INCREMENT = 1");
-    query.exec("INSERT INTO UniqueBoard (BoardState) VALUES ('22222222222211111111444444444444')");
     */
 
     for (int ii = 1; ii <= 1; ++ii) {
@@ -63,7 +63,7 @@ int main() {
             int DrawChecker = 1; //When this equal 200 the game is called draw
             std::vector<std::vector<std::string>> thisBoard = {}; //The current state of the board
             std::string player = "AI"; //If the player is human or AI
-            std::string player2 = "AI"; //If the player is human or AI
+            std::string player2 = "Random"; //If the player is human or AI
             std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
             std::vector<std::vector<double>> startUpRobot; //The initial position of the robot
             std::future<bool> fut;
@@ -75,6 +75,9 @@ int main() {
 
             int i = 0;
 
+            query.exec("select board_id from UniqueBoard order by board_id desc limit 1");
+            query.first();
+            int UniqueBoardIDCounter = query.value(0).toInt() + 1;
 
             RefreshTempTable(playerTurn); // Refreshes the Temp table
 
@@ -85,9 +88,30 @@ int main() {
             std::vector<std::vector<std::string>> boards = startUp();
 
             while(true){ //Game loop
+
+                std::string output;
+
+                for (int i = 0; i < 8; ++i) {
+                    for (int j = 0; j < 8; ++j) {
+                        if(boards[i][j] == "1 "){
+                            output += "1";
+                        } else if(boards[i][j] == "B "){
+                            output += "2";
+                        } else if(boards[i][j] == "BK"){
+                            output += "3";
+                        } else if(boards[i][j] == "R "){
+                            output += "4";
+                        } else if(boards[i][j] == "RK"){
+                            output += "5";
+                        }
+                    }
+                }
+
+                std::string* outputPtr = &output;
+
                 thisTurn = playerTurn; //Which player's turn it is
 
-                if (DrawChecker == 175){ // Tjekker om der er gået 175 træk uden en vinder
+                if (DrawChecker == 200){ // Tjekker om der er gået 175 træk uden en vinder
                     query.exec("UPDATE Temp SET WinOrLoss = 0.5"); // Sætter en halv ind i wincase for uafgjort
                     std::cout << "The game is a draw!" << std::endl;
                     break;
@@ -114,7 +138,7 @@ int main() {
 
                             if (DBmove == "No moves"){
                                 std::cout << "No moves found" << std::endl;
-                                alphaBeta(boards, 5, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                                alphaBeta(boards, 7, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {},CounterForTempTable,DrawChecker); //AI's move
                             }
                             else{
                                 std::cout << "AI move from database: " << DBmove << std::endl;
@@ -127,8 +151,8 @@ int main() {
 
                             }
                         }
-                        else {
-                            //alphaBeta(boards, 3, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                        else if (playerTurn == 1 && player == "Random" || playerTurn == 2 && player2 == "Random"){
+
                             std::vector<std::string> MovesToPickFrom;
                             std::vector<std::string> PossibleJumps = movePossible(playerTurn, boards, jumps, moreMove, moveTo);
                             for(int i = 0; i < PossibleJumps.size(); i+=2){
@@ -146,6 +170,10 @@ int main() {
                             DB_move(playerTurn, boards, redPieces, blackPieces, moveFrom, moveTo);
                             MoveMade = ChosenMove;
                             DatabaseMoveMade = true;
+
+                        }
+                        else if (playerTurn == 1 && player == "AI" || playerTurn == 2 && player2 == "AI"){
+                            alphaBeta(boards, 6, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {},CounterForTempTable,DrawChecker); //AI's move
                         }
                     }
 
@@ -180,31 +208,12 @@ int main() {
                     DatabaseMoveMade = false;
 
 
-                    std::string output;
 
-                    for (int i = 0; i < 8; ++i) {
-                        for (int j = 0; j < 8; ++j) {
-                            if(boards[i][j] == "1 "){
-                                output += "1";
-                            } else if(boards[i][j] == "B "){
-                                output += "2";
-                            } else if(boards[i][j] == "BK"){
-                                output += "3";
-                            } else if(boards[i][j] == "R "){
-                                output += "4";
-                            } else if(boards[i][j] == "RK"){
-                                output += "5";
-                            }
-                        }
-                    }
-
-                    std::string* outputPtr = &output;
                     std::string* MoveMadePtr = &MoveMade;
 
 
                     if (CheckDuplicateMoves(output, MoveMade, thisTurn)){
                         InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
-                        CounterForTempTable++;
                     }
 
                     OldBoard = output;
@@ -255,12 +264,11 @@ int main() {
                 std::cout << "Player 1 wins! No more moves for red" << std::endl;
             }
         }
-        UploadTempToDatabase(); // Uploads the temp table to the database
-        //UpdateMoveWinrate(CounterForTempTable);
+        UploadTempToDatabase(UniqueBoardIDCounter); // Uploads the temp table to the database
         std::cout << "Moves made by database: " << TestCounterForDatabase << std::endl;
     }
-
-    cv::Mat img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards4.jpg");
+    /*
+    cv::Mat img = imread("/home/pascal/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards4.jpg");
     std::vector<std::vector<Vec3f>> colorsAndCircles = detectAndDrawCentersOfCircles(img);
     std::vector<Vec3f> circles = colorsAndCircles[0];
     std::vector<Vec3f> colors = colorsAndCircles[1];
@@ -268,7 +276,7 @@ int main() {
     axis = {allAxis[0], allAxis[2], allAxis[3]};
     std::vector<cv::Point2f> newCorners = newChessCorners(axis);
     std::vector<double> init = findCoordFrame(newCorners, cv::Point2f(circles[0][0]*pixToMeters, circles[0][1]*pixToMeters));
-
+    */
     /*
     Matrix robotBase(2, 1);
     setMatrixValues(robotBase, {-robotBasex, -robotBasey});
@@ -298,21 +306,23 @@ int main() {
     multiply = chess.multiply(robot);
     //simpleMove(multiply.at(0,2), multiply.at(1,2), 0.02);
     */
+    /*
     int playerTurn = 2;
     std::vector<std::vector<std::string>> chessBoard;
     std::vector<Vec3b> colours = firstLoop(allAxis, newCorners, img, circles, colors, chessBoard);
     Vec3b black = colours[0];
     Vec3b red = colours[1];
-    img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards5.jpg");
+    img = imread("/home/pascal/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards5.jpg");
     std::vector<std::vector<std::string>> prevBoard = chessBoard;
     chessBoard = boardLoop(black, red, newCorners, img);
     std::vector<std::string> move = findMove(prevBoard, chessBoard, playerTurn);
     std::cout << move[0] << " " << move[1] << std::endl;
     playerTurn = 1;
-    img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards6.jpg");
+    img = imread("/home/pascal/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards6.jpg");
     prevBoard = chessBoard;
     chessBoard = boardLoop(black, red, newCorners, img);
     move = findMove(prevBoard, chessBoard, playerTurn);
     std::cout << move[0] << " " << move[1] << std::endl;
+    */
     return 0;
 }

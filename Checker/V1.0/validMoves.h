@@ -6,6 +6,7 @@
 #include<vector>
 #include<string>
 #include <random>
+#include "CheckersDatabase.h"
 
 //Function to get the player's input
 bool playerInput(std::string& playerStart, std::string& playerMove, int& playerTurn, std::vector<std::vector<std::string>>& boards) {
@@ -586,7 +587,11 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
 }
 
 // The alphaBeta function
-int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, std::vector<std::vector<std::string>>& boards2, std::vector<std::string>& moveSet, int alpha, int beta, int& blackPieces2, int& redPieces2, int& playerTurn2, std::string playerMove){
+int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, std::vector<std::vector<std::string>>& boards2, std::vector<std::string>& moveSet, int alpha, int beta, int& blackPieces2, int& redPieces2, int& playerTurn2, std::string playerMove, int& CounterForTempTable, int& TurnNr){
+
+    QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
+    QSqlQuery query = QSqlQuery(db);
+
     int maxEval; //The highest eval
     int eval; //The eval
     bool jumped; //If a piece has jumped
@@ -624,10 +629,14 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
             //Sets the start and end position for the move
             playerStart = posMove[i];
             playerMove = posMove[i+1];
-
+            std::string MoveMade = playerStart+playerMove;
             //Adds the start and end position to the vector moves
             moves.push_back(playerStart);
             moves.push_back(playerMove);
+
+            if (depth == 2 || depth == 1){
+                insertAlphaBetaToTemp(tempBoard,MoveMade,tempPlayer,CounterForTempTable); // Skal slettes når Database er trænet
+            }
 
             //Checks if the piece has jumped
             jumped = pieceJump(playerStart, playerMove, tempPlayer, tempBoard);
@@ -639,9 +648,9 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
             //If the piece is able to jump again the turn doesnt change
             jumps = jumpPossible(tempPlayer, tempBoard);
             if(moreMoveCheck(jumps, playerMove) && jumped && !promotion){
-                eval = alphaBeta(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove);
+                eval = alphaBeta(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove,CounterForTempTable,TurnNr);
             } else {
-                eval = alphaBeta(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, {});
+                eval = alphaBeta(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, {},CounterForTempTable,TurnNr);
             }
 
             //If the eval is higher than the maxEval, it sets the maxEval to eval and sets the bestBoard, bestMoves, bestPieces and playerTurn to the match the board
@@ -660,10 +669,11 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
             }
 
             //If eval is higher than beta, it breaks the for-loop
+            /*
             if(eval > beta){
                 break;
             }
-
+            */
             //Resets the board, pieces, and moves
             tempBoard = boards;
             tempBlack = blackPieces;
@@ -688,8 +698,14 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
         for (int i = 0; i < (posMove.size()-1); i += 2) {
             playerStart = posMove[i];
             playerMove = posMove[i+1];
+            std::string MoveMade = playerStart+playerMove;
+            //Adds the start and end position to the vector moves
             moves.push_back(playerStart);
             moves.push_back(playerMove);
+
+            if (depth == 2 || depth == 1){
+                insertAlphaBetaToTemp(tempBoard,MoveMade,tempPlayer,CounterForTempTable); // Skal slettes når Database er trænet
+            }
             jumped = pieceJump(playerStart, playerMove, tempPlayer, tempBoard);
             promotion = boardChange(tempPlayer, tempBoard, playerStart, playerMove, tempRed, tempBlack);
             bool promotion2 = promotion;
@@ -698,9 +714,9 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
             //If the piece is able to jump again, it finds all possible moves
             jumps = jumpPossible(tempPlayer, tempBoard);
             if(moreMoveCheck(jumps, playerMove) && jumped && !promotion){
-                eval = alphaBeta(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove);
+                eval = alphaBeta(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove,CounterForTempTable,TurnNr);
             } else {
-                eval = alphaBeta(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, {});
+                eval = alphaBeta(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, {},CounterForTempTable,TurnNr);
             }
             if(maxEval > eval){
                 maxEval = eval;
@@ -716,9 +732,11 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
                     bestPlayer = 1;
                 }
             }
+            /*
             if(eval < alpha){
                 break;
             }
+            */
             tempBoard = boards;
             tempBlack = blackPieces;
             tempRed = redPieces;
