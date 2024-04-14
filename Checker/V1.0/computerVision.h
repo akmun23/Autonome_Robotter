@@ -13,13 +13,8 @@
 using namespace cv;
 using namespace std;
 
-double offsetx = 249;
-double offsety = 639;
 double pixToMeters;
 std::vector<cv::Point2f> axis;
-Vec3b green = {101, 179, 168};
-Vec3b yellow = {74, 224, 255};
-Vec3b magenta = {173, 122, 179};
 
 std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
     vector<Vec3f> circles;
@@ -94,7 +89,6 @@ std::vector<cv::Point2f> detectAndDrawChessboardCorners(cv::Mat src) {
         // The length of the individual squares of the board are calculated to calibrate the game program.
         cout << "Boardsize: " << boardSize << endl;
     }
-    imshow("Chessboard", src);
     std::vector<cv::Point2f> axis = {corners[0], corners[6], corners[42], corners[48]};
     return axis;
 }

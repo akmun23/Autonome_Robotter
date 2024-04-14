@@ -2,10 +2,9 @@
 #include<vector>
 #include<string>
 #include "boardUpdate.h"
-#include "robotMove.h"
 #include "computerPos.h"
 #include "qa.hpp"
-#include "robotMove.h"
+//#include "robotMove.h"
 #include "validMoves.h"
 #include "CheckersDatabase.h"
 #include "computerVision.h"
@@ -22,14 +21,6 @@
 #include <future>
 
 using namespace ur_rtde;
-
-void setMatrixValues(Matrix& m, std::vector<double> v){
-    for(int r=0; r<m.getRows(); r++){
-        for(int c=0; c<m.getCols(); c++){
-            m.at(r,c) = v[r*m.getCols() + c];
-        }
-    }
-}
 
 int main() {
 
@@ -261,64 +252,27 @@ int main() {
         std::cout << "Moves made by database: " << TestCounterForDatabase << std::endl;
     }
 
+    // Loads in the image
     cv::Mat img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/visionTest4.jpg");
-    std::vector<std::vector<Vec3f>> circlesAndcolors = detectAndDrawCentersOfCircles(img);
-    std::vector<cv::Point2f> allAxis = detectAndDrawChessboardCorners(img);
-    axis = {allAxis[0], allAxis[2], allAxis[3]};
-    std::vector<cv::Point2f> newCorners = newChessCorners(axis);
 
+    // Variables that is needed for the robot movement
+    std::vector<cv::Point2f> newCorners;
+    std::vector<cv::Point2f> calibrate;
+
+    // The chessboard
     std::vector<std::vector<std::string>> chessBoard;
-    std::vector<Vec3b> colours = firstLoop(allAxis, newCorners, img, circlesAndcolors[0], circlesAndcolors[1], chessBoard);
 
+    // Finds the new corners of the chessboard
+    std::vector<Vec3b> colours = firstLoop(newCorners, img, chessBoard, calibrate);
 
     // Robot movement
-    std::vector<cv::Point2f> calibrate = calibrationCircles(circlesAndcolors);
-
     std::cout << calibrate[0] << std::endl;
     std::cout << calibrate[1] << std::endl;
     std::cout << calibrate[2] << std::endl;
 
-    cv::Point2f xaxis = meanPoints(xaxis1, xaxis2, xaxis3);
-    cv::Point2f yaxis = meanPoints(yaxis1, yaxis2, yaxis3);
-    cv::Point2f orego = meanPoints(orego1, orego2, orego3);
-    cv::Point2f oregoPicture = Point2f(calibrate[0].x*pixToMeters, calibrate[0].y*pixToMeters);
-    cv::Point2f xaxisPicture = Point2f(calibrate[1].x*pixToMeters, calibrate[1].y*pixToMeters);
-    cv::Point2f yaxisPicture = Point2f(calibrate[2].x*pixToMeters, calibrate[2].y*pixToMeters);
+    //robotStartVision(newCorners, calibrate, chessBoard);
 
-    std::vector<std::vector<double>> unitVecRobot = calcUnitVec2D({yaxis, orego, xaxis});
-    std::vector<std::vector<double>> unitVecCamera = calcUnitVec2D({yaxisPicture, oregoPicture, xaxisPicture});
-    std::vector<std::vector<double>> unitVecChess = calcUnitVec2D({newCorners[0], newCorners[1], newCorners[2]});
-
-    Matrix Robot(4,4);
-    setMatrixValues(Robot, {unitVecRobot[0][0], unitVecRobot[1][0], 0, orego.x, unitVecRobot[0][1], unitVecRobot[1][1], 0, orego.y, 0, 0, 1, 0, 0, 0, 0, 1});
-    Matrix Camera(4, 4);
-    setMatrixValues(Camera, {unitVecCamera[0][0], unitVecCamera[1][0], 0, 0, unitVecCamera[0][1], unitVecCamera[1][1], 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
-    Matrix Chess(4, 4);
-    setMatrixValues(Chess, {unitVecChess[0][0], unitVecChess[1][0], 0, newCorners[1].x-oregoPicture.x, unitVecChess[0][1], unitVecChess[1][1], 0, newCorners[1].y-oregoPicture.y, 0, 0, 1, 0, 0, 0, 0, 1});
-    Matrix CamToChess = Camera*Chess;
-    Matrix Translation(4, 1);
-    setMatrixValues(Translation, {CamToChess.at(0,3), CamToChess(1,3) , 0.0, 1});
-    Matrix RobotToChessTransformation = Robot*Translation;
-
-    simpleMove(RobotToChessTransformation.at(0,0), RobotToChessTransformation.at(1,0), 0.02);
-
-    for(int i = 0; i < 8; i++){
-        for(int j = 0; j < 8; j++){
-            setMatrixValues(Chess, {unitVecChess[0][0], unitVecChess[1][0], 0, newCorners[1].x-oregoPicture.x, unitVecChess[0][1], unitVecChess[1][1], 0, newCorners[1].y-oregoPicture.y, 0, 0, 1, 0, 0, 0, 0, 1});
-            CamToChess = Camera*Chess;
-
-            Matrix piece(4, 4);
-            setMatrixValues(piece, {1, 0, 0, i*0.03, 0, 1, 0, j*0.03, 0, 0, 1, 0, 0, 0, 0, 1});
-
-            Matrix pieceLocation = CamToChess*piece;
-
-            setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3) , 0.0, 1});
-            RobotToChessTransformation = Robot*Translation;
-
-            simpleMove(RobotToChessTransformation.at(0,0), RobotToChessTransformation.at(1,0), 0.02);
-        }
-    }
-
+    /*
     int playerTurn = 2;
     img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards5.jpg");
     std::vector<std::string> move = boardLoop(colours[0], colours[1], newCorners, img, chessBoard, playerTurn);
@@ -328,5 +282,6 @@ int main() {
     img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards6.jpg");
     move = boardLoop(colours[0], colours[1], newCorners, img, chessBoard, playerTurn);
     std::cout << move[0] << " " << move[1] << std::endl;
+    */
     return 0;
 }
