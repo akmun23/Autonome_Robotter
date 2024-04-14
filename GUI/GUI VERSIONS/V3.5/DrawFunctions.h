@@ -1,3 +1,5 @@
+#include "boardUpdate.h"
+#include "validMoves.h"
 #include <iostream>
 #include <opencv4/opencv2/opencv.hpp>
 #include <opencv4/opencv2/core.hpp>
@@ -41,7 +43,7 @@ void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves
     if(turnVal > 0){
         outputString = moveStart + " To " + moveEnd + ": ";
         moves.push_back(outputString);
-        scores.push_back(giveBoardScore(boards, thisTurn, blackPieces, redPieces, depth));
+        scores.push_back(giveBoardScore(boards, thisTurn, blackPieces, redPieces, depth)/1000);
 
         rectangle(img, Point(700,75), Point(1000,200), Scalar(255,255,255), -1);
 
@@ -121,7 +123,7 @@ void Draw(Mat img, bool& startUpMain){
         }
 
         //Loads graveyard segment image, and resizes it to fit inside rect.
-        resize(imread("/home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt/graveyard.jpg"), graveyardDownSized, Size(50, 50), INTER_LINEAR);
+        resize(imread("/home/aksel/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/graveyard.jpg"), graveyardDownSized, Size(50, 50), INTER_LINEAR);
         graveyardDownSized.copyTo(img(blackGraveyardRect)); //Draws graveyard onto img.
         graveyardDownSized.copyTo(img(redGraveyardRect));
 
