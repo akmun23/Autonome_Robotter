@@ -329,10 +329,9 @@ bool isJumpPossible(int x, int y, int checkerID, vector<Circle> checkerVec, vect
 }
 
 void jumps(int x, int y, int i, int checkerID, vector<Circle> checkerVec, vector<Circle> enemyCheckerVec){
-
     if(isJumpPossible(x, y, checkerID, checkerVec, enemyCheckerVec)){ //Checks if there is a jump possible for a checker at the given position, where the enemy is given also.
         //Checks if there is a checker across from the selected checker - Both right and left.
-        if(checkerVec == rCheckers && checkerID < 12){ 
+        if(checkerVec == rCheckers && checkerID < 12){
             if((doesRectContainChecker(x + 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, checkerVec)) && (doesRectContainChecker(x - 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x - 100, y - 100, enemyCheckerVec) && !doesRectContainChecker(x - 100, y - 100, checkerVec))){
                 if(rectangles[i-14].contains(Point(x + 100, y - 100))){
                     img(rectangles[i-14]) = Vec3b(14,17,175); //Highlights the possible jump locations.
@@ -340,7 +339,7 @@ void jumps(int x, int y, int i, int checkerID, vector<Circle> checkerVec, vector
                 if(rectangles[i-18].contains(Point(x - 100, y - 100))){
                 img(rectangles[i-18]) = Vec3b(14,17,175);
                 }
-                
+
                 selected.push_back(2); //Represents multiple jumps possible.
             }
             //Checks if there is a checker across from the selected checker - Right.
@@ -397,7 +396,7 @@ void jumps(int x, int y, int i, int checkerID, vector<Circle> checkerVec, vector
                 img(rectangles[i+14]) = Vec3b(14,17,175);
                 img(rectangles[i+18]) = Vec3b(14,17,175);
                 selected.push_back(3);
-                
+
                 if((doesRectContainChecker(x + 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, checkerVec))){
                     img(rectangles[i-14]) = Vec3b(14,17,175); //Highlights the possible jump locations.
                 }
@@ -410,7 +409,7 @@ void jumps(int x, int y, int i, int checkerID, vector<Circle> checkerVec, vector
                 img(rectangles[i-14]) = Vec3b(14,17,175); //Highlights the possible jump locations.
                 img(rectangles[i-18]) = Vec3b(14,17,175);
                 selected.push_back(3);
-                
+
                 if((doesRectContainChecker(x + 50, y + 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y + 100, enemyCheckerVec) && !doesRectContainChecker(x + 100, y + 100, checkerVec))){
                     img(rectangles[i+18]) = Vec3b(14,17,175);
                 }
@@ -458,7 +457,7 @@ void jumps(int x, int y, int i, int checkerID, vector<Circle> checkerVec, vector
                 }
             }
             else if((doesRectContainChecker(x + 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, checkerVec) && doesPosContainRect(x + 100, y - 100, rectangles)) || (doesRectContainChecker(x - 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x - 100, y - 100, enemyCheckerVec) && !doesRectContainChecker(x - 100, y - 100, checkerVec) && doesPosContainRect(x - 100, y - 100, rectangles)) || (doesRectContainChecker(x + 50, y + 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y + 100, enemyCheckerVec) && !doesRectContainChecker(x + 100, y + 100, checkerVec) && doesPosContainRect(x + 100, y + 100, rectangles)) || (doesRectContainChecker(x - 50, y + 50, enemyCheckerVec) && !doesRectContainChecker(x - 100, y + 100, enemyCheckerVec) && !doesRectContainChecker(x - 100, y + 100, checkerVec) && doesPosContainRect(x - 100, y + 100, rectangles))){
-                
+
                 selected.push_back(1); //3
 
                 if(doesRectContainChecker(x + 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, checkerVec) && doesPosContainRect(x + 100, y - 100, rectangles)){
@@ -506,12 +505,15 @@ void promotionGUI(vector<Circle> checkerVector){
 }
 
 bool isGameWon(vector<Circle> checkerVec, vector<Circle> enemyCheckerVec, int turn){
+    std::vector<std::string> jumps = jumpPossible(turn, boards);
+    bool moreMove = false;
+    std::string move = "";
 
     if(checkerVec == rCheckers){
         if(piecesLeft(rectangles, enemyCheckerVec) < 1){
             return true;
         }
-        else if(movePossible(turn, boards, jumpPossible(turn, boards), false, "").size() < 1){
+        else if(movePossible(turn, boards, jumps, moreMove, move).size() < 1){
             return true;
         }
         else{
@@ -522,7 +524,7 @@ bool isGameWon(vector<Circle> checkerVec, vector<Circle> enemyCheckerVec, int tu
         if(piecesLeft(rectangles, enemyCheckerVec) < 1){
             return true;
         }
-        else if(movePossible(turn, boards, jumpPossible(turn, boards), false, "").size() < 1){
+        else if(movePossible(turn, boards, jumps, moreMove, move).size() < 1){
             return true;
         }
         else{

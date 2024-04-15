@@ -84,14 +84,12 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                         }
 
                         //Checks if move is legal.
-                        if(playerMover(stringPos[0], stringPos[1], thisTurn, boards)){
+                        if(move(thisTurn, boards, redPieces, blackPieces, stringPos[0], stringPos[1])){
                             
                             //Changes the position of selected checker.
                             rCheckers[selected[1]].x = rectangles[i].x;
                             rCheckers[selected[1]].y = rectangles[i].y;
                             
-                            //Changes gamestate in board.
-                            boardChange(thisTurn, boards, stringPos[0], stringPos[1], redPieces, blackPieces);
                             //Prints new gamestate to console.
                             checkerBoard(boards);
 
@@ -136,7 +134,6 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                                 setBool(jumpPerformed, false);
 
                                 turnVal++;
-                                thisTurn = (turnVal%2 == 0 ? 1 : 2);
                                 updateText(img, turnVal, latestScores, latestMoves, moveStart, moveEnd); //Updates text.
                                 promotionGUI(rCheckers);
                                 Draw(img, startUpMain); //Draws new gamestate.
@@ -162,12 +159,11 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                             moveEnd = stringPos[stringPos.size()-1];
                         }
 
-                        if(playerMover(stringPos[0], stringPos[1], thisTurn, boards)){
+                        if(move(thisTurn, boards, redPieces, blackPieces, stringPos[0], stringPos[1])){
 
                             bCheckers[selected[1]].x = rectangles[i].x;
                             bCheckers[selected[1]].y = rectangles[i].y;
 
-                            boardChange(thisTurn, boards, stringPos[0], stringPos[1], redPieces, blackPieces);
                             checkerBoard(boards);
 
                             if(selected[3] != 0 && selected[3] < 5){
@@ -209,7 +205,6 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                                 setBool(jumpPerformed, false);
 
                                 turnVal++;
-                                thisTurn = (turnVal%2 == 0 ? 1 : 2);
                                 updateText(img, turnVal, latestScores, latestMoves, moveStart, moveEnd); //Updates text.
                                 promotionGUI(bCheckers);
                                 Draw(img, startUpMain); //Draws new gamestate.
@@ -337,7 +332,6 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
             rCheckers[selected[selected.size()-1]].x = intPos[intPos.size()-2];
             rCheckers[selected[selected.size()-1]].y = intPos[intPos.size()-1];
 
-            boardChange(thisTurn, boards, moveSet[moveSet.size()-2], moveSet[moveSet.size()-1], redPieces, blackPieces);
             checkerBoard(boards);
             Draw(img, startUpMain);
 
@@ -355,7 +349,6 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
         setBool(jumpPerformed, false);
 
         turnVal++;
-        thisTurn = (turnVal%2 == 0 ? 1 : 2);
         updateText(img, turnVal, latestScores, latestMoves, moveStart, moveEnd);
         promotionGUI(rCheckers);
         Draw(img, startUpMain); //Draws new gamestate.
@@ -384,7 +377,7 @@ int main(){
             Draw(img, startUpMain);
             updateText(img, turnVal, latestScores, latestMoves, moveStart, moveEnd);
             imshow(winName, img);
-            thisTurn = (turnVal%2 == 0 ? 1 : 2);
+            thisTurn = 1;
         }
 
         //Creates window, and shows image on it.
