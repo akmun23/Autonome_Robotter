@@ -142,17 +142,17 @@ std::vector<std::vector<double>> robotStartVision(std::vector<cv::Point2f> newCo
     Matrix RobotToChesspieceTransformation = Robot*Translation;
 
     // Finds the height of a piece on the chessboard
-    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, 0}, 1, 0.1);
+    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, pieceLocation.at(2,2)}, 1, 0.1);
     std::vector<double> target = rtde_receive.getActualTCPPose();
-    rtde_control.moveL({RobotToChesspieceTransformation.at(0,3), RobotToChesspieceTransformation.at(1,3), target[2], target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), target[2], target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){}
     target = rtde_receive.getActualTCPPose();
     double piece = target[2]+0.0015;
     rtde_control.speedStop();
 
-    // Moves to standard position
-    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, 0}, 2, 0.5);
+    // Moves robot above the found piece
+    rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
 
     // Sets up to move to middle of chess board
     setMatrixValues(checker, {1, 0, 0, (3.5*factor), 0, 1, 0, (3.5*factor), 0, 0, 1, 0, 0, 0, 0, 1});
@@ -161,27 +161,32 @@ std::vector<std::vector<double>> robotStartVision(std::vector<cv::Point2f> newCo
     RobotToChesspieceTransformation = Robot*Translation;
 
     // Finds heigh of chessboard on table
-    rtde_control.moveL({RobotToChesspieceTransformation.at(0,3), RobotToChesspieceTransformation.at(1,3), piece, target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){}
     double chess = rtde_receive.getActualTCPPose()[2]+0.0015;
     rtde_control.speedStop();
+    rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
 
     // Sets up to move to graveyard
-    setMatrixValues(checker, {1, 0, 0, (1*factor), 0, 1, 0, (-3*factor), 0, 0, 1, 0, 0, 0, 0, 1});
+    setMatrixValues(checker, {1, 0, 0, (1*factor), 0, 1, 0, (-4*factor), 0, 0, 1, 0, 0, 0, 0, 1});
     pieceLocation = CamToChess*checker;
     setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3) , pieceLocation(2,3), 1});
     RobotToChesspieceTransformation = Robot*Translation;
 
     // Finds height of graveyard on table
-    rtde_control.moveL({RobotToChesspieceTransformation.at(0,3), RobotToChesspieceTransformation.at(1,3), piece, target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){}
     double table = rtde_receive.getActualTCPPose()[2]+0.0015;
     rtde_control.speedStop();
+    rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
 
-    std::vector<double> rotMat = {RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(1,0), RobotToChesspieceTransformation.at(2,0), RobotToChesspieceTransformation.at(0,1), RobotToChesspieceTransformation.at(1,1), RobotToChesspieceTransformation.at(2,1), RobotToChesspieceTransformation.at(0,2), RobotToChesspieceTransformation.at(1,2), RobotToChesspieceTransformation.at(2,2)};
-    return {target, rotMat, {piece, chess, table}};
+    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, pieceLocation.at(2,2)}, 2, 0.5);
+
+    std::vector<double> camToChessTransf = {CamToChess.at(0,0), CamToChess.at(0,1), CamToChess.at(0,2), CamToChess.at(0,3), CamToChess.at(1,0), CamToChess.at(1,1), CamToChess.at(1,2), CamToChess.at(1,3), CamToChess.at(2,0), CamToChess.at(2,1), CamToChess.at(2,2), CamToChess.at(2,3), CamToChess.at(3,0), CamToChess.at(3,1), CamToChess.at(3,2), CamToChess.at(3,3)};
+    std::vector<double> robTransf = {Robot.at(0,0), Robot.at(0,1), Robot.at(0,2), Robot.at(0,3), Robot.at(1,0), Robot.at(1,1), Robot.at(1,2), Robot.at(1,3), Robot.at(2,0), Robot.at(2,1), Robot.at(2,2), Robot.at(2,3), Robot.at(3,0), Robot.at(3,1), Robot.at(3,2), Robot.at(3,3)};;
+    return {camToChessTransf, robTransf, {piece, chess, table}};
 }
 
 // Function to make the robot promote a piece by placiing a previously captured piece ontop of the piece to be promoted
@@ -193,24 +198,34 @@ void checkerJump(std::vector<std::string> moveSet, std::vector<std::vector<doubl
     row = row - '1';
 
     // Set up the robot
-    std::vector<double> boardPlane = startUp[0];
-    std::vector<double> rotMatrix = startUp[1];
+    Matrix CamToChess(4,4);
+    setMatrixValues(CamToChess, startUp[0]);
+    Matrix Robot(4,4);
+    setMatrixValues(Robot, startUp[1]);
 
-    // Calculate the coords of the piece to be promoted
-    double xcord = rotMatrix[0]*column*factor + rotMatrix[3]*row*factor + rotMatrix[6]*0*factor + boardPlane[0];
-    double ycord = rotMatrix[1]*column*factor + rotMatrix[4]*row*factor + rotMatrix[7]*0*factor + boardPlane[1];
-    double hover = startUp[2][0] - startUp[2][1];
+    // Calculate the coords of the piece that was jumped
+    Matrix checker(4, 4);
+    setMatrixValues(checker, {1, 0, 0, column*factor, 0, 1, 0, row*factor, 0, 0, 1, 0, 0, 0, 0, 1});
 
-    piecesLeft = (12 - piecesLeft) * hover;
+    Matrix pieceLocation = CamToChess*checker;
+
+    Matrix Translation(4, 1);
+    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3), pieceLocation(2,3), 1});
+
+    Matrix location = Robot*Translation;
+    double xcord = location.at(0,0);
+    double ycord = location.at(1,0);
+    double hover = (startUp[2][0] - startUp[2][1]) * 2;
+
+    piecesLeft = (12 - piecesLeft) * (hover/2);
 
     double offset = 0.005;
 
     std::vector<double> target = rtde_receive.getActualTCPPose();
-
-    rtde_control.moveL({xcord, ycord, startUp[2][0] + hover, target[3], target[4], target[5]}, 1,   0.2);
-    rtde_control.moveL({xcord, ycord, startUp[2][1],         target[3], target[4], target[5]}, 0.2, 0.05);
+    rtde_control.moveL({xcord,     ycord,     startUp[2][0] + hover,              target[3], target[4], target[5]}, 1,   0.2);
+    rtde_control.moveL({xcord,     ycord,     startUp[2][1],                      target[3], target[4], target[5]}, 0.2, 0.05);
     atmegaCom('6');
-    rtde_control.moveL({xcord, ycord, startUp[2][0] + hover + piecesLeft, target[3], target[4], target[5]}, 1,   0.2);
+    rtde_control.moveL({xcord,     ycord,     startUp[2][0] + hover + piecesLeft, target[3], target[4], target[5]}, 1,   0.2);
 
     int gravex;
     if(playerTurn == 1){
@@ -219,12 +234,16 @@ void checkerJump(std::vector<std::string> moveSet, std::vector<std::vector<doubl
         gravex = 7;
     }
 
-    int gravey = -3;
+    int gravey = -4;
 
-    double xcord2 = rotMatrix[0] * gravex * factor + rotMatrix[3] * gravey * factor + rotMatrix[6] * 0 * factor + boardPlane[0];
-    double ycord2 = rotMatrix[1] * gravex * factor + rotMatrix[4] * gravey * factor + rotMatrix[7] * 0 * factor + boardPlane[1];
+    setMatrixValues(checker, {1, 0, 0, gravex*factor, 0, 1, 0, gravey*factor, 0, 0, 1, 0, 0, 0, 0, 1});
+    pieceLocation = CamToChess*checker;
+    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3), pieceLocation(2,3), 1});
+    location = Robot*Translation;
+    double xcord2 = location.at(0,0);
+    double ycord2 = location.at(1,0);
 
-    rtde_control.moveL({xcord2 + offset, ycord2 + offset, startUp[2][2] + hover + piecesLeft, target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({xcord2 + offset, ycord2 + offset, startUp[2][0] + hover + piecesLeft, target[3], target[4], target[5]}, 1, 0.2);
 
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){}
@@ -239,17 +258,30 @@ void checkerJump(std::vector<std::string> moveSet, std::vector<std::vector<doubl
 }
 
 void promotePiece(std::vector<std::string> moveSet, std::vector<std::vector<double>> startUp, std::vector<std::vector<std::string>> boards, int playerTurn, double factor, int piecesLeft){
-    std::vector<double> boardPlane = startUp[0];
-    std::vector<double> rotMatrix = startUp[1];
+    // Set up the robot
+    Matrix CamToChess(4,4);
+    setMatrixValues(CamToChess, startUp[0]);
+    Matrix Robot(4,4);
+    setMatrixValues(Robot, startUp[1]);
 
     char column = moveSet[1][0];
     column = column - 'a';
     int row = moveSet[1][1] - '1';
 
-    double xcord = rotMatrix[0] * column * factor + rotMatrix[3] * row*factor + rotMatrix[6] * 0 * factor + boardPlane[0];
-    double ycord = rotMatrix[1] * column * factor + rotMatrix[4] * row*factor + rotMatrix[7] * 0 * factor + boardPlane[1];
-    double hover = startUp[2][0] - startUp[2][1];
-    piecesLeft = (12 - piecesLeft) * hover;
+    // Calculate the coords of the piece to be promoted
+    Matrix checker(4, 4);
+    setMatrixValues(checker, {1, 0, 0, column*factor, 0, 1, 0, row*factor, 0, 0, 1, 0, 0, 0, 0, 1});
+
+    Matrix pieceLocation = CamToChess*checker;
+
+    Matrix Translation(4, 1);
+    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3), pieceLocation(2,3), 1});
+
+    Matrix location = Robot*Translation;
+    double xcord = location.at(0,0);
+    double ycord = location.at(1,0);
+    double hover = (startUp[2][0] - startUp[2][1]) * 2;
+    piecesLeft = (12 - piecesLeft) * (hover/2);
 
     double offset = 0.005;
 
@@ -261,12 +293,16 @@ void promotePiece(std::vector<std::string> moveSet, std::vector<std::vector<doub
     } else {
         gravex = 1;
     }
+    int gravey = -4;
 
-    int gravey = -3;
-    double xcord2 = rotMatrix[0] * gravex*factor + rotMatrix[3] * gravey * factor + rotMatrix[6] * 0 * factor + boardPlane[0];
-    double ycord2 = rotMatrix[1] * gravex*factor + rotMatrix[4] * gravey * factor + rotMatrix[7] * 0 * factor + boardPlane[1];
+    setMatrixValues(checker, {1, 0, 0, gravex*factor, 0, 1, 0, gravey*factor, 0, 0, 1, 0, 0, 0, 0, 1});
+    pieceLocation = CamToChess*checker;
+    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3), pieceLocation(2,3), 1});
+    location = Robot*Translation;
+    double xcord2 = location.at(0,0);
+    double ycord2 = location.at(1,0);
 
-    rtde_control.moveL({xcord2 + offset, ycord2 + offset, startUp[2][0],                      target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({target[0],       target[2],       startUp[2][2] + hover + piecesLeft, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord2 + offset, ycord2 + offset, startUp[2][2] + hover + piecesLeft, target[3], target[4], target[5]}, 1, 0.2);
     atmegaCom('6');
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
@@ -276,50 +312,69 @@ void promotePiece(std::vector<std::string> moveSet, std::vector<std::vector<doub
     double gravez = rtde_receive.getActualTCPPose()[2]+0.0005;
     rtde_control.speedStop();
 
-    rtde_control.moveL({xcord2 + offset, ycord2 + offset, gravez + hover, target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({xcord2 + offset, ycord2 + offset, gravez + hover+ piecesLeft,      target[3], target[4], target[5]}, 1, 0.2);
     atmegaCom('8');
-    rtde_control.moveL({xcord2, ycord2, gravez + hover,             target[3], target[4], target[5]}, 1, 0.2);
-    rtde_control.moveL({xcord2, ycord2, gravez - hover,             target[3], target[4], target[5]}, 0.2, 0.05);
+    rtde_control.moveL({xcord2,          ycord2,          gravez + hover + piecesLeft,     target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({xcord2,          ycord2,          gravez - (hover/2) + piecesLeft, target[3], target[4], target[5]}, 0.2, 0.05);
     atmegaCom('6');
-    rtde_control.moveL({xcord2, ycord2, startUp[2][0],              target[3], target[4], target[5]}, 1, 0.2);
-
-    rtde_control.moveL({xcord,  ycord,  startUp[2][0],              target[3], target[4], target[5]}, 1, 0.2);
-    rtde_control.moveL({xcord,  ycord,  startUp[2][0] - (hover/2),  target[3], target[4], target[5]}, 0.2, 0.05);
+    rtde_control.moveL({xcord2,          ycord2,          gravez + hover + piecesLeft,     target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({xcord,           ycord,           gravez + hover + piecesLeft,     target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({xcord,           ycord,           startUp[2][0],                   target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({xcord,           ycord,           startUp[2][0] - (hover/4),       target[3], target[4], target[5]}, 0.2, 0.05);
     atmegaCom('8');
-    rtde_control.moveL({xcord, ycord, startUp[2][0], target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({xcord,           ycord,           startUp[2][0] + hover,           target[3], target[4], target[5]}, 1, 0.2);
 }
 
 //Function to move the robot
-bool robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>> startUp, std::vector<std::vector<std::string>> boards, int playerTurn){
+bool robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>>& startUp, std::vector<std::vector<std::string>>& boards, int& playerTurn){
     double factor = 0.03;
     double xcord = 0;
     double ycord = 0;
-    double zcord = 0;
     double xcord2 = 0;
     double ycord2 = 0;
-    double zcord2 = 0;
     double speed = 2;
     double speed2 = 1;
     double acc = 0.5;
     double acc2 = 0.2;
-    double hover = startUp[2][0] - startUp[2][1];
+    double hover = (startUp[2][0] - startUp[2][1]) * 2;
 
-    std::vector<double> boardPlane = startUp[0];
-    std::vector<double> rotMatrix = startUp[1];
+    Matrix CamToChess(4,4);
+    setMatrixValues(CamToChess, startUp[0]);
+    Matrix Robot(4,4);
+    setMatrixValues(Robot, startUp[1]);
 
     char column = moveSet[0][0]; //Starting column
     column = column - 'a';
     int row = moveSet[0][1] - '1'; //Starting row
 
+    Matrix checker(4, 4);
+    setMatrixValues(checker, {1, 0, 0, column*factor, 0, 1, 0, row*factor, 0, 0, 1, 0, 0, 0, 0, 1});
+
+    Matrix pieceLocation = CamToChess*checker;
+
+    Matrix Translation(4, 1);
+    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3), pieceLocation(2,3), 1});
+
+    Matrix location = Robot*Translation;
+    xcord = location.at(0,0);
+    ycord = location.at(1,0);
+
     char column2 = moveSet[1][0]; //Ending column
     column2 = column2 - 'a';
     int row2 = moveSet[1][1] - '1'; //Ending row
 
-    xcord  = rotMatrix[0] * column  * factor + rotMatrix[3] * row  * factor + rotMatrix[6] * 0 * factor + boardPlane[0];
-    ycord  = rotMatrix[1] * column  * factor + rotMatrix[4] * row  * factor + rotMatrix[7] * 0 * factor + boardPlane[1];
+    setMatrixValues(checker, {1, 0, 0, column2*factor, 0, 1, 0, row2*factor, 0, 0, 1, 0, 0, 0, 0, 1});
+    pieceLocation = CamToChess*checker;
+    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3), pieceLocation(2,3), 1});
+    location = Robot*Translation;
+    xcord2 = location.at(0,0);
+    ycord2 = location.at(1,0);
 
-    xcord2 = rotMatrix[0] * column2 * factor + rotMatrix[3] * row2 * factor + rotMatrix[6] * 0 * factor + boardPlane[0];
-    ycord2 = rotMatrix[1] * column2 * factor + rotMatrix[4] * row2 * factor + rotMatrix[7] * 0 * factor + boardPlane[1];
+    // xcord  = rotMatrix[0] * column  * factor + rotMatrix[3] * row  * factor + rotMatrix[6] * 0 * factor + boardPlane[0];
+    // ycord  = rotMatrix[1] * column  * factor + rotMatrix[4] * row  * factor + rotMatrix[7] * 0 * factor + boardPlane[1];
+
+    // xcord2 = rotMatrix[0] * column2 * factor + rotMatrix[3] * row2 * factor + rotMatrix[6] * 0 * factor + boardPlane[0];
+    // ycord2 = rotMatrix[1] * column2 * factor + rotMatrix[4] * row2 * factor + rotMatrix[7] * 0 * factor + boardPlane[1];
 
     std::vector<double> target = rtde_receive.getActualTCPPose();
 
@@ -378,7 +433,7 @@ bool robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>
         promotePiece({moveSet[0], moveSet[1]}, startUp, boards, playerTurn, factor, piecesLeft);
     }
 
-    rtde_control.moveL(target, 1, hover);
+    rtde_control.moveL(target, speed, acc);
 
     return true;
 }

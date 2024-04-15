@@ -4,7 +4,7 @@
 #include "boardUpdate.h"
 #include "computerPos.h"
 #include "qa.hpp"
-//#include "robotMove.h"
+#include "robotMove.h"
 #include "validMoves.h"
 #include "CheckersDatabase.h"
 #include "computerVision.h"
@@ -253,7 +253,7 @@ int main() {
     }
 
     // Loads in the image
-    cv::Mat img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/visionTest4.jpg");
+    cv::Mat img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/visionTest6.jpg");
 
     // Variables that is needed for the robot movement
     std::vector<cv::Point2f> newCorners;
@@ -270,7 +270,10 @@ int main() {
     std::cout << calibrate[1] << std::endl;
     std::cout << calibrate[2] << std::endl;
 
-    //robotStartVision(newCorners, calibrate, chessBoard);
+    std::vector<std::vector<double>> startUp = robotStartVision(newCorners, calibrate, boardSize);
+
+    int playerTurn = 1;
+    robotMove({"c3", "e5"}, startUp, chessBoard, playerTurn);
 
     /*
     int playerTurn = 2;

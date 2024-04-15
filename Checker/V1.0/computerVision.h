@@ -15,6 +15,7 @@ using namespace std;
 
 double pixToMeters;
 std::vector<cv::Point2f> axis;
+double boardSize = 0;
 
 std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
     vector<Vec3f> circles;
@@ -83,7 +84,6 @@ std::vector<cv::Point2f> detectAndDrawChessboardCorners(cv::Mat src) {
         } // Corners er redefined with coordinates in m instead of pixels.
 
         // Draw the corners of the board and offset
-        float boardSize;
         int exponent = 2;
         boardSize = sqrt((pow(corners[1].x - corners[0].x,exponent)) + (pow(corners[1].y - corners[0].y,exponent)));
         // The length of the individual squares of the board are calculated to calibrate the game program.

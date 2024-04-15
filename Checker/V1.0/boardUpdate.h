@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 
-void checkerBoard(std::vector<std::vector<std::string>> boards);
+void checkerBoard(std::vector<std::vector<std::string>>& boards);
 
 std::vector<std::vector<std::string>> startUp(){
     std::vector<std::vector<std::string>> boards = {
@@ -28,7 +28,7 @@ std::vector<std::vector<std::string>> startUp(){
 
 
 //Prints the board with input given by the vector boards
-void checkerBoard(std::vector<std::vector<std::string>> boards){
+void checkerBoard(std::vector<std::vector<std::string>>& boards){
     std::cout << " " << " "  << "1"  << "  "        << "2" << "  "         << "3"  << "  "        << "4"  << "  "        << "5"  << "  "        << "6"  << "  "        << "7"  << "  "        << "8"          << std::endl;
     std::cout << "A" << " "  << boards[0][0] << " " << boards[0][1] << " " << boards[0][2] << " " << boards[0][3] << " " << boards[0][4] << " " << boards[0][5] << " " << boards[0][6] << " " << boards[0][7] << std::endl;
     std::cout << "B" << " "  << boards[1][0] << " " << boards[1][1] << " " << boards[1][2] << " " << boards[1][3] << " " << boards[1][4] << " " << boards[1][5] << " " << boards[1][6] << " " << boards[1][7] << std::endl;
