@@ -57,7 +57,6 @@ void posToStringConvert(int x, int y, vector<string>& stringPos){
 }
 
 void stringToPosConvert(string stringPosValue, vector<int>& outputVector){
-
     int x, y;
     int boardOffSetX = 100;
     int boardOffSetY = 75;

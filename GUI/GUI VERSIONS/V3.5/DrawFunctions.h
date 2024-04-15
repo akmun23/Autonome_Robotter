@@ -35,7 +35,7 @@ void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves
     string spiller2 = "Det er spiller 2's tur.";
     string playerTurnString, outputString;
 
-    ((turnVal%2 == 0) ? playerTurnString = spiller1 : playerTurnString = spiller2);
+    ((thisTurn%2 == 1) ? playerTurnString = spiller1 : playerTurnString = spiller2);
 
     rectangle(img, Point(115,0), Point(500,35), Scalar(255,255,255), -1); //Creates a white rectangle, that covers the old text.
     putText(img, playerTurnString, Point(115, 25), FONT_HERSHEY_COMPLEX, 1, Scalar(0,0,0), 1); //Prints new text.
