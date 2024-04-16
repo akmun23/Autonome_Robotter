@@ -515,6 +515,12 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
         }
     }
 
+    if(!jump1.empty() && !jump2.empty() && playerTurn == 1){
+        score -= 100;
+    } else if(!jump1.empty() && !jump2.empty() && playerTurn == 2){
+        score += 100;
+    }
+
     if(red == 0 || movePossible(2, boards, jump2, moreMove, move).empty()){
         score += 10000;
     }
@@ -538,9 +544,9 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
     }
 
     if(playerTurn == 1){
-        score += depth*10;
+        score += depth;
     } else {
-        score -= depth*10;
+        score -= depth;
     }
 
     score *= 1000;

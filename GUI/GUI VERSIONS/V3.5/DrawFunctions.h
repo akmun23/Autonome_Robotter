@@ -25,7 +25,7 @@ string moveStart = "", moveEnd = "";
 int thisTurn; //Which player's turn it is
 int blackPieces = 12; //Initial number of black pieces
 int redPieces = 12; //Initial number of red pieces
-int depth = 5;
+int depth = 9; //Depth of the minimax algorithm
 
 bool startUpMain = true; //Bool, true if code is being run for the first time.
 
