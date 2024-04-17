@@ -634,7 +634,7 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
             moves.push_back(playerStart);
             moves.push_back(playerMove);
 
-            if (depth == 2 || depth == 1){
+            if (depth == 1){
                 insertAlphaBetaToTemp(tempBoard,MoveMade,tempPlayer,CounterForTempTable); // Skal slettes når Database er trænet
             }
 
@@ -703,7 +703,7 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
             moves.push_back(playerStart);
             moves.push_back(playerMove);
 
-            if (depth == 2 || depth == 1){
+            if (depth == 1){
                 insertAlphaBetaToTemp(tempBoard,MoveMade,tempPlayer,CounterForTempTable); // Skal slettes når Database er trænet
             }
             jumped = pieceJump(playerStart, playerMove, tempPlayer, tempBoard);
