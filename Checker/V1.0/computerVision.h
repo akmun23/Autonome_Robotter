@@ -13,12 +13,9 @@
 using namespace cv;
 using namespace std;
 
-double offsetx = 837;
-double offsety = 1267;
-double robotBasex = 1436;
-double robotBasey = 856;
 double pixToMeters;
 std::vector<cv::Point2f> axis;
+double boardSize = 0;
 
 std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
     vector<Vec3f> circles;
@@ -35,7 +32,7 @@ std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
     //![houghcircles]
     HoughCircles(gray, circles, HOUGH_GRADIENT, 1,
                  gray.rows/50,  // change this value to detect circles with different distances to each other
-                 100, 30, 18, 32 // change the last two parameters
+                 100, 30, 16, 32 // change the last two parameters
                  // (min_radius & max_radius) to detect larger circles
                  );
     //![houghcircles]
@@ -50,9 +47,13 @@ std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
         circle(src, center, 1, Scalar(0,100,100), 3, LINE_AA);
         // circle outline
         int radius = c[2];
-        circle(src, center, radius+5, Scalar(0,0,0), -1, LINE_AA);
+        circle(src, center, radius+3, Scalar(0,0,0), -1, LINE_AA);
     }
-    imshow("detected circles", src);
+    namedWindow("detected board", WINDOW_NORMAL);
+    imshow("detected board", src);
+    resizeWindow("detected board", 1000, 1300);
+    moveWindow("detected board",src.cols/2,100);
+    waitKey();
     return {circles, colors};
 }
 
@@ -83,13 +84,11 @@ std::vector<cv::Point2f> detectAndDrawChessboardCorners(cv::Mat src) {
         } // Corners er redefined with coordinates in m instead of pixels.
 
         // Draw the corners of the board and offset
-        float boardSize;
         int exponent = 2;
         boardSize = sqrt((pow(corners[1].x - corners[0].x,exponent)) + (pow(corners[1].y - corners[0].y,exponent)));
         // The length of the individual squares of the board are calculated to calibrate the game program.
         cout << "Boardsize: " << boardSize << endl;
     }
-
     std::vector<cv::Point2f> axis = {corners[0], corners[6], corners[42], corners[48]};
     return axis;
 }
