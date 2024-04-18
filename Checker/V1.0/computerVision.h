@@ -46,7 +46,7 @@ std::vector<cv::Point2f> calibrationCircles(std::vector<std::vector<cv::Vec3f>> 
 std::vector<cv::Vec3b> startBoard(std::vector<std::vector<double>> circleChecked, std::vector<cv::Vec3f> colors, std::vector<std::vector<std::string>>& chessBoard);
 
 // Runs the first time the board is detected and finds the orientation of the board
-std::vector<cv::Vec3b> firstLoop(std::vector<cv::Point2f>& newCorners, cv::Mat firstLoop, std::vector<std::vector<std::string>>& chessBoard, std::vector<cv::Point2f>& calibrate, double& pixToMeters, double& boardSize);
+std::vector<cv::Vec3b> firstLoop(std::vector<cv::Point2f>& newCorners, cv::Mat& firstLoop, std::vector<std::vector<std::string>>& chessBoard, std::vector<cv::Point2f>& calibrate, double& pixToMeters, double& boardSize);
 
 // Runs the loop that detects the checker pieces on the board
 std::vector<std::string> boardLoop(cv::Vec3b black, cv::Vec3b red, std::vector<cv::Point2f> newCorners, cv::Mat img, std::vector<std::vector<std::string>> chessBoard, int playerTurn, double pixToMeters);

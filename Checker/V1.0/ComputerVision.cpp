@@ -16,8 +16,8 @@ std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
 
     //![houghcircles]
     HoughCircles(gray, circles, HOUGH_GRADIENT, 1,
-                 gray.rows/70,  // change this value to detect circles with different distances to each other
-                 100, 30, 6, 45 // change the last two parameters
+                 gray.rows/100,  // change this value to detect circles with different distances to each other
+                 110, 25, 5, 15 // change the last two parameters
                  // (min_radius & max_radius) to detect larger circles
                  );
     //![houghcircles]
@@ -32,7 +32,7 @@ std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
         circle(src, center, 1, Scalar(0,100,100), 3, LINE_AA);
         // circle outline
         int radius = c[2];
-        circle(src, center, radius+3, Scalar(0,0,0), -1, LINE_AA);
+        circle(src, center, radius+1, Scalar(0,0,0), -1, LINE_AA);
     }
     namedWindow("detected board", WINDOW_NORMAL);
     imshow("detected board", src);
@@ -144,7 +144,7 @@ std::vector<double> findCoordInFrame(std::vector<cv::Point2f> axis, cv::Point2f 
 std::vector<cv::Point2f> calibrationCircles(std::vector<std::vector<Vec3f>> circlesAndColors){
     // Preset values for the three calibration circles
     Vec3b green = {160, 205, 200};
-    Vec3b yellow = {120, 214, 245};
+    Vec3b yellow = {130, 224, 245};
     Vec3b magenta = {210, 138, 180};
     // Stores the coordinates of all cirlces and their color that has been detected
     std::vector<cv::Vec3f> circles = circlesAndColors[0];
@@ -156,7 +156,7 @@ std::vector<cv::Point2f> calibrationCircles(std::vector<std::vector<Vec3f>> circ
     cv::Point2f magentaFunc;
 
     // Tolerance for the color detection
-    int tolerance = 22;
+    int tolerance = 25;
 
     // Finds the coordinates of the three calibration circles by iterating through all the detected circles
     for (int k = 0; k < circles.size(); k++) {
@@ -196,7 +196,7 @@ std::vector<Vec3b> startBoard(std::vector<std::vector<double>> circleChecked, st
         for (int j = 0; j < 8; j++) {
             for (int k = 0; k < circleChecked.size(); k++) {
                 // Checks if the circle is within the boundaries of the expected location of the checker piece
-                if(((circleChecked[k][0] - 0.0075) <  (j*0.03)) && ((circleChecked[k][0] + 0.0075) > (j*0.03) && ((circleChecked[k][1] - 0.0075) < (i*0.03)) && ((circleChecked[k][1] + 0.0075) > (i*0.03)))){
+                if(((circleChecked[k][0] - 0.015) <  (j*0.03)) && ((circleChecked[k][0] + 0.015) > (j*0.03) && ((circleChecked[k][1] - 0.015) < (i*0.03)) && ((circleChecked[k][1] + 0.015) > (i*0.03)))){
                     // If the piece is located at the black end of the board then the value is saved as the color of a black piece else it is stored as the color of a red piece
                     if(circleChecked[k][1] < 0.1){
                         chessBoard[i][j] = "B ";
@@ -237,7 +237,7 @@ std::vector<Vec3b> startBoard(std::vector<std::vector<double>> circleChecked, st
 }
 
 // Runs the first time the board is detected and finds the orientation of the board
-std::vector<Vec3b> firstLoop(std::vector<cv::Point2f>& newCorners, cv::Mat firstLoop, std::vector<std::vector<std::string>>& chessBoard, std::vector<cv::Point2f>& calibrate, double& pixToMeters, double& boardSize){
+std::vector<Vec3b> firstLoop(std::vector<cv::Point2f>& newCorners, cv::Mat& firstLoop, std::vector<std::vector<std::string>>& chessBoard, std::vector<cv::Point2f>& calibrate, double& pixToMeters, double& boardSize){
     // Detects the circles and the chessboard corners
     std::vector<std::vector<Vec3f>> circlesAndColors = detectAndDrawCentersOfCircles(firstLoop);
     std::vector<cv::Point2f> allAxis = detectAndDrawChessboardCorners(firstLoop, pixToMeters, boardSize);
@@ -264,7 +264,7 @@ std::vector<Vec3b> firstLoop(std::vector<cv::Point2f>& newCorners, cv::Mat first
         if(checkLoop == 0){
             for (int i = 0; i < circles.size()+remove; i++) {
                 circleChecked.push_back(findCoordInFrame(newCorners, cv::Point2f(circles[i-remove][0]*pixToMeters, circles[i-remove][1]*pixToMeters)));
-                if((circleChecked[i-remove][0] > -0.02) && (circleChecked[i-remove][0] < 0.242) && (circleChecked[i-remove][1] > -0.02) && (circleChecked[i-remove][1] < 0.242)){
+                if((circleChecked[i-remove][0] > -0.02) && (circleChecked[i-remove][0] < 0.225) && (circleChecked[i-remove][1] > -0.02) && (circleChecked[i-remove][1] < 0.225)){
                     continue;
                 }
                 circleChecked.erase(std::next(circleChecked.begin(), i-remove));
@@ -285,10 +285,10 @@ std::vector<Vec3b> firstLoop(std::vector<cv::Point2f>& newCorners, cv::Mat first
             if(-0.005 < circleChecked[i][0] && 0.005 > circleChecked[i][0] && -0.005 < circleChecked[i][1] && 0.005 > circleChecked[i][1]){
                 orego = true;
                 break;
-            } else if (0.205 < circleChecked[i][0] && 0.215 > circleChecked[i][0] && -0.005 < circleChecked[i][1] && 0.005 > circleChecked[i][1]){
+            } else if (0.2 < circleChecked[i][0] && 0.225 > circleChecked[i][0] && -0.005 < circleChecked[i][1] && 0.005 > circleChecked[i][1]){
                 yaxis = true;
                 break;
-            } else if (-0.005 < circleChecked[i][0] && 0.005 > circleChecked[i][0] && 0.205 < circleChecked[i][1] && 0.215 > circleChecked[i][1]){
+            } else if (-0.005 < circleChecked[i][0] && 0.005 > circleChecked[i][0] && 0.2 < circleChecked[i][1] && 0.225 > circleChecked[i][1]){
                 xaxis = true;
                 break;
             }
@@ -318,7 +318,7 @@ std::vector<std::string> boardLoop(cv::Vec3b black, cv::Vec3b red, std::vector<c
     std::vector<Vec3f> colors;
     std::vector<std::vector<std::string>> prevBoard = chessBoard;
     int count = 99;
-    int tolerance = 10;
+    int tolerance = 40;
 
     while(count > 24){
         // Detects the circles and their colors in the img
@@ -354,7 +354,7 @@ std::vector<std::string> boardLoop(cv::Vec3b black, cv::Vec3b red, std::vector<c
             for (int j = 0; j < 8; j++) {
                 for (int k = 0; k < circleChecked.size(); k++) {
                     // If the circle is within the boundaries of the expected location of the checker piece then the color is checked
-                    if(((circleChecked[k][0] - 0.005) <  (j*0.03)) && ((circleChecked[k][0] + 0.005) > (j*0.03)) && ((circleChecked[k][1] - 0.005) < (i*0.03)) && ((circleChecked[k][1] + 0.005) > (i*0.03))){
+                    if(((circleChecked[k][0] - 0.015) <  (j*0.03)) && ((circleChecked[k][0] + 0.015) > (j*0.03)) && ((circleChecked[k][1] - 0.015) < (i*0.03)) && ((circleChecked[k][1] + 0.015) > (i*0.03))){
                         // If the color of the circle is within the tolerance of the color of a black or red checker piece then the checker piece is placed on the board
                         if((black[0]-tolerance < colors[k][0]) && (black[0]+tolerance > colors[k][0]) && (black[1]-tolerance < colors[k][1]) && (black[1]+tolerance > colors[k][1]) && (black[2]-tolerance < colors[k][2]) && (black[2]+tolerance > colors[k][2])){
                             chessBoard[i][j] = "B ";

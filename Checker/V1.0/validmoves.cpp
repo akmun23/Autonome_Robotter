@@ -263,6 +263,15 @@ bool validMoves::pieceJump(std::string& playerStart, std::string& playerMove, in
     int row3 = row2 + (row-row2)/2; //Middle row
     char column = playerStart[0]-((playerStart[0]-playerMove[0])/2); //Middle column
     column = column - 'a';
+
+    //Checks if the piece is able to jump over an enemy piece
+    if(((boards[column][row3] == "R ") || (boards[column][row3] == "RK")) && (playerTurn == 1)){
+        return true;
+    } else if(((boards[column][row3] == "B ") || (boards[column][row3] == "BK")) && (playerTurn == 2)){
+        return true;
+    } else {
+        return false;
+    }
 }
 
 //Checks if a piece is able to promote

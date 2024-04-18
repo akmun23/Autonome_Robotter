@@ -3,15 +3,13 @@
 #include<vector>
 #include<string>
 #include "boardUpdate.h"
-//#include "computerPos.h"
 #include "qa.hpp"
-//#include "robotMove.h"
 #include "validmoves.h"
 
 #include "mainfunctions.h"
 #include "CheckersDatabase.h"
 #include "computerVision.h"
-#include "robotMove.h"
+//#include "robotMove.h"
 #include "matrix.h"
 #include "alphabeta.h"
 
@@ -25,7 +23,7 @@
 #include "opencv2/calib3d.hpp"
 #include "opencv2/imgcodecs.hpp"
 
-#include <future>
+//#include <future>
 
 
 
@@ -245,15 +243,15 @@ int main(int argc, char** argv) {
 
             int CounterForTempTable = 1;
 
-            int playerTurn = 1; //Which player's turn it is
+            int playerTurn = 2; //Which player's turn it is
             int blackPieces = 12; //Initial number of black pieces
             int redPieces = 12; //Initial number of red pieces
             bool gameEnd = false; //If the game has ended
             int thisTurn; //Which player's turn it is
             int DrawChecker = 1; //When this equal 200 the game is called draw
             std::vector<std::vector<std::string>> thisBoard = {}; //The current state of the board
-            std::string player = "p"; //If the player is human or AI
-            std::string player2 = "AI"; //If the player is human or AI
+            std::string player = "AI"; //If the player is human or AI
+            std::string player2 = "p"; //If the player is human or AI
             std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
             std::vector<std::vector<double>> startUpRobot; //The initial position of the robot
             std::future<bool> fut;
@@ -263,10 +261,10 @@ int main(int argc, char** argv) {
             alphaBeta alphaBeta(4);
 
             std::vector<double> teachPos;
-            prepForPic(true, teachPos);
+            //prepForPic(true, teachPos);
 
             // Loads in the image
-            cv::Mat img = cameraFeed(argv);
+            cv::Mat img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/Checker/V1.0/build/Desktop-Debug/main1.jpg");
 
             // Variables that is needed for the robot movement
             std::vector<cv::Point2f> newCorners;
@@ -285,7 +283,7 @@ int main(int argc, char** argv) {
             std::cout << calibrate[1] << std::endl;
             std::cout << calibrate[2] << std::endl;
 
-            std::vector<std::vector<double>> startUp = robotStartVision(newCorners, calibrate, boardSize, pixToMeters);
+            //std::vector<std::vector<double>> startUp = robotStartVision(newCorners, calibrate, boardSize, pixToMeters);
 
 
             int TestCounterForDatabase = 0;
@@ -328,8 +326,9 @@ int main(int argc, char** argv) {
                     if((playerTurn == 1 && player == "p") || (playerTurn == 2 && player2 == "p")){
                         bool valid = false;
                         while(!valid){
-                            prepForPic(false, teachPos);
-                            img = cameraFeed(argv); // Loads in the image
+                            //prepForPic(false, teachPos);
+                            img.empty();
+                            img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/Checker/V1.0/build/Desktop-Debug/main0.jpg"); // Loads in the image
                             std::vector<std::string> move = boardLoop(colours[0], colours[1], newCorners, img, boards, playerTurn, pixToMeters); // Player's move
                             std::cout << move[0] << " " << move[1] << std::endl;
 
@@ -353,7 +352,7 @@ int main(int argc, char** argv) {
                     }
 
                     // Skriv true i første input for at køre robotten
-                    MoveRobot(true ,fut,tempBoard,thisTurn,moveSet,startUpRobot,i); //Robot movement
+                    MoveRobot(false ,fut,tempBoard,thisTurn,moveSet,startUpRobot,i); //Robot movement
 
                     printAIMove(DatabaseMoveMade,moveSet,MoveMade,thisTurn); //Prints the move made by the AI
 
