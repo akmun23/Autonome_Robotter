@@ -26,6 +26,7 @@ add_executable(main main.cpp
     matrix.cpp
     matrix.h
     alphabeta.h alphabeta.cpp
-    validmoves.h validmoves.cpp)
+    validmoves.h validmoves.cpp
+    main2.cpp)
 
 target_link_libraries(main PRIVATE ur_rtde::rtde Qt5::Core Qt5::Sql opencv_core opencv_highgui opencv_imgcodecs ${OpenCV_LIBS})

@@ -23,7 +23,7 @@
 
 using namespace ur_rtde;
 
-int main() {
+int main(int argc, char** argv) {
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
@@ -40,6 +40,11 @@ int main() {
     query.next();
     int count = query.value(0).toInt();
     if (count < 36){
+        query.exec("SELECT * FROM points");
+        for(int i = 0; i < count; i++){
+            query.next();
+            alphaBetas.push_back(alphaBeta(query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
+        }
         for (int i = 0; i < 36-count; i++) {
             alphaBetas.push_back(alphaBeta());
             alphaBetas[i].dbInsert();
@@ -52,6 +57,10 @@ int main() {
             alphaBetas.push_back(alphaBeta(query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
             i++;
         }
+    }
+
+    for(int i = 0; i < alphaBetas.size(); i++){
+        alphaBetas[i].resetWins();
     }
 
     double evoRate = 0.3;
@@ -156,23 +165,29 @@ int main() {
         std::vector<alphaBeta> winners;
 
         int size = query.size();
+        std::vector<int> remove;
 
         while(i < size){
             if(i < 4){
                 query.next();
                 winners.push_back(alphaBeta(query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
             } else {
-                query.prepare("DELETE FROM winner "
-                              "WHERE ai_id = :id");
-                query.bindValue(":id", alphaBetas[i].getId());
-                query.exec();
-
-                query.prepare("DELETE FROM points "
-                              "WHERE ai_id = :id");
-                query.bindValue(":id", alphaBetas[i].getId());
-                query.exec();
+                query.next();
+                remove.push_back(query.value(0).toInt());
             }
             i++;
+        }
+
+        for(int i = 0; i < remove.size(); i++){
+            query.prepare("DELETE FROM winner "
+                          "WHERE ai_id = :id");
+            query.bindValue(":id", remove[i]);
+            query.exec();
+
+            query.prepare("DELETE FROM points "
+                          "WHERE ai_id = :id");
+            query.bindValue(":id", remove[i]);
+            query.exec();
         }
 
         alphaBetas = {};
@@ -205,8 +220,9 @@ int main() {
         } else {
             std::cout << "Delete failed" << std::endl;
         }
-        evoRate *= 0.85;
+        evoRate *= 0.9;
     }
+
     //
 
     //Det her er er til vis man vil reset dataen i databasen
@@ -426,9 +442,11 @@ int main() {
     }
     */
 
-    /*
+/*
     // Loads in the image
-    cv::Mat img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/visionTest6.jpg");
+    cv::Mat img = cameraFeed(argv);
+    // Show the image taken
+    imshow("Image", img);
 
     // Variables that is needed for the robot movement
     std::vector<cv::Point2f> newCorners;
@@ -445,21 +463,20 @@ int main() {
     std::cout << calibrate[1] << std::endl;
     std::cout << calibrate[2] << std::endl;
 
-    std::vector<std::vector<double>> startUp = robotStartVision(newCorners, calibrate, boardSize);
+    // std::vector<std::vector<double>> startUp = robotStartVision(newCorners, calibrate, boardSize);
 
     int playerTurn = 1;
-    robotMove({"c3", "e5"}, startUp, chessBoard, playerTurn);
-    */
-    /*
-    int playerTurn = 2;
-    img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards5.jpg");
+    // robotMove({"c3", "e5"}, startUp, chessBoard, playerTurn);
+
+    playerTurn = 2;
+    img = cameraFeed(argv);
     std::vector<std::string> move = boardLoop(colours[0], colours[1], newCorners, img, chessBoard, playerTurn);
     std::cout << move[0] << " " << move[1] << std::endl;
 
     playerTurn = 1;
-    img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards6.jpg");
+    img = cameraFeed(argv);
     move = boardLoop(colours[0], colours[1], newCorners, img, chessBoard, playerTurn);
     std::cout << move[0] << " " << move[1] << std::endl;
-    */
+*/
     return 0;
 }

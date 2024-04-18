@@ -326,7 +326,7 @@ void promotePiece(std::vector<std::string> moveSet, std::vector<std::vector<doub
 }
 
 //Function to move the robot
-bool robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>>& startUp, std::vector<std::vector<std::string>>& boards, int& playerTurn){
+bool robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>> startUp, std::vector<std::vector<std::string>> boards, int playerTurn){
     double factor = 0.03;
     double xcord = 0;
     double ycord = 0;
