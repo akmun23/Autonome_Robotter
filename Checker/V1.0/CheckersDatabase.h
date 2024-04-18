@@ -1,5 +1,9 @@
+
 #ifndef CHECKERSDATABASE_H
 #define CHECKERSDATABASE_H
+
+#pragma once
+
 #include <QCoreApplication>
 #include <QtSql>
 #include <QSqlDatabase>
@@ -20,7 +24,7 @@ std::string MovePlayer(std::string& BoardState,int& PlayerTurn);
 
 
 //Temp
-void RefreshTempTable(int& PlayerTurn);
+void RefreshTempTable();
 bool CheckDuplicateMoves(std::string& BoardState, std::string& MoveToCheck, int& PlayerId);
 
 // Inserting to database

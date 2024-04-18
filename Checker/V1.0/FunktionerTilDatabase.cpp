@@ -378,12 +378,12 @@ void InsertToTemp(std::string& BoardState,std::string& Move,int& Counter,int Pla
 
 
 
-void RefreshTempTable(int& playerTurn){
+void RefreshTempTable(){
 
     QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
     QSqlQuery query = QSqlQuery(db);
 
-    //Clear Temp og sætter start board ind
+    //Clear Temp
     query.exec("DELETE FROM Temp WHERE tempBoard_id >= 0");
     query.exec("DELETE FROM TempMoves WHERE tempBoard_id >= 0");
 

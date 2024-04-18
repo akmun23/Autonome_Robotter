@@ -20,11 +20,20 @@ add_executable(main main.cpp
     robotMove.h
     AtmegaCom.h
     CheckersDatabase.h
-    computerPos.h
+
     FunktionerTilDatabase.cpp
     computerVision.h
     qa.hpp
     matrix.cpp
-    matrix.h)
+    matrix.h
+    mainfunctions.h mainfunctions.cpp
+    ValidMoves.cpp
+    Atmega.cpp
+    BoardUpdate.cpp
+    ComputerVision.cpp
+
+
+    robotMove.cpp
+)
 
 target_link_libraries(main PRIVATE ur_rtde::rtde Qt5::Core Qt5::Sql opencv_core opencv_highgui opencv_imgcodecs ${OpenCV_LIBS})
