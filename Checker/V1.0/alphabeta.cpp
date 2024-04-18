@@ -1,4 +1,5 @@
 #include "alphabeta.h"
+#include "CheckersDatabase.h"
 #include "validmoves.h"
 
 // The constructor for the alphaBeta class with no defined values
@@ -18,6 +19,8 @@ alphaBeta::alphaBeta() {
     _TwoJump *= distr(eng);
     _depth *= distr(eng);
 }
+
+alphaBeta::alphaBeta(int depth) : _depth(depth){}
 
 // The constructor for the alphaBeta class with defined values
 alphaBeta::alphaBeta(double piece, double king, double lock, double lockKing, double forward, double TwoEmpty, double OneJump, double OneEmpty, double TwoJump, double depth) {
@@ -194,7 +197,7 @@ int alphaBeta::giveScoreAI(std::vector<std::vector<std::string>>& boards, int& p
 }
 
 // The alphaBeta function
-int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, std::vector<std::vector<std::string>>& boards2, std::vector<std::string>& moveSet, int alpha, int beta, int& blackPieces2, int& redPieces2, int& playerTurn2, std::string playerMove){
+int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, std::vector<std::vector<std::string>>& boards2, std::vector<std::string>& moveSet, int alpha, int beta, int& blackPieces2, int& redPieces2, int& playerTurn2, std::string playerMove,int& CounterForTempTable){
     int maxEval; //The highest eval
     int eval; //The eval
     bool jumped; //If a piece has jumped
@@ -232,13 +235,17 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
             //Sets the start and end position for the move
             playerStart = posMove[i];
             playerMove = posMove[i+1];
-
+            std::string MoveMade = playerStart + playerMove;
             //Adds the start and end position to the vector moves
             moves.push_back(playerStart);
             moves.push_back(playerMove);
 
+
             //Checks if the piece has jumped
             jumped = pieceJump(playerStart, playerMove, tempPlayer, tempBoard);
+            if (depth == 1){
+                insertAlphaBetaToTemp(tempBoard, MoveMade, playerTurn, CounterForTempTable);
+            }
 
             //Checks if the piece has been promoted
             promotion = boardChange(tempPlayer, tempBoard, playerStart, playerMove, tempRed, tempBlack);
@@ -247,9 +254,9 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
             jumps = jumpPossible(tempPlayer, tempBoard);
 
             if(moreMoveCheck(jumps, playerMove) && jumped && !promotion){
-                eval = moveAI(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove);
+                eval = moveAI(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove,CounterForTempTable);
             } else {
-                eval = moveAI(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, {});
+                eval = moveAI(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, {},CounterForTempTable);
             }
 
             //If the eval is higher than the maxEval, it sets the maxEval to eval and sets the bestBoard, bestMoves, bestPieces and playerTurn to the match the board
@@ -296,8 +303,14 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
         for (int i = 0; i < (posMove.size()-1); i += 2) {
             playerStart = posMove[i];
             playerMove = posMove[i+1];
+            std::string MoveMade = playerStart + playerMove;
             moves.push_back(playerStart);
             moves.push_back(playerMove);
+
+            if (depth == 1){
+                insertAlphaBetaToTemp(tempBoard, MoveMade, playerTurn, CounterForTempTable);
+            }
+
             jumped = pieceJump(playerStart, playerMove, tempPlayer, tempBoard);
             promotion = boardChange(tempPlayer, tempBoard, playerStart, playerMove, tempRed, tempBlack);
             bool promotion2 = promotion;
@@ -306,9 +319,9 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
             //If the piece is able to jump again, it finds all possible moves
             jumps = jumpPossible(tempPlayer, tempBoard);
             if(moreMoveCheck(jumps, playerMove) && jumped && !promotion){
-                eval = moveAI(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove);
+                eval = moveAI(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove,CounterForTempTable);
             } else {
-                eval = moveAI(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, {});
+                eval = moveAI(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, {},CounterForTempTable);
             }
             if(maxEval > eval){
                 maxEval = eval;

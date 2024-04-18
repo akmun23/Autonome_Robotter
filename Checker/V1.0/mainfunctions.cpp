@@ -1,7 +1,7 @@
 #include "mainfunctions.h"
 #include "boardUpdate.h"
 #include "CheckersDatabase.h"
-#include "validMoves.h"
+#include "validmoves.h"
 #include "AtmegaCom.h"
 #include "robotMove.h"
 #include <QCoreApplication>
@@ -65,18 +65,19 @@ void loadBoardToString(std::vector<std::vector<std::string>> boards, std::string
 
 }
 
-void MoveDBMain(std::string& BoardState, int& playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces, std::vector<std::string>& moveSet, std::string& MoveMade, int& CounterForTempTable, int& DrawChecker, bool& DatabaseMoveMade, int& TestCounterForDatabase){
+void MoveDBMain(std::string& BoardState, int& playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces, std::vector<std::string>& moveSet, std::string& MoveMade, int& CounterForTempTable, int& DrawChecker, bool& DatabaseMoveMade, int& TestCounterForDatabase, validMoves validm, alphaBeta alphab){
+
 
     std::string DBmove = MovePlayer(BoardState, playerTurn); // Database best move on current board
     if (DBmove == "No moves"){
         std::cout << "No moves found" << std::endl;
-        alphaBeta(boards, 1, playerTurn, redPieces, blackPieces,boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {},CounterForTempTable,DrawChecker); //AI's move
+        alphab.moveAI(boards, 1, playerTurn, redPieces, blackPieces,boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {},CounterForTempTable); //AI's move
     }
     else{
         std::cout << "AI move from database: " << DBmove << std::endl;
         std::string DBmoveFrom = DBmove.substr(0,2);
         std::string DBmoveTo = DBmove.substr(2,2);
-        DB_move(playerTurn, boards, redPieces, blackPieces, DBmoveFrom, DBmoveTo); //Database AI's move
+        validm.DB_move(playerTurn, boards, redPieces, blackPieces, DBmoveFrom, DBmoveTo); //Database AI's move
         MoveMade = DBmove;
         TestCounterForDatabase++;
         DatabaseMoveMade = true;
@@ -84,9 +85,9 @@ void MoveDBMain(std::string& BoardState, int& playerTurn, std::vector<std::vecto
     }
 }
 
-void MoveRandom(int& playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces, std::vector<std::string>& moveSet, std::string& MoveMade, bool& DatabaseMoveMade, std::vector<std::string>& jumps, bool moreMove, std::string moveTo){
+void MoveRandom(int& playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces, std::vector<std::string>& moveSet, std::string& MoveMade, bool& DatabaseMoveMade, std::vector<std::string>& jumps, bool moreMove, std::string moveTo, validMoves validm){
     std::vector<std::string> MovesToPickFrom;
-    std::vector<std::string> PossibleJumps = movePossible(playerTurn, boards, jumps, moreMove, moveTo);
+    std::vector<std::string> PossibleJumps = validm.movePossible(playerTurn, boards, jumps, moreMove, moveTo);
     for(int i = 0; i < PossibleJumps.size(); i+=2){
         MovesToPickFrom.push_back(PossibleJumps[i] + PossibleJumps[i+1]);
     }
@@ -99,7 +100,7 @@ void MoveRandom(int& playerTurn, std::vector<std::vector<std::string>>& boards, 
     std::cout << "Chosen move: " << ChosenMove << std::endl;
     std::string moveFrom = ChosenMove.substr(0,2);
     std::string moveTo2 = ChosenMove.substr(2,2);
-    DB_move(playerTurn, boards, redPieces, blackPieces, moveFrom, moveTo2);
+    validm.DB_move(playerTurn, boards, redPieces, blackPieces, moveFrom, moveTo2);
     MoveMade = ChosenMove;
     DatabaseMoveMade = true;
 }
@@ -117,7 +118,6 @@ void MoveRobot(bool RunChecker,std::future<bool>& fut, std::vector<std::vector<s
         // Moves the robot
         if(i == 0){
             // Set up the robot
-            startUpRobot = robotStart();
             atmegaCom('6'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
             sleep(1); // Venter 1 sekund
             atmegaCom('8'); // Sender et signal for at gripperen skal åbne
@@ -141,7 +141,7 @@ void printAIMove(bool& DatabaseMoveMade, std::vector<std::string>& moveSet, std:
     DatabaseMoveMade = false;
 }
 
-void printGameState(int ii, int DrawChecker, int redPieces, int blackPieces, int playerTurn, std::vector<std::vector<std::string>>& boards, int depth){
+void printGameState(int ii, int DrawChecker, int redPieces, int blackPieces, int playerTurn, std::vector<std::vector<std::string>>& boards, int depth, alphaBeta alphab){
     //Prints data from the state of the game and prints the board
     std::cout << "It is game nr: " << ii << std::endl;
     std::cout << "It is turn: " << DrawChecker << std::endl;
@@ -149,7 +149,7 @@ void printGameState(int ii, int DrawChecker, int redPieces, int blackPieces, int
     std::cout << "There are " << blackPieces << " black pieces left." << std::endl;
     std::cout << std::endl;
     checkerBoard(boards);
-    std::cout << "Game score is: " << giveBoardScore(boards, playerTurn, blackPieces, redPieces, depth) << std::endl;
+    std::cout << "Game score is: " << alphab.giveScoreAI(boards, playerTurn, blackPieces, redPieces, depth) << std::endl;
     std::cout << std::endl;
 }
 

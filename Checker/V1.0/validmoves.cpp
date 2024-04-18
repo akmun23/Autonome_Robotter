@@ -154,13 +154,107 @@ bool validMoves::moreMoveCheck(std::vector<std::string>& playerJump, std::string
         }
     }
 
-
+}
+//Returns a vector of possible moves for a player
 //Returns a vector of possible moves for a player
 std::vector<std::string> validMoves::movePossible(int playerTurn, std::vector<std::vector<std::string>>& boards, std::vector<std::string>& playerJump, bool& moreMove, std::string& playerMove){
     char column;
     char column2;
     std::vector<std::string> posMove = {};
 
+    //If a jump is possible it goes into this if-statement since a jump is mandatory
+    if(playerJump.size() > 0){
+        //If the player is able to jump again, it checks all the possible jumps for the new board-state
+        if(moreMove){
+            for(int i = 0; i < playerJump.size(); i +=2){
+                if(playerMove == playerJump[i]){
+                    posMove.push_back(playerJump[i]);
+                    posMove.push_back(playerJump[i+1]);
+                }
+            }
+        } else {
+            //Set posMove to all possible jumps, since no piece has jumped yet
+            posMove = playerJump;
+        }
+        //Returns the vector posMove
+        return posMove;
+    }
+
+    //If no jump is possible, it goes into this if-statement
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+
+            if(boards[i][j] == "1 " || boards[i][j] == "  "){
+                continue;
+            }
+
+            if(playerTurn == 1 && ((boards[i][j] == "B ") || (boards[i][j] == "BK"))){ //If it is player 1's turn, it checks if the player's piece is able to move
+                if(i < 7){
+                    if((j < 7) && (boards[i+1][j+1] == "1 ")){
+                        column = 'a' + i;
+                        column2 = 'a' + i + 1;
+                        posMove.push_back(column + std::to_string(j+1));
+                        posMove.push_back(column2 + std::to_string(j+2));
+                    }
+                    if((j > 0) && (boards[i+1][j-1] == "1 ")){
+                        column = 'a' + i;
+                        column2 = 'a' + i + 1;
+                        posMove.push_back(column + std::to_string(j+1));
+                        posMove.push_back(column2 + std::to_string(j));
+                    }
+                }
+                if(i > 0){
+                    if((j < 7) && (boards[i][j] == "BK") && (boards[i-1][j+1] == "1 ")){
+                        column = 'a' + i;
+                        column2 = 'a' + i - 1;
+                        posMove.push_back(column + std::to_string(j+1));
+                        posMove.push_back(column2 + std::to_string(j+2));
+                    }
+                    if((j > 0) && (boards[i][j] == "BK") && (boards[i-1][j-1] == "1 ")){
+                        column = 'a' + i;
+                        column2 = 'a' + i - 1;
+                        posMove.push_back(column + std::to_string(j+1));
+                        posMove.push_back(column2 + std::to_string(j));
+                    }
+                }
+
+            } else if((playerTurn == 2) && ((boards[i][j] == "R ") || (boards[i][j] == "RK"))){ //If it is player 2's turn, it checks if the player's piece is able to move
+                if(i > 0){
+                    if((j < 7) && (boards[i-1][j+1] == "1 ")){
+                        column = 'a' + i;
+                        column2 = 'a' + i - 1;
+                        posMove.push_back(column + std::to_string(j+1));
+                        posMove.push_back(column2 + std::to_string(j+2));
+                    }
+                    if((j > 0) && (boards[i-1][j-1] == "1 ")){
+                        column = 'a' + i;
+                        column2 = 'a' + i - 1;
+                        posMove.push_back(column + std::to_string(j+1));
+                        posMove.push_back(column2 + std::to_string(j));
+                    }
+                }
+                if(i < 7){
+                    if((j < 7) && (boards[i][j] == "RK") && (boards[i+1][j+1] == "1 ")){
+                        column = 'a' + i;
+                        column2 = 'a' + i + 1;
+                        posMove.push_back(column + std::to_string(j+1));
+                        posMove.push_back(column2 + std::to_string(j+2));
+                    }
+                    if((j > 0) && (boards[i][j] == "RK") && (boards[i+1][j-1] == "1 ")){
+                        column = 'a' + i;
+                        column2 = 'a' + i + 1;
+                        posMove.push_back(column + std::to_string(j+1));
+                        posMove.push_back(column2 + std::to_string(j));
+
+                    }
+                }
+            }
+        }
+    }
+
+    //Returns the vector posMove
+    return posMove;
+}
 
 //Checks if the piece has jumped
 bool validMoves::pieceJump(std::string& playerStart, std::string& playerMove, int& playerTurn, std::vector<std::vector<std::string>>& boards){
@@ -169,7 +263,7 @@ bool validMoves::pieceJump(std::string& playerStart, std::string& playerMove, in
     int row3 = row2 + (row-row2)/2; //Middle row
     char column = playerStart[0]-((playerStart[0]-playerMove[0])/2); //Middle column
     column = column - 'a';
-
+}
 
 //Checks if a piece is able to promote
 bool validMoves::promotion(std::vector<std::vector<std::string>>& boards, int& playerTurn){

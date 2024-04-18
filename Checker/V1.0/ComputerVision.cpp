@@ -16,8 +16,8 @@ std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
 
     //![houghcircles]
     HoughCircles(gray, circles, HOUGH_GRADIENT, 1,
-                 gray.rows/50,  // change this value to detect circles with different distances to each other
-                 100, 30, 16, 32 // change the last two parameters
+                 gray.rows/70,  // change this value to detect circles with different distances to each other
+                 100, 30, 6, 45 // change the last two parameters
                  // (min_radius & max_radius) to detect larger circles
                  );
     //![houghcircles]
@@ -63,7 +63,7 @@ std::vector<cv::Point2f> detectAndDrawChessboardCorners(cv::Mat src, double& pix
 
         // Define the offset of where the table the checkers board can be placed on starts. Also the scale of cm per pixel. These have to be defined when camera is set up.
         pixToMeters = (0.03 / sqrt(pow((corners[1].x - corners[0].x),2) + pow((corners[1].y - corners[0].y),2)));
-
+        std::cout << "PixToMeters: " << pixToMeters << std::endl;
         for(int i = 0; i <= corners.size(); i++){
             corners[i].x = (corners[i].x)* pixToMeters;
             corners[i].y = (corners[i].y) * pixToMeters;
@@ -143,10 +143,9 @@ std::vector<double> findCoordInFrame(std::vector<cv::Point2f> axis, cv::Point2f 
 // Finds the coordinates for the three calibration circles
 std::vector<cv::Point2f> calibrationCircles(std::vector<std::vector<Vec3f>> circlesAndColors){
     // Preset values for the three calibration circles
-    Vec3b green = {101, 190, 168};
-    Vec3b yellow = {40, 224, 255};
-    Vec3b magenta = {180, 122, 179};
-
+    Vec3b green = {160, 205, 200};
+    Vec3b yellow = {120, 214, 245};
+    Vec3b magenta = {210, 138, 180};
     // Stores the coordinates of all cirlces and their color that has been detected
     std::vector<cv::Vec3f> circles = circlesAndColors[0];
     std::vector<cv::Vec3f> colors = circlesAndColors[1];
@@ -311,14 +310,14 @@ std::vector<Vec3b> firstLoop(std::vector<cv::Point2f>& newCorners, cv::Mat first
 }
 
 // Runs the loop that detects the checker pieces on the board
-std::vector<std::string> boardLoop(cv::Vec3b black, cv::Vec3b red, std::vector<cv::Point2f> newCorners, cv::Mat img, std::vector<std::vector<std::string>>& chessBoard, int playerTurn, double pixToMeters){
+std::vector<std::string> boardLoop(cv::Vec3b black, cv::Vec3b red, std::vector<cv::Point2f> newCorners, cv::Mat img, std::vector<std::vector<std::string>> chessBoard, int playerTurn, double pixToMeters){
     // Startup variables
     std::vector<std::vector<double>> circleChecked;
     std::vector<std::vector<Vec3f>> colorsAndCircles;
     std::vector<Vec3f> circles;
     std::vector<Vec3f> colors;
     std::vector<std::vector<std::string>> prevBoard = chessBoard;
-    int count = 0;
+    int count = 99;
     int tolerance = 10;
 
     while(count > 24){
@@ -335,7 +334,7 @@ std::vector<std::string> boardLoop(cv::Vec3b black, cv::Vec3b red, std::vector<c
         // Removes the circles that are outside the board
         for(int i = 0; i < circles.size()+remove; i++) {
             circleChecked.push_back(findCoordInFrame(newCorners, cv::Point2f(circles[i-remove][0]*pixToMeters, circles[i-remove][1]*pixToMeters)));
-            if((circleChecked[i-remove][0] > -0.02) && (circleChecked[i-remove][0] < 0.242) && (circleChecked[i-remove][1] > -0.02) && (circleChecked[i-remove][1] < 0.242)){
+            if((circleChecked[i-remove][0] > -0.02) && (circleChecked[i-remove][0] < 0.225) && (circleChecked[i-remove][1] > -0.02) && (circleChecked[i-remove][1] < 0.225)){
                 continue;
             }
             circleChecked.erase(std::next(circleChecked.begin(), i-remove));
@@ -416,4 +415,60 @@ std::vector<std::string> boardLoop(cv::Vec3b black, cv::Vec3b red, std::vector<c
     std::string playerEnd = rowLetter2 + columnLetter2;
 
     return {playerStart, playerEnd};
+}
+
+
+
+
+cv::Mat cameraFeed(char** argv){
+    //read video
+    string path;
+    cv::VideoCapture capture;
+    capture.open("/dev/video2", CAP_V4L2);
+    capture.set(cv::CAP_PROP_FRAME_WIDTH, 1920);
+    capture.set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
+
+    double dWidth = capture.get(cv::CAP_PROP_FRAME_WIDTH); //get the width of frames of the video
+    double dHeight = capture.get(cv::CAP_PROP_FRAME_HEIGHT); //get the height of frames of the video
+
+    cout << "camera width = " << dWidth << ", height = " << dHeight << endl;
+
+    if (!capture.isOpened()) { //check if video device has been initialised
+        cout << "cannot open camera";
+    }
+
+    Mat frame;
+
+    string dir = argv[0];
+    int index = 0;
+    while (true)
+    {
+        bool bSuccess = capture.read(frame); // read a new frame from video
+
+        //Breaking the while loop if the frames cannot be captured
+        if (bSuccess == false)
+        {
+            cout << "Video camera is disconnected" << endl;
+            cin.get(); //Wait for any key press
+            break;
+        }
+
+        //show the frame in the created window
+        imshow("video", frame);
+
+        path = dir + std::to_string(index) + ".jpg";
+        imwrite(path, frame);
+
+        //wait for for 10 ms until any key is pressed.
+        //If the 'Esc' key is pressed, break the while loop.
+        //If the any other key is pressed, continue the loop
+        //If any key is not pressed withing 10 ms, continue the loop
+        if (waitKey(10) == 27)
+        {
+            cout << "Esc key is pressed by user. Stoppig the video" << endl;
+            break;
+        }
+    }
+    cv::Mat src = imread(path);
+    return src;
 }

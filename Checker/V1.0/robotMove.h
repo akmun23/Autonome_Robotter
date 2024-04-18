@@ -15,12 +15,6 @@
 
 using namespace ur_rtde;
 
-
-
-
-
-
-
 // Function to set the values of a matrix from the Matrix class
 void setMatrixValues(Matrix& m, std::vector<double> v);
 
@@ -41,18 +35,10 @@ void checkerJump(std::vector<std::string> moveSet, std::vector<std::vector<doubl
 void promotePiece(std::vector<std::string> moveSet, std::vector<std::vector<double>> startUp, std::vector<std::vector<std::string>> boards, int playerTurn, double factor, int piecesLeft);
 
 //Function to move the robot
-bool robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>> startUp, std::vector<std::vector<std::string>> boards, int playerTurn){
-    double factor = 0.03;
-    double xcord = 0;
-    double ycord = 0;
-    double xcord2 = 0;
-    double ycord2 = 0;
-    double speed = 2;
-    double speed2 = 1;
-    double acc = 0.5;
-    double acc2 = 0.2;
-    double hover = (startUp[2][0] - startUp[2][1]) * 2;
+bool robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>> startUp, std::vector<std::vector<std::string>> boards, int playerTurn);
 
 void simpleMove(double x, double y, double z);
+
+void prepForPic(bool firstTime, std::vector<double>& teachPos);
 
 #endif // ROBOTMOVE_H

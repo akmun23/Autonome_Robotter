@@ -149,6 +149,7 @@ std::vector<std::vector<double>> robotStartVision(std::vector<cv::Point2f> newCo
     // Calculates the transformation matrix for the robot to the checker piece
     Matrix RobotToChesspieceTransformation = Robot*Translation;
 
+    atmegaCom('6');
     // Finds the height of a piece on the chessboard
     rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, pieceLocation.at(2,2)}, 1, 0.1);
     std::vector<double> target = rtde_receive.getActualTCPPose();
@@ -191,7 +192,7 @@ std::vector<std::vector<double>> robotStartVision(std::vector<cv::Point2f> newCo
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
 
     rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, pieceLocation.at(2,2)}, 2, 0.5);
-
+    atmegaCom('8');
     std::vector<double> camToChessTransf = {CamToChess.at(0,0), CamToChess.at(0,1), CamToChess.at(0,2), CamToChess.at(0,3), CamToChess.at(1,0), CamToChess.at(1,1), CamToChess.at(1,2), CamToChess.at(1,3), CamToChess.at(2,0), CamToChess.at(2,1), CamToChess.at(2,2), CamToChess.at(2,3), CamToChess.at(3,0), CamToChess.at(3,1), CamToChess.at(3,2), CamToChess.at(3,3)};
     std::vector<double> robTransf = {Robot.at(0,0), Robot.at(0,1), Robot.at(0,2), Robot.at(0,3), Robot.at(1,0), Robot.at(1,1), Robot.at(1,2), Robot.at(1,3), Robot.at(2,0), Robot.at(2,1), Robot.at(2,2), Robot.at(2,3), Robot.at(3,0), Robot.at(3,1), Robot.at(3,2), Robot.at(3,3)};;
     return {camToChessTransf, robTransf, {piece, chess, table}};
@@ -349,7 +350,6 @@ bool robotMove(std::vector<std::string> moveSet, std::vector<std::vector<double>
     RTDEControlInterface rtde_control("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
     RTDEReceiveInterface rtde_receive("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
 
-
     double factor = 0.03;
     double xcord = 0;
     double ycord = 0;
@@ -472,3 +472,18 @@ void simpleMove(double x, double y, double z){
     rtde_control.moveL({x, y, z, target[3], target[4], target[5]}, 0.5, 0.05);
 }
 
+void prepForPic(bool FirstTime, std::vector<double>& teachPos){
+    RTDEControlInterface rtde_control("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
+    RTDEReceiveInterface rtde_receive("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
+
+    if(FirstTime == true){
+        std::cout << "Teach a position for the robot to move to when taking a pic" << std::endl;
+        rtde_control.teachMode();
+        std::cin.get();
+        teachPos = rtde_receive.getActualTCPPose();
+        FirstTime = false;
+    }
+    else{
+        rtde_control.moveL(teachPos, 0.5, 0.05);
+    }
+}

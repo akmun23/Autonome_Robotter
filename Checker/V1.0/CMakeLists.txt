@@ -24,8 +24,7 @@ add_executable(main main.cpp
     qa.hpp
     matrix.h matrix.cpp
     alphabeta.h alphabeta.cpp
-    validmoves.h validmoves.cpp
-    main2.cpp)
+    validmoves.h validmoves.cpp)
     
     
     
