@@ -15,18 +15,23 @@ find_package( OpenCV REQUIRED )
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 
 add_executable(main main.cpp
-    boardUpdate.h
-    robotMove.h
-    AtmegaCom.h
-    CheckersDatabase.h
-    computerPos.h
-    FunktionerTilDatabase.cpp
-    computerVision.h
+    boardUpdate.h BoardUpdate.cpp
+    robotMove.h robotMove.cpp
+    AtmegaCom.h Atmega.cpp
+    CheckersDatabase.h FunktionerTilDatabase.cpp
+    mainfunctions.h mainfunctions.cpp
+    computerVision.h ComputerVision.cpp
     qa.hpp
-    matrix.cpp
-    matrix.h
+    matrix.h matrix.cpp
     alphabeta.h alphabeta.cpp
     validmoves.h validmoves.cpp
     main2.cpp)
+    
+    
+    
+
+
+   
+
 
 target_link_libraries(main PRIVATE ur_rtde::rtde Qt5::Core Qt5::Sql opencv_core opencv_highgui opencv_imgcodecs ${OpenCV_LIBS})

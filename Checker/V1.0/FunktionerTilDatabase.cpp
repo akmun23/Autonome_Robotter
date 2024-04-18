@@ -6,252 +6,254 @@
 #include "CheckersDatabase.h"
 
 
-void AddBoard(std::string NewBoardState, std::string& OldBoardState, int TempBoardID){                                                 // Funktion til at indsætte et board i databasen
+
+
+
+
+
+
+//////////////////////////////////////////////// Main databasen ///////////////////////////////////////////////////////////////////
+void UploadTempToDatabase(int& UniqueBoardIDCounter){
 
     QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
     QSqlQuery query = QSqlQuery(db);
 
-    query.prepare("select count(board_id) "
-                  "from UniqueBoard "
-                  "where exists(select 1 "
-                  "             from Temp "
-                  "             where UniqueBoard.BoardState = :BoardState)");
-    query.bindValue(":BoardState", QString::fromStdString(NewBoardState));
-    query.exec();
-    query.first();
-    std::cout << query.value(0).toInt() << std::endl;
 
-    if (query.value(0).toInt() == 1){                                           // Hvis boardstate er i UniqueBoard
-        AddMove(TempBoardID, OldBoardState);                                                   // Så skal den bare tilføje et move til det boardstate
+    //////////////// BEGGE DISSE 2 SKAL RETTES SÅ DE KØRER PÅ DEN NYE TEMP TABEL /////////////////////////////
 
-        return;
+    // Den her kommando giver måske for mange outputs find ud af hvornår sidst have temp ca 800 rækker og den her gav ca 6000
+    query.exec(" select UniqueBoard.board_id, Temp.tempBoard_id"     // Her finder vi alle de bræt der ikke er nye
+               " from Temp "
+               " left JOIN UniqueBoard "
+               " ON UniqueBoard.BoardState = Temp.BoardState"
+               " where UniqueBoard.BoardState IS NOT NULL;");                               // Her finder vi alle de bræt der er i uniqueboard ved at finde de bræt der ikke er lig null i boardstate efter join
+
+    while (query.next()) {
+        int BoardID = query.value(0).toInt();
+        int TempBoardID = query.value(0).toInt();
+        InserNewMoveToOldBoard(BoardID,TempBoardID);                                // Indsætter de nye træk i de gamle brætter
+
     }
-    else if (query.value(0).toInt() == 0){                                      // Hvis boardstate ikke er i UniqueBoard
-        query.prepare(" INSERT INTO UniqueBoard "
-                      " (BoardState) "                   // Så skal den tilføje boardstate til UniqueBoard
-                      " VALUES "
-                      " (:BoardState)");
-        query.bindValue(":BoardState", QString::fromStdString(NewBoardState));
-        query.exec();
-        AddMove(TempBoardID, OldBoardState);                                                   // Og derefter tilføje et move til det boardstate
 
-        return;
+
+
+    query.exec(" select Temp.tempBoard_id, Temp.BoardState"  // Her der finder vi alle de bræt der er nye
+               " from Temp "
+               " left JOIN UniqueBoard "
+               " ON UniqueBoard.BoardState = Temp.BoardState"
+               " where UniqueBoard.BoardState IS NULL");                           // Her finder vi alle de bræt der ikke er i uniqueboard ved at finde de bræt der er lig null i boardstate efter join
+    while (query.next()) {
+        int TempBoardID = query.value(0).toInt();
+        QString BoardState = query.value(1).toString();
+                                                                                    // Da dette er alle de nye ikke tjekkes for noget men bare indsættes
+        InsertBoardToDatabase(BoardState);                                          // Indsætter brættet i uniqueboard
+
+        InsertNewMoveToNewBoard(TempBoardID,UniqueBoardIDCounter);                         // Indsætter no moves i movesP1
+
+        UniqueBoardIDCounter++;
+
+    }
+
+
+    return;
+}
+
+void InsertBoardToDatabase(QString& BoardState){                                // funktion til at indsætte bræt i uniqueboard
+
+    QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
+    QSqlQuery query = QSqlQuery(db);
+
+    query.prepare(" INSERT INTO UniqueBoard "
+                  " (BoardState) "
+                  " VALUES "
+                  " (:BoardState)");
+    query.bindValue(":BoardState", BoardState);
+    query.exec();
+    return;
+}
+void InsertNewMoveToNewBoard(int& TempBoardID, int& BoardID){    // funktion til at indsætte træk i MovesP1
+
+    QSqlDatabase db = QSqlDatabase::database("QMYSQL");
+    QSqlQuery query = QSqlQuery(db);
+
+
+    query.exec("select Move, PlayerID, WinOrLoss "
+               "from TempMoves "
+               "where tempBoard_id = " + QString::number(TempBoardID));
+
+    while (query.next()) {
+        QString Move = query.value(0).toString();
+        int PlayerID = query.value(1).toInt();
+        double WinOrLoss = query.value(2).toDouble();
+
+        if (PlayerID == 1){                                                         // Indsætter trækket i den rigtige spillers tabel
+            InsertMove(BoardID, Move, PlayerID, WinOrLoss);
+
+        }
+        else if (PlayerID == 2){
+            InsertMove(BoardID, Move, PlayerID, WinOrLoss);
+
+        }
     }
 }
 
-void AddMove(int& TempBoardID, std::string& OldBoardState){                                                 // Funktion til at add move til et boardstate
-    // Eller update winrate hvis move allerede er i Moves
 
+void InserNewMoveToOldBoard(int& BoardID, int& TempBoardID){
 
-    //Laver variabler til at holde data fra databasen
-    int BoardID = 0;
-    int PlayerID = 0;
-    std::string NewMoveToCheck;
-    std::vector<std::string> OldMoves;
-    std::string PlayersMoveDB;
-    int count = 0;
-
-    QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
+    QSqlDatabase db = QSqlDatabase::database("QMYSQL");
     QSqlQuery query = QSqlQuery(db);
 
-    if (OldBoardState == "Start"){                                                      // Hvis det er det første board i spillet
-        return;                                                                 // så skal den ikke tilføje et move da den henter movet fra hvordan
-    }                                                                           // man kom til det boardstate og der er ikke et move hen til startbrættet
 
-    query.exec(" Select PlayerID, Move "                                              // Finder ud af om det move den skal tilføje
-               " FROM Temp "                                                     // var et move fra spilleren der vandt ellet tabte
-               " WHERE tempBoard_id = " + QString::number(TempBoardID));
-    query.first();
-    PlayerID = query.value(0).toInt();
-    NewMoveToCheck = query.value(1).toString().toStdString();
+    query.exec("select Move, PlayerID, WinOrLoss "
+               "from TempMoves "
+               "where tempBoard_id = " + QString::number(TempBoardID));
+    while (query.next()) {
+        HandleNewMoves(query.value(0).toString(), query.value(1).toInt(), query.value(2).toDouble(),BoardID);
+    }
+
+
+}
+
+void HandleNewMoves(QString Move, int PlayerID, double WinOrLoss, int BoardID){
+    QSqlDatabase db = QSqlDatabase::database("QMYSQL");
+    QSqlQuery query = QSqlQuery(db);
 
     if (PlayerID == 1){
-        PlayersMoveDB = "MovesP1";
-    }
-    else if (PlayerID == 2){
-        PlayersMoveDB = "MovesP2";
-    }
 
-    query.prepare(  " SELECT board_id "                                            // Finder board id fra det board som den skal tilføje et move til
-                    " FROM UniqueBoard "
-                    " WHERE BoardState = :boardState");
-    query.bindValue(":boardState", OldBoardState.c_str());
-    query.exec();
-    query.first();
-    BoardID = query.value(0).toInt();
-
-
-    query.prepare(  " UPDATE Temp "
-                    " SET oldboard_id = :board_id "
-                    " WHERE tempboard_id = :tempboard_id");
-    query.bindValue(":board_id", BoardID);
-    query.bindValue(":tempboard_id", TempBoardID);
-    query.exec();
-
-
-    query.prepare(" SELECT count(Move) "                                            // Tæller hvor mange ryk der er lavet på det boardstate
-                  " FROM  " + QString::fromStdString(PlayersMoveDB) +
-                  " WHERE board_id = :board_id");
-    query.bindValue(":board_id", BoardID);
-    query.exec();
-    query.first();
-    count = query.value(0).toInt();
-
-    if (count == 0){                                                            // Hvis der ikke er nogen moves på det boardstate
-        InsertToMove(BoardID, NewMoveToCheck, PlayerID, PlayersMoveDB);                         // Så skal den bare tilføje et move
-        return;
-    }
-    else{                                                                       // Hvis der er moves på det boardstate
-
-        std::string Move;
-        bool UpdatedMove = false;
-
-        query.prepare( " SELECT Move "                                               // Så skal den kigge på alle moves på det boardstate
-                       " FROM " + QString::fromStdString(PlayersMoveDB) +
-                       " WHERE board_id = :board_id");
-        query.bindValue(":board_id", BoardID);
-        query.exec();
-
-        while (query.next()) {                                                  // Her kører den igennem alle moves på det boardstate
-            Move = query.value(0).toString().toStdString();
-
-            if (Move == NewMoveToCheck){                                           // Hvis det move der skal tilføjes allerede er i Moves
-
-                //UpdateMoveWinrate(BoardID, NewMoveToCheck, PlayerID);            // Så skal den opdatere winrate, wincases og usescases for det move
-                UpdatedMove = true;                                             // Og sætte UpdatedMove til true så den ikke går ned i nedenstående
+        query.exec( " select Move "
+                   " from MovesP1 "
+                   " where board_id = " + QString::number(BoardID) );
+        while (query.next()) {
+            if (Move == query.value(0).toString()){
+                //UpdateMoveWinRate(Move, BoardID, WinOrLoss, PlayerID);
                 return;
             }
         }
-        if (UpdatedMove == false){                                              // hvis den har kørt ovenstående loop igennem og ikke fundet et match
-            // så betyder det at movet ikke er gemt i forvejen.
-            InsertToMove(BoardID, NewMoveToCheck, PlayerID,PlayersMoveDB);                     // Så derfor tilføjer vi det
-            return;
+        InsertMove(BoardID, Move, PlayerID, WinOrLoss);
+    }
+    else if (PlayerID == 2){
+        query.exec( " select Move "
+                   " from MovesP2 "
+                   " where board_id = " + QString::number(BoardID) );
+        while (query.next()) {
+            if (Move == query.value(0).toString()){
+                //UpdateMoveWinRate(Move, BoardID, WinOrLoss, PlayerID);
+                return;
+            }
         }
+        InsertMove(BoardID, Move, PlayerID, WinOrLoss);
+
     }
 }
-void InsertToTemp(std::string& BoardState,                                      // Funktion til at indsætte data mellem hvert ryk ind i temp
-                  std::string& Move,
-                  int& Counter,
-                  int PlayerId){
 
-    QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
+
+void InsertMove(int board_id, QString Move, int PlayerID, double WinOrLoss){
+    QSqlDatabase db = QSqlDatabase::database("QMYSQL");
     QSqlQuery query = QSqlQuery(db);
 
-    query.prepare(  " INSERT INTO Temp "                                           // Indsætter data i Temp
-                    " (tempBoard_id, BoardState, Move, PlayerID, WinOrLoss) "
-                    " VALUES "
-                    " (:tempBoard_id, :BoardState, :Move, :PlayerID, :WinOrLoss)");
-    query.bindValue(":tempBoard_id", Counter);
-    query.bindValue(":BoardState", QString::fromStdString(BoardState));
-    query.bindValue(":Move", QString::fromStdString(Move));
-    query.bindValue(":PlayerID", PlayerId);
-
-    query.exec();
-}
-
-
-void InsertToMove(int& BoardID,                                                 // Funktion til at indsætte et move i Moves
-                  std::string& MoveToCheck,
-                  int& PlayerID,
-                  std::string& PlayerMoveDB){
-
-    QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
-    QSqlQuery query = QSqlQuery(db);
-    query.prepare(  " INSERT INTO " + QString::fromStdString(PlayerMoveDB) +                                          // Tilføjer et move til tabellen ud fra inputtet
-                    " (board_id, Move, WinRate, WinCases, UseCases) "
-                    " VALUES "
-                    " (:board_id, :Move, :WinRate, :WinCases, 0)");
-    query.bindValue(":board_id", BoardID);
-    query.bindValue(":Move", MoveToCheck.c_str());
-    query.bindValue(":WinRate", 50);
-    query.bindValue(":WinCases", 0);
-    query.exec();
-}
-
-void UpdateMoveWinrate(int& AmountOfMoves){
-
-    QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
-    QSqlQuery query = QSqlQuery(db);
-
-    // Opretter variabler
-    double WinChecker = 0;
-    int PlayerID = 0;
-    std::string NewMoveToCheck;
-    int OldBoardID = 0;
-    std::string PlayersMoveDB;
-
-
-                                                        // var et move fra spilleren der vandt ellet tabte
-    for (int i = 1; i < AmountOfMoves; ++i){
-        query.prepare(  " Select WinOrLoss, PlayerID, Move, oldboard_id "                                              // Finder ud af om det move den skal tilføje
-                        " FROM Temp "
-                        " WHERE tempBoard_id = :tempBoard_id");
-        query.bindValue(":tempBoard_id", i);
+    if (PlayerID == 1){
+        query.prepare(  " INSERT INTO MovesP1"
+                      " (board_id, Move, WinRate, WinCases, UseCases) "
+                      " VALUES "
+                      " (:board_id, :Move, :WinRate, :WinCases, 1)");
+        query.bindValue(":board_id", board_id);
+        query.bindValue(":Move", Move);
+        query.bindValue(":WinRate", 50);        // Skal sættes til WinOrLoss * 100
+        query.bindValue(":WinCases", 0.5);      // Skal sættes til WinOrLoss
         query.exec();
-        query.first();
-        WinChecker = query.value(0).toDouble();
-        PlayerID = query.value(1).toInt();
-        NewMoveToCheck = query.value(2).toString().toStdString();
-        OldBoardID = query.value(3).toInt();
+    }
+    else if (PlayerID == 2){
+        query.prepare(  " INSERT INTO MovesP2"
+                      " (board_id, Move, WinRate, WinCases, UseCases) "
+                      " VALUES "
+                      " (:board_id, :Move, :WinRate, :WinCases, 1)");
+        query.bindValue(":board_id", board_id);
+        query.bindValue(":Move", Move);
+        query.bindValue(":WinRate", 50);        // Skal sættes til WinOrLoss * 100
+        query.bindValue(":WinCases", 0.5);      // Skal sættes til WinOrLoss
+        query.exec();
+    }
+}
 
-        if (PlayerID == 1){
-            PlayersMoveDB = "MovesP1";
-        }
-        else if (PlayerID == 2){
-            PlayersMoveDB = "MovesP2";
-        }
+void UpdateMoveWinRate(QString& Move, int& BoardID, double& WinOrLoss, int& PlayerId){  // funktion til at opdatere træk i MovesP1 eller MovesP2
 
-        query.prepare(" UPDATE " + QString::fromStdString(PlayersMoveDB) +" SET "                                           // Opdaterer WinCases og UseCases for det move
+    QSqlDatabase db = QSqlDatabase::database("QMYSQL");
+    QSqlQuery query = QSqlQuery(db);
+
+    if (PlayerId == 1){
+        query.prepare(" UPDATE MovesP1"
+                      " SET "
                       " WinCases = WinCases + :WinCases,"
                       " UseCases = UseCases + 1, "
                       " WinRate = (WinCases/UseCases)*100"
                       " WHERE board_id = :board_id "
                       " AND Move = :Move");
-        query.bindValue(":WinCases", WinChecker);
-        query.bindValue(":board_id", OldBoardID);
-        query.bindValue(":Move", NewMoveToCheck.c_str());
+        query.bindValue(":WinCases", WinOrLoss);
+        query.bindValue(":board_id", BoardID);
+        query.bindValue(":Move", Move);
         query.exec();
     }
+    else if (PlayerId == 2){
+        query.prepare(" UPDATE MovesP2"
+                      " SET "
+                      " WinCases = WinCases + :WinCases,"
+                      " UseCases = UseCases + 1, "
+                      " WinRate = (WinCases/UseCases)*100"
+                      " WHERE board_id = :board_id "
+                      " AND Move = :Move");
+        query.bindValue(":WinCases", WinOrLoss);
+        query.bindValue(":board_id", BoardID);
+        query.bindValue(":Move", Move);
+        query.exec();
+    }
+
+
 }
 
-std::string MovePlayer(std::string& BoardState,
-                       int& PlayerTurn){             // Funktion til at lave et move
 
-    QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
+
+
+
+
+std::string MovePlayer(std::string& BoardState,int& PlayerTurn){
+
+    QSqlDatabase db = QSqlDatabase::database("QMYSQL");
     QSqlQuery query = QSqlQuery(db);
 
-    std::string PlayersMoveDB;
+    QString PlayersMoveDB;
 
 
-    query.prepare(  " SELECT count(*)"
+    QString QBoardState = QString::fromStdString(BoardState);
+
+    query.prepare(  " SELECT count(*)"                          // Tjekker om databasen kender brættet der er givet
                     " FROM UniqueBoard "
-                    " WHERE BoardState = :output");
-    query.bindValue(":output", QString::fromStdString(BoardState));
+                    " WHERE BoardState = :BoardState");
+    query.bindValue(":BoardState", QBoardState);
     query.exec();
     query.first();
     if (query.value(0).toInt() == 0){
-        return "No moves";
+        return "No moves";                                      // Hvis databasen ikke kender brættet så skal den returnere no moves
     }
     else{
-        query.prepare("SELECT board_id "
+        query.prepare("SELECT board_id "                        // Hvis databasen kender brættet så skal den finde det rigtige board_id
                       "FROM UniqueBoard "
-                      "WHERE BoardState = :output");
-        query.bindValue(":output", QString::fromStdString(BoardState));
+                      "WHERE BoardState = :BoardState");
+        query.bindValue(":BoardState", QBoardState);
         query.exec();
         query.first();
         int BoardID = query.value(0).toInt();
 
 
-        if (PlayerTurn == 1){
+        if (PlayerTurn == 1){                                   // Vælger den rigtige tabel ud fra hvilken spiller der skal trækkes for
             PlayersMoveDB = "MovesP1";
         }
         else if (PlayerTurn == 2){
             PlayersMoveDB = "MovesP2";
         }
 
-
+        // Den her der tjekker om et move er der skal måske slettes da der ikke burde være en situation hvor et move ikke er der
         query.prepare(" SELECT count(*)"
-                   " FROM " + QString::fromStdString(PlayersMoveDB) +
+                   " FROM " + PlayersMoveDB +
                    " WHERE board_id = " + QString::number(BoardID) + " "
                    " ORDER BY WinRate DESC");
         query.exec();
@@ -260,81 +262,157 @@ std::string MovePlayer(std::string& BoardState,
             return "No moves";
         }
         else{
-            query.prepare(" SELECT Move"
-                       " FROM "+ QString::fromStdString(PlayersMoveDB) +
+            query.prepare(" SELECT Move"                        // Finder det bedste move og returnere det
+                       " FROM "+ PlayersMoveDB +
                        " WHERE board_id = " + QString::number(BoardID) + " "
                        " ORDER BY WinRate DESC");
             query.exec();
             query.first();
             std::string Move = query.value(0).toString().toStdString();
-            if (Move == ""){
-                std::cout << "No moves error check" << std::endl;
-                return "No moves";
-            }
-            else{
-                return Move;
-            }
+            return Move;
         }
 
     }
 
 
 }
-void RefreshTempTable(int& playerTurn){
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////// Temp ting//////////////////////////////////////////////////////////////////////////////
+
+void InsertToTemp(std::string& BoardState,std::string& Move,int& Counter,int PlayerId){
 
     QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
     QSqlQuery query = QSqlQuery(db);
 
-    //Clear Temp og sætter start board ind
-    query.exec("DELETE FROM Temp WHERE tempBoard_id >= 0");
+    bool DuplicateBoard = false;
+    bool DuplicateMove = false;
+    int BoardID;
+    QString BoardStateFromTemp;
 
-    query.prepare(  " INSERT INTO Temp "
-                    " (tempBoard_id, BoardState, PlayerID) "
-                    " VALUES "
-                    " (0, '22222222222211111111444444444444', :StartingPlayer)");
-    query.bindValue(":StartingPlayer", playerTurn);
-    query.exec();
-    return;
-}
+    query.exec("Select * from Temp");
+    while (query.next()) {
+        BoardStateFromTemp = query.value(1).toString();
+        if (BoardStateFromTemp == BoardState.c_str()){
+            DuplicateBoard = true;
+            BoardID = query.value(0).toInt();
+            break;
+        }
+    }
+    if (DuplicateBoard == true){
+        query.prepare("Select Move "
+                   "from TempMoves "
+                   "where tempBoard_id = :tempBoard_id");
+        query.bindValue(":tempBoard_id", BoardID);
+        if (!query.exec()){
 
-bool CheckDuplicateMoves(std::string& BoardState, std::string& MoveToCheck, int& PlayerId){
+            query.prepare("INSERT INTO TempMoves "
+                          "(tempBoard_id, Move, PlayerID) "
+                          "VALUES "
+                          "(:tempBoard_id, :Move, :PlayerID)");
+            query.bindValue(":tempBoard_id", BoardID);
+            query.bindValue(":Move", QString::fromStdString(Move));
+            query.bindValue(":PlayerID", PlayerId);
+            query.exec();
+        }
+        else{
+            while (query.next()) {
+                if (query.value(0).toString().toStdString() == Move){
+                    DuplicateMove = true;
+                }
+            }
+        }
 
-    QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
-    QSqlQuery query = QSqlQuery(db);
 
-    query.prepare(" SELECT count(tempboard_id) "                                // Tjekker om trækket allerede er lavet i det her spil
-                  " FROM Temp "
-                  " WHERE Move = :MoveMade"
-                  " AND BoardState = :board"
-                  " AND PlayerID = :PlayerId");
-    query.bindValue(":MoveMade", QString::fromStdString(MoveToCheck));
-    query.bindValue(":board", QString::fromStdString(BoardState));
-    query.bindValue(":PlayerId", PlayerId);
-    query.exec();
+        if (DuplicateMove == true){
+            return;
+        }
+        else{
+            query.prepare("INSERT INTO TempMoves "
+                          "(tempBoard_id, Move, PlayerID) "
+                          "VALUES "
+                          "(:tempBoard_id, :Move, :PlayerID)");
+            query.bindValue(":tempBoard_id", BoardID);
+            query.bindValue(":Move", QString::fromStdString(Move));
+            query.bindValue(":PlayerID", PlayerId);
+            query.exec();
+        }
 
-    query.first();
-    if (query.value(0).toInt() == 0){
-        return true;                                                            // Hvis trækket ikke er lavet i det her spil
     }
     else{
-        return false;                                                           // Hvis trækket er lavet i det her spil
+        query.prepare(  " INSERT INTO Temp "                                           // Indsætter data i Temp
+                      " (tempBoard_id, BoardState) "
+                      " VALUES "
+                      " (:tempBoard_id, :BoardState)");
+        query.bindValue(":tempBoard_id", Counter);
+        query.bindValue(":BoardState", QString::fromStdString(BoardState));
+
+        query.exec();
+
+        query.prepare("INSERT INTO TempMoves "
+                      "(tempBoard_id, Move, PlayerID) "
+                      "VALUES "
+                      "(:tempBoard_id, :Move, :PlayerID)");
+        query.bindValue(":tempBoard_id", Counter);
+        query.bindValue(":Move", QString::fromStdString(Move));
+        query.bindValue(":PlayerID", PlayerId);
+        query.exec();
+        Counter++;
+
     }
+
+
 }
-void UploadTempToDatabase(){
+
+
+
+
+
+void RefreshTempTable(){
 
     QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
     QSqlQuery query = QSqlQuery(db);
 
-    std::string OldBoardState = "Start";                                                  // Bruges til moves da den skal bruge det forige boardstate
-
-    query.exec("SELECT BoardState, tempboard_id "                                           // Henter alle tempBoard_id fra Temp
-               "FROM Temp");
-    while (query.next()) {                                                      // Kører igennem alle tempBoard id
-        AddBoard(query.value(0).toString().toStdString(), OldBoardState, query.value(1).toInt());            // Kalder AddBoard for alle de tempBoard id'er der er i Temp
-        OldBoardState = query.value(0).toString().toStdString();                // Sætter OldBoardState til det boardstate der lige er blevet tilføjet
-    }
+    //Clear Temp
+    query.exec("DELETE FROM Temp WHERE tempBoard_id >= 0");
+    query.exec("DELETE FROM TempMoves WHERE tempBoard_id >= 0");
 
     return;
+}
 
+
+void insertAlphaBetaToTemp(std::vector<std::vector<std::string>>& tempBoard, std::string& MoveMade, int& tempPlayer, int& CounterForTempTable){
+    std::string output;
+
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if(tempBoard[i][j] == "1 "){
+                output += "1";
+            } else if(tempBoard[i][j] == "B "){
+                output += "2";
+            } else if(tempBoard[i][j] == "BK"){
+                output += "3";
+            } else if(tempBoard[i][j] == "R "){
+                output += "4";
+            } else if(tempBoard[i][j] == "RK"){
+                output += "5";
+            }
+        }
+    }
+
+    std::string* outputPtr = &output;
+    std::string* MoveMadePtr = &MoveMade;
+    InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, tempPlayer);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
 
 }
+
