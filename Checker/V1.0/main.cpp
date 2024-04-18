@@ -35,8 +35,8 @@ int main() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
     db.setDatabaseName("CheckersDatabase");
-    db.setUserName("Pascal");  // Change to username
-    db.setPassword("Superbror22!");  // Change to password
+    db.setUserName("IndsætBrugernavn");  // Change to username
+    db.setPassword("IndsætPassword!");  // Change to password
     db.open();
 
     QSqlQuery query;
