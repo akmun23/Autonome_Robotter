@@ -1,6 +1,5 @@
 #include "computerVision.h"
-
-
+#include <unistd.h>
 
 std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
     vector<Vec3f> circles;
@@ -17,7 +16,7 @@ std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
     //![houghcircles]
     HoughCircles(gray, circles, HOUGH_GRADIENT, 1,
                  gray.rows/100,  // change this value to detect circles with different distances to each other
-                 110, 25, 5, 15 // change the last two parameters
+                 110, 25, 5, 20 // change the last two parameters
                  // (min_radius & max_radius) to detect larger circles
                  );
     //![houghcircles]
@@ -32,13 +31,9 @@ std::vector<std::vector<Vec3f>> detectAndDrawCentersOfCircles(Mat& src){
         circle(src, center, 1, Scalar(0,100,100), 3, LINE_AA);
         // circle outline
         int radius = c[2];
-        circle(src, center, radius+1, Scalar(0,0,0), -1, LINE_AA);
+        circle(src, center, radius+2, Scalar(0,0,0), -1, LINE_AA);
     }
-    namedWindow("detected board", WINDOW_NORMAL);
     imshow("detected board", src);
-    resizeWindow("detected board", 1000, 1300);
-    moveWindow("detected board",src.cols/2,100);
-    waitKey();
     return {circles, colors};
 }
 
@@ -62,7 +57,7 @@ std::vector<cv::Point2f> detectAndDrawChessboardCorners(cv::Mat src, double& pix
         drawChessboardCorners(src, patternsize, Mat(corners), patternfound); // Corners er visualized.
 
         // Define the offset of where the table the checkers board can be placed on starts. Also the scale of cm per pixel. These have to be defined when camera is set up.
-        pixToMeters = (0.03 / sqrt(pow((corners[1].x - corners[0].x),2) + pow((corners[1].y - corners[0].y),2)));
+        pixToMeters = ((0.03*6) / sqrt(pow((corners[6].x - corners[0].x),2) + pow((corners[6].y - corners[0].y),2)));
         std::cout << "PixToMeters: " << pixToMeters << std::endl;
         for(int i = 0; i <= corners.size(); i++){
             corners[i].x = (corners[i].x)* pixToMeters;
@@ -139,34 +134,54 @@ std::vector<double> findCoordInFrame(std::vector<cv::Point2f> axis, cv::Point2f 
     return {newPointx, newPointy};
 }
 
-
 // Finds the coordinates for the three calibration circles
-std::vector<cv::Point2f> calibrationCircles(std::vector<std::vector<Vec3f>> circlesAndColors){
+std::vector<cv::Point2f> calibrationCircles(std::vector<std::vector<Vec3f>> circlesAndColors, char** argv){
     // Preset values for the three calibration circles
-    Vec3b green = {160, 205, 200};
-    Vec3b yellow = {130, 224, 245};
-    Vec3b magenta = {210, 138, 180};
-    // Stores the coordinates of all cirlces and their color that has been detected
-    std::vector<cv::Vec3f> circles = circlesAndColors[0];
-    std::vector<cv::Vec3f> colors = circlesAndColors[1];
-
-    // Stores the coordinates of the three calibration circles
+    Vec3b green = {175, 223, 210};
+    Vec3b yellow = {135, 230, 245};
+    Vec3b magenta = {200, 138, 195};
+    bool greenFound = false;
+    bool yellowFound = false;
+    bool magentaFound = false;
     cv::Point2f greenFunc;
     cv::Point2f yellowFunc;
     cv::Point2f magentaFunc;
+    int i = 0;
+    while(!greenFound || !yellowFound || !magentaFound){
+        if(i > 0){
+            cv::Mat src = cameraFeed(argv);
+            circlesAndColors = detectAndDrawCentersOfCircles(src);
 
-    // Tolerance for the color detection
-    int tolerance = 25;
-
-    // Finds the coordinates of the three calibration circles by iterating through all the detected circles
-    for (int k = 0; k < circles.size(); k++) {
-        if((green[0]-tolerance < colors[k][0]) && (green[0]+tolerance > colors[k][0]) && (green[1]-tolerance < colors[k][1]) && (green[1]+tolerance > colors[k][1]) && (green[2]-tolerance < colors[k][2]) && (green[2]+tolerance > colors[k][2])){
-            greenFunc = {circles[k][0], circles[k][1]};
-        } else if((yellow[0]-tolerance < colors[k][0]) && (yellow[0]+tolerance > colors[k][0]) && (yellow[1]-tolerance < colors[k][1]) && (yellow[1]+tolerance > colors[k][1]) && (yellow[2]-tolerance < colors[k][2]) && (yellow[2]+tolerance > colors[k][2])){
-            yellowFunc = {circles[k][0], circles[k][1]};
-        } else if((magenta[0]-tolerance < colors[k][0]) && (magenta[0]+tolerance > colors[k][0]) && (magenta[1]-tolerance < colors[k][1]) && (magenta[1]+tolerance > colors[k][1]) && (magenta[2]-tolerance < colors[k][2]) && (magenta[2]+tolerance > colors[k][2])){
-            magentaFunc = {circles[k][0], circles[k][1]};
+            greenFound = false;
+            yellowFound = false;
+            magentaFound = false;
         }
+        // Stores the coordinates of all cirlces and their color that has been detected
+        std::vector<cv::Vec3f> circles = circlesAndColors[0];
+        std::vector<cv::Vec3f> colors = circlesAndColors[1];
+
+        // Stores the coordinates of the three calibration circles
+        greenFunc = {0, 0};
+        yellowFunc = {0, 0};
+        magentaFunc = {0, 0};
+
+        // Tolerance for the color detection
+        int tolerance = 25;
+
+        // Finds the coordinates of the three calibration circles by iterating through all the detected circles
+        for (int k = 0; k < circles.size(); k++) {
+            if((green[0]-tolerance < colors[k][0]) && (green[0]+tolerance > colors[k][0]) && (green[1]-tolerance < colors[k][1]) && (green[1]+tolerance > colors[k][1]) && (green[2]-tolerance < colors[k][2]) && (green[2]+tolerance > colors[k][2])){
+                greenFunc = {circles[k][0], circles[k][1]};
+                greenFound = true;
+            } else if((yellow[0]-tolerance < colors[k][0]) && (yellow[0]+tolerance > colors[k][0]) && (yellow[1]-tolerance < colors[k][1]) && (yellow[1]+tolerance > colors[k][1]) && (yellow[2]-tolerance < colors[k][2]) && (yellow[2]+tolerance > colors[k][2])){
+                yellowFunc = {circles[k][0], circles[k][1]};
+                yellowFound = true;
+            } else if((magenta[0]-tolerance < colors[k][0]) && (magenta[0]+tolerance > colors[k][0]) && (magenta[1]-tolerance < colors[k][1]) && (magenta[1]+tolerance > colors[k][1]) && (magenta[2]-tolerance < colors[k][2]) && (magenta[2]+tolerance > colors[k][2])){
+                magentaFunc = {circles[k][0], circles[k][1]};
+                magentaFound = true;
+            }
+        }
+        i++;
     }
 
     return {magentaFunc, yellowFunc, greenFunc};
@@ -196,7 +211,7 @@ std::vector<Vec3b> startBoard(std::vector<std::vector<double>> circleChecked, st
         for (int j = 0; j < 8; j++) {
             for (int k = 0; k < circleChecked.size(); k++) {
                 // Checks if the circle is within the boundaries of the expected location of the checker piece
-                if(((circleChecked[k][0] - 0.015) <  (j*0.03)) && ((circleChecked[k][0] + 0.015) > (j*0.03) && ((circleChecked[k][1] - 0.015) < (i*0.03)) && ((circleChecked[k][1] + 0.015) > (i*0.03)))){
+                if(((circleChecked[k][0] - 0.012) <  (j*0.03)) && ((circleChecked[k][0] + 0.012) > (j*0.03) && ((circleChecked[k][1] - 0.012) < (i*0.03)) && ((circleChecked[k][1] + 0.012) > (i*0.03)))){
                     // If the piece is located at the black end of the board then the value is saved as the color of a black piece else it is stored as the color of a red piece
                     if(circleChecked[k][1] < 0.1){
                         chessBoard[i][j] = "B ";
@@ -237,11 +252,11 @@ std::vector<Vec3b> startBoard(std::vector<std::vector<double>> circleChecked, st
 }
 
 // Runs the first time the board is detected and finds the orientation of the board
-std::vector<Vec3b> firstLoop(std::vector<cv::Point2f>& newCorners, cv::Mat& firstLoop, std::vector<std::vector<std::string>>& chessBoard, std::vector<cv::Point2f>& calibrate, double& pixToMeters, double& boardSize){
+std::vector<Vec3b> firstLoop(std::vector<cv::Point2f>& newCorners, cv::Mat& firstLoop, std::vector<std::vector<std::string>>& chessBoard, std::vector<cv::Point2f>& calibrate, double& pixToMeters, double& boardSize, char** argv){
     // Detects the circles and the chessboard corners
     std::vector<std::vector<Vec3f>> circlesAndColors = detectAndDrawCentersOfCircles(firstLoop);
     std::vector<cv::Point2f> allAxis = detectAndDrawChessboardCorners(firstLoop, pixToMeters, boardSize);
-    calibrate = calibrationCircles(circlesAndColors);
+    calibrate = calibrationCircles(circlesAndColors, argv);
 
     // Startup variables
     std::vector<std::vector<double>> circleChecked;
@@ -380,19 +395,23 @@ std::vector<std::string> boardLoop(cv::Vec3b black, cv::Vec3b red, std::vector<c
     int column2 = 0;
     int row2 = 0;
     std::string checkPiece;
+    std::string checkPiece2;
     if(playerTurn == 1){
         checkPiece = "B ";
+        checkPiece2 = "BK";
     } else {
         checkPiece = "R ";
+        checkPiece2 = "RK";
     }
     for (int i = 0; i < chessBoard.size(); ++i) {
         for (int j = 0; j < chessBoard[0].size(); ++j) {
             if (prevBoard[i][j] != chessBoard[i][j]){
-                if(prevBoard[i][j] == checkPiece){
+                if(prevBoard[i][j] == checkPiece2 && chessBoard[i][j] == checkPiece){
+                    continue;
+                } else if(prevBoard[i][j] == checkPiece || prevBoard[i][j] == checkPiece2){
                     row = i;
                     column = j;
-                }
-                if(chessBoard[i][j] == checkPiece){
+                } else if(chessBoard[i][j] == checkPiece){
                     row2 = i;
                     column2 = j;
                 }
@@ -416,9 +435,6 @@ std::vector<std::string> boardLoop(cv::Vec3b black, cv::Vec3b red, std::vector<c
 
     return {playerStart, playerEnd};
 }
-
-
-
 
 cv::Mat cameraFeed(char** argv){
     //read video
@@ -454,18 +470,18 @@ cv::Mat cameraFeed(char** argv){
         }
 
         //show the frame in the created window
-        imshow("video", frame);
+        // imshow("video", frame);
 
-        path = dir + std::to_string(index) + ".jpg";
+        path = dir + std::to_string(0) + ".jpg";
         imwrite(path, frame);
 
         //wait for for 10 ms until any key is pressed.
         //If the 'Esc' key is pressed, break the while loop.
         //If the any other key is pressed, continue the loop
         //If any key is not pressed withing 10 ms, continue the loop
-        if (waitKey(10) == 27)
-        {
-            cout << "Esc key is pressed by user. Stoppig the video" << endl;
+        usleep(100);
+        index++;
+        if (index == 10){
             break;
         }
     }

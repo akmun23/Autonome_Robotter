@@ -2,8 +2,6 @@
 #include "boardUpdate.h"
 #include "CheckersDatabase.h"
 #include "validmoves.h"
-#include "AtmegaCom.h"
-#include "robotMove.h"
 #include <QCoreApplication>
 #include <QtSql>
 #include <QSqlDatabase>
@@ -109,22 +107,7 @@ void MoveRandom(int& playerTurn, std::vector<std::vector<std::string>>& boards, 
 void MoveRobot(bool RunChecker,std::future<bool>& fut, std::vector<std::vector<std::string>>& tempBoard, int& thisTurn, std::vector<std::string>& moveSet, std::vector<std::vector<double>>& startUpRobot, int& i){
 
     if (RunChecker == true){
-        if (i > 0){
-            fut.get();
-        }
 
-
-
-        // Moves the robot
-        if(i == 0){
-            // Set up the robot
-            atmegaCom('6'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
-            sleep(1); // Venter 1 sekund
-            atmegaCom('8'); // Sender et signal for at gripperen skal åbne
-            fut = std::async(robotMove, moveSet, startUpRobot, tempBoard, thisTurn);
-        } else {
-            fut = std::async(robotMove, moveSet, startUpRobot, tempBoard, thisTurn);
-        }
     }
 
 }

@@ -244,7 +244,7 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
             //Checks if the piece has jumped
             jumped = pieceJump(playerStart, playerMove, tempPlayer, tempBoard);
             if (depth == 1){
-                insertAlphaBetaToTemp(tempBoard, MoveMade, playerTurn, CounterForTempTable);
+                //insertAlphaBetaToTemp(tempBoard, MoveMade, playerTurn, CounterForTempTable);
             }
 
             //Checks if the piece has been promoted
@@ -254,7 +254,7 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
             jumps = jumpPossible(tempPlayer, tempBoard);
 
             if(moreMoveCheck(jumps, playerMove) && jumped && !promotion){
-                eval = moveAI(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove,CounterForTempTable);
+                eval = moveAI(tempBoard, depth, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove,CounterForTempTable);
             } else {
                 eval = moveAI(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, {},CounterForTempTable);
             }
@@ -308,7 +308,7 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
             moves.push_back(playerMove);
 
             if (depth == 1){
-                insertAlphaBetaToTemp(tempBoard, MoveMade, playerTurn, CounterForTempTable);
+                //insertAlphaBetaToTemp(tempBoard, MoveMade, playerTurn, CounterForTempTable);
             }
 
             jumped = pieceJump(playerStart, playerMove, tempPlayer, tempBoard);
@@ -319,7 +319,7 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
             //If the piece is able to jump again, it finds all possible moves
             jumps = jumpPossible(tempPlayer, tempBoard);
             if(moreMoveCheck(jumps, playerMove) && jumped && !promotion){
-                eval = moveAI(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove,CounterForTempTable);
+                eval = moveAI(tempBoard, depth, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove,CounterForTempTable);
             } else {
                 eval = moveAI(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, {},CounterForTempTable);
             }
@@ -439,3 +439,21 @@ void alphaBeta::dbInsert(){
     query.bindValue(":id", _id);
     query.exec();
 }
+
+void alphaBeta::addWinner(){
+    query.prepare("INSERT INTO allTime(ai_id, piece, king, locked, lockKing, forward, TwoEmpty, OneJump, OneEmpty, TwoJump, depth) "
+                  "VALUES (:id, :piece, :king, :lock, :lockKing, :forward, :TwoEmpty, :OneJump, :OneEmpty, :TwoJump, :depth)");
+    query.bindValue(":id", _id);
+    query.bindValue(":piece", _piece);
+    query.bindValue(":king", _king);
+    query.bindValue(":lock", _lock);
+    query.bindValue(":lockKing", _lockKing);
+    query.bindValue(":forward", _forward);
+    query.bindValue(":TwoEmpty", _TwoEmpty);
+    query.bindValue(":OneJump", _OneJump);
+    query.bindValue(":OneEmpty", _OneEmpty);
+    query.bindValue(":TwoJump", _TwoJump);
+    query.bindValue(":depth", _depth);
+    query.exec();
+}
+

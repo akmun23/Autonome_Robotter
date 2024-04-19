@@ -1,50 +1,35 @@
-
 #include <iostream>
 #include<vector>
 #include<string>
-#include "boardUpdate.h"
-#include "qa.hpp"
 #include "validmoves.h"
 
 #include "mainfunctions.h"
 #include "CheckersDatabase.h"
 #include "computerVision.h"
-//#include "robotMove.h"
-#include "matrix.h"
+#include "robotMove.h"
 #include "alphabeta.h"
 
-
 #include <unistd.h>
-#include <ur_rtde/rtde_control_interface.h>
-#include <ur_rtde/rtde_receive_interface.h>
 #include <opencv2/opencv.hpp>
-#include "opencv2/imgproc.hpp"
-#include "opencv2/highgui.hpp"
-#include "opencv2/calib3d.hpp"
-#include "opencv2/imgcodecs.hpp"
 
-//#include <future>
-
-
-
+#include <future>
 
 //using namespace ur_rtde;
-
 int main(int argc, char** argv) {
-
+/*
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
-    db.setDatabaseName("CheckersDatabase");
-    db.setUserName("IndsætBrugernavn");  // Change to username
-    db.setPassword("IndsætPassword!");  // Change to password
+    db.setDatabaseName("alphaBeta");
+    db.setUserName("aksel");  // Change to username
+    db.setPassword("password");  // Change to password
     db.open();
 
     QSqlQuery query;
 
     // Skriv true i input hvis databasens indhold skal slettes
     resetDB(false); // Resets the database
-    /*
-    for (int ii = 1; ii <= 100; ++ii) {
+
+    //for (int ii = 1; ii <= 100; ++ii) {
 
     std::vector<alphaBeta> alphaBetas;
     // If the database has no entries, create 36 alphaBeta objects
@@ -93,7 +78,7 @@ int main(int argc, char** argv) {
                 validMoves validMoves;
                 alphaBeta alphaBeta(4);
                 // Construct initial board
-                std::vector<std::vector<std::string>> boards = startUp(); 
+                std::vector<std::vector<std::string>> boards = startUp();
                 while(true){
                     thisTurn = playerTurn; //Which player's turn it is
 
@@ -109,9 +94,9 @@ int main(int argc, char** argv) {
                     if(((validMoves.movePossible(playerTurn, boards, jumps, moreMove, moveTo).size())/2) > 0 && redPieces > 0 && blackPieces > 0){
                         std::vector<std::vector<std::string>> tempBoard = boards; // To be used in robotMove
                         if(playerTurn == 1){
-                            alphaBetas[i].moveAI(boards, 5, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                            alphaBetas[i].moveAI(boards, 5, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}, playerTurn); //AI's move
                         } else {
-                            alphaBetas[j].moveAI(boards, 5, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                            alphaBetas[j].moveAI(boards, 5, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}, playerTurn); //AI's move
                         }
                     } else { //If no valid moves, or no more pieces on the board
                         gameEnd = true; //Game has ended
@@ -119,11 +104,11 @@ int main(int argc, char** argv) {
                     }
                     DrawChecker++;
                 }
-                // Checks how the game ended and gives points to the winning AI
+                                // Checks how the game ended and gives points to the winning AI
                if(gameEnd){
                     if(redPieces == 0){
                         query.prepare("UPDATE winner "
-                                      "SET wins = wins + 1"
+                                      "SET wins = wins + 1 "
                                       "WHERE ai_id = :id");
                         query.bindValue(":id", alphaBetas[i].getId());
                         query.exec();
@@ -164,7 +149,7 @@ int main(int argc, char** argv) {
         }
 
         // Find the 4 best AI's with wins counting as 1 point and draws counting as 0.5 points
-        query.exec("SELECT points.*, (winner.wins + (winner.draws * 0.5)) AS winrate "
+        query.exec("SELECT points.*, (winner.wins + (winner.draws * 0.33)) AS winrate "
                    "FROM points "
                    "JOIN winner ON points.ai_id = winner.ai_id "
                    "ORDER BY winrate DESC; "
@@ -189,6 +174,8 @@ int main(int argc, char** argv) {
             }
             i++;
         }
+
+        winners[0].addWinner();
 
         for(int i = 0; i < remove.size(); i++){
             query.prepare("DELETE FROM winner "
@@ -234,24 +221,22 @@ int main(int argc, char** argv) {
         }
         evoRate *= 0.9;
     }
-
+*/
     //
-    */
-
 
     for (int ii = 1; ii <= 1; ++ii) {
 
             int CounterForTempTable = 1;
 
-            int playerTurn = 2; //Which player's turn it is
+            int playerTurn = 1; //Which player's turn it is
             int blackPieces = 12; //Initial number of black pieces
             int redPieces = 12; //Initial number of red pieces
             bool gameEnd = false; //If the game has ended
             int thisTurn; //Which player's turn it is
             int DrawChecker = 1; //When this equal 200 the game is called draw
             std::vector<std::vector<std::string>> thisBoard = {}; //The current state of the board
-            std::string player = "AI"; //If the player is human or AI
-            std::string player2 = "p"; //If the player is human or AI
+            std::string player = "p"; //If the player is human or AI
+            std::string player2 = "AI"; //If the player is human or AI
             std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
             std::vector<std::vector<double>> startUpRobot; //The initial position of the robot
             std::future<bool> fut;
@@ -261,10 +246,10 @@ int main(int argc, char** argv) {
             alphaBeta alphaBeta(4);
 
             std::vector<double> teachPos;
-            //prepForPic(true, teachPos);
+            prepForPic(true, teachPos);
 
             // Loads in the image
-            cv::Mat img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/Checker/V1.0/build/Desktop-Debug/main1.jpg");
+            cv::Mat img = cameraFeed(argv);
 
             // Variables that is needed for the robot movement
             std::vector<cv::Point2f> newCorners;
@@ -276,14 +261,15 @@ int main(int argc, char** argv) {
             std::vector<std::vector<std::string>> boards;
 
             // Finds the new corners of the chessboard
-            std::vector<Vec3b> colours = firstLoop(newCorners, img, boards, calibrate, pixToMeters, boardSize);
+            std::vector<Vec3b> colours = firstLoop(newCorners, img, boards, calibrate, pixToMeters, boardSize, argv);
 
             // Robot movement
             std::cout << calibrate[0] << std::endl;
             std::cout << calibrate[1] << std::endl;
             std::cout << calibrate[2] << std::endl;
 
-            //std::vector<std::vector<double>> startUp = robotStartVision(newCorners, calibrate, boardSize, pixToMeters);
+
+            std::vector<std::vector<double>> startUp = robotStartVision(newCorners, calibrate, boardSize, pixToMeters);
 
 
             int TestCounterForDatabase = 0;
@@ -308,7 +294,7 @@ int main(int argc, char** argv) {
                 thisTurn = playerTurn; //Which player's turn it is
 
                 if (DrawChecker == 200){ // Tjekker om der er gået 175 træk uden en vinder
-                    query.exec("UPDATE TempMoves SET WinOrLoss = 0.5"); // Sætter en halv ind i wincase for uafgjort
+                    //query.exec("UPDATE TempMoves SET WinOrLoss = 0.5"); // Sætter en halv ind i wincase for uafgjort
                     std::cout << "The game is a draw!" << std::endl;
                     break;
                 }
@@ -326,9 +312,10 @@ int main(int argc, char** argv) {
                     if((playerTurn == 1 && player == "p") || (playerTurn == 2 && player2 == "p")){
                         bool valid = false;
                         while(!valid){
-                            //prepForPic(false, teachPos);
-                            img.empty();
-                            img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/Checker/V1.0/build/Desktop-Debug/main0.jpg"); // Loads in the image
+                            std::cout << "Please make your move and then press enter: " << std::endl;
+                            std::cin.get();
+                            prepForPic(false, teachPos);
+                            cv::Mat img = cameraFeed(argv); // Loads in the image
                             std::vector<std::string> move = boardLoop(colours[0], colours[1], newCorners, img, boards, playerTurn, pixToMeters); // Player's move
                             std::cout << move[0] << " " << move[1] << std::endl;
 
@@ -350,9 +337,27 @@ int main(int argc, char** argv) {
                             alphaBeta.moveAI(boards, 2, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {},CounterForTempTable); //AI's move
                         }
                     }
-
+                    if(thisTurn == 2){
+                        robotMove(moveSet, startUp, tempBoard, thisTurn);
+                    }
                     // Skriv true i første input for at køre robotten
-                    MoveRobot(false ,fut,tempBoard,thisTurn,moveSet,startUpRobot,i); //Robot movement
+                    MoveRobot(false, fut,tempBoard,thisTurn,moveSet,startUpRobot,i); //Robot movement
+                    /*
+                    if (i > 0 && playerTurn == 2){
+                            fut.get();
+                        }
+
+                        // Moves the robot
+                        if(i == 0 && playerTurn == 2){
+                            // Set up the robot
+                            atmegaCom('6'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
+                            sleep(1); // Venter 1 sekund
+                            atmegaCom('8'); // Sender et signal for at gripperen skal åbne
+                            fut = std::async(robotMove, moveSet, startUpRobot, tempBoard, thisTurn);
+                        } else if (playerTurn == 2){
+                            fut = std::async(robotMove, moveSet, startUpRobot, tempBoard, thisTurn);
+                        }
+                    */
 
                     printAIMove(DatabaseMoveMade,moveSet,MoveMade,thisTurn); //Prints the move made by the AI
 

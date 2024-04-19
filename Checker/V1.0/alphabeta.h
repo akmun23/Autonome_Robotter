@@ -10,16 +10,16 @@
 
 class alphaBeta : public validMoves
 {
-    double _piece = 10;
-    double _king = 20;
-    double _lock = 5;
-    double _lockKing = 5;
-    double _forward = 2;
-    double _TwoEmpty = 20;
-    double _OneJump = 50;
-    double _OneEmpty = 10;
-    double _TwoJump = 80;
-    double _depth = 2;
+    double _piece = 7.5742126627791135;
+    double _king = 15.452885793319332;
+    double _lock = 3.510642298522243;
+    double _lockKing = 3.217031955937848;
+    double _forward = 0.9469326185608599;
+    double _TwoEmpty = 24.339960777642677;
+    double _OneJump = 37.55305763341628;
+    double _OneEmpty = 4.465623172402512;
+    double _TwoJump = 139.11336679273032;
+    double _depth = 1.281201654689201;
     int _id;
 public:
     QSqlQuery query;
@@ -34,6 +34,7 @@ public:
     void evolve(double rate);
     void resetWins();
     void dbInsert();
+    void addWinner();
 };
 
 #endif // ALPHABETA_H
