@@ -1,6 +1,8 @@
+#pragma once
 #ifndef ALPHABETA_H
 #define ALPHABETA_H
 
+#include "CheckersDatabase.h"
 #include "validmoves.h"
 #include <string>
 #include <vector>
@@ -10,6 +12,7 @@
 
 class alphaBeta : public validMoves
 {
+    // For database
     double _piece = 7.5742126627791135;
     double _king = 15.452885793319332;
     double _lock = 3.510642298522243;
@@ -21,16 +24,30 @@ class alphaBeta : public validMoves
     double _TwoJump = 139.11336679273032;
     double _depth = 1.281201654689201;
     int _id;
+
+    // For AI
+    int _depthAI;
+    std::vector<std::vector<std::string>> _boards;
+    std::string _playerStart;
+    std::string _playerMove;
+    int _blackPieces;
+    int _redPieces;
+    int _playerTurn;
+    int _CounterForTempTable;
+
 public:
     QSqlQuery query;
     alphaBeta();
     alphaBeta(int depth);
     alphaBeta(double piece, double king, double lock, double lockKing, double forward, double TwoEmpty, double OneJump, double OneEmpty, double TwoJump, double depth);
-    //alphaBeta(alphaBeta const &ab);
+
+    std::vector<std::string> jumpPossible(int playerTurn, std::vector<std::vector<std::string>>& boards);
+    std::vector<std::string> movePossible(int playerTurn, std::vector<std::vector<std::string>>& boards);
 
     int giveScoreAI(std::vector<std::vector<std::string>>& boards, int& playerTurn, int& black, int& red, int& depth);
-    int moveAI(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, std::vector<std::vector<std::string>>& boards2, std::vector<std::string>& moveSet, int alpha, int beta, int& blackPieces2, int& redPieces2, int& playerTurn2, std::string playerMove, int &CounterForTempTable);
+    int moveAI(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, int alpha, int beta, std::string playerMove, int &CounterForTempTable);
     int getId();
+    std::vector<std::string> getMove();
     void evolve(double rate);
     void resetWins();
     void dbInsert();

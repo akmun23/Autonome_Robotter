@@ -1,5 +1,6 @@
 #include "matrix.h"
-#include <iostream>
+
+Matrix::Matrix(){}
 
 Matrix::Matrix(int rows, int cols, double val):_rows(rows), _cols(cols) {
     for(int i = 0; i < rows*cols; i++){

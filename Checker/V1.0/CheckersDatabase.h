@@ -1,17 +1,12 @@
-
+#pragma once
 #ifndef CHECKERSDATABASE_H
 #define CHECKERSDATABASE_H
-
-#pragma once
 
 #include <QCoreApplication>
 #include <QtSql>
 #include <QSqlDatabase>
 #include <iostream>
 #include <string>
-
-
-
 
 // Boards and Moves
 void UploadTempToDatabase(int& UniqueBoardIDCounter);

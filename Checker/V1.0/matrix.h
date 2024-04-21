@@ -1,10 +1,10 @@
 #pragma once
-
 #ifndef MATRIX_H
 #define MATRIX_H
 
 #include <vector>
 #include <memory>
+#include <iostream>
 
 class Matrix
 {
@@ -12,6 +12,8 @@ class Matrix
     int _rows;
     int _cols;
 public:
+    Matrix();
+
     Matrix(int rows, int cols, double val = 0);
 
     Matrix(Matrix& m);
