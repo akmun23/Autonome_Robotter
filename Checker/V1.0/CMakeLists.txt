@@ -16,11 +16,9 @@ include_directories( ${OpenCV_INCLUDE_DIRS} )
 
 add_executable(main main.cpp
     boardUpdate.h BoardUpdate.cpp
-
     AtmegaCom.h AtmegaCom.cpp
     CheckersDatabase.h FunktionerTilDatabase.cpp
     mainfunctions.h mainfunctions.cpp
-
     qa.hpp
     matrix.h matrix.cpp
     alphabeta.h alphabeta.cpp
@@ -29,11 +27,4 @@ add_executable(main main.cpp
     robot.h robot.cpp
     )
     
-    
-    
-
-
-   
-
-
 target_link_libraries(main PRIVATE ur_rtde::rtde Qt5::Core Qt5::Sql opencv_core opencv_highgui opencv_imgcodecs ${OpenCV_LIBS})

@@ -1,5 +1,8 @@
+#include "alphabeta.h"
 #include "boardUpdate.h"
-#include "validMoves.h"
+#include "robot.h"
+#include "validmoves.h"
+
 #include <iostream>
 #include <opencv4/opencv2/opencv.hpp>
 #include <opencv4/opencv2/core.hpp>
@@ -12,8 +15,8 @@ using namespace cv;
 Mat3b img(500, 1000, Vec3b(255, 255, 255)); //Creates drawing surface, img.
 vector<Rect> rectangles; //Vec consisting of instances of "Rect", as segments of board.
 vector<Circle> bCheckers, rCheckers; //Vec consisting of instances of "Circle" for black checkers.
-vector<int> latestScores;
-vector<std::string> moveSet = {}; //The moves that have been made during the turn
+vector<int> latestScores = {};
+vector<std::string> moveSet = {"",""}; //The moves that have been made during the turn
 Rect blackGraveyardRect(600, 75, 50, 50); //Instance of Rect, used as a graveyard Rect.
 Rect redGraveyardRect(600, 175, 50, 50);
 Rect promotionRect(600, 225, 50, 50);
@@ -25,9 +28,15 @@ string moveStart = "", moveEnd = "";
 int thisTurn; //Which player's turn it is
 int blackPieces = 12; //Initial number of black pieces
 int redPieces = 12; //Initial number of red pieces
-int depth = 9; //Depth of the minimax algorithm
+int depth = 7; //Depth of the minimax algorithm
+std::vector<std::vector<std::string>> boards;
 
 bool startUpMain = true; //Bool, true if code is being run for the first time.
+
+validMoves validMoves;
+alphaBeta alphaBeta(0);
+Robot robot;
+Vision vision;
 
 //Updates text displayed, depending player turn.
 void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves, string moveStart, string moveEnd){
@@ -43,7 +52,7 @@ void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves
     if(turnVal > 0){
         outputString = moveStart + " To " + moveEnd + ": ";
         moves.push_back(outputString);
-        scores.push_back(giveBoardScore(boards, thisTurn, blackPieces, redPieces, depth)/1000);
+        scores.push_back(alphaBeta.giveScoreAI(boards, thisTurn, blackPieces, redPieces, depth)/1000);
 
         rectangle(img, Point(700,75), Point(1000,200), Scalar(255,255,255), -1);
 
@@ -268,6 +277,9 @@ void Draw(Mat img, bool& startUpMain){
             }
         }
     }
+
+    rectangle(img, Point(img.cols-img.cols/4, img.rows-75), Point(img.cols - 50 , img.rows-25), Scalar(0,0,0), -1);
+    putText(img, "Take picture", Point(img.cols-img.cols/4 , img.rows-50), FONT_HERSHEY_COMPLEX, 1, Scalar(255,255,255), 1);
 }
 
 //Checks if a jump is possible for an element of given vector at a given position.
@@ -505,15 +517,11 @@ void promotionGUI(vector<Circle> checkerVector){
 }
 
 bool isGameWon(vector<Circle> checkerVec, vector<Circle> enemyCheckerVec, int turn){
-    std::vector<std::string> jumps = jumpPossible(turn, boards);
-    bool moreMove = false;
-    std::string move = "";
-
     if(checkerVec == rCheckers){
         if(piecesLeft(rectangles, enemyCheckerVec) < 1){
             return true;
         }
-        else if(movePossible(turn, boards, jumps, moreMove, move).size() < 1){
+        else if(validMoves.movePossible().size() < 1){
             return true;
         }
         else{
@@ -524,7 +532,7 @@ bool isGameWon(vector<Circle> checkerVec, vector<Circle> enemyCheckerVec, int tu
         if(piecesLeft(rectangles, enemyCheckerVec) < 1){
             return true;
         }
-        else if(movePossible(turn, boards, jumps, moreMove, move).size() < 1){
+        else if(validMoves.movePossible().size() < 1){
             return true;
         }
         else{

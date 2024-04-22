@@ -3,7 +3,6 @@
 #include<string>
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
-#include <future>
 
 #include "validmoves.h"
 #include "mainfunctions.h"
@@ -393,16 +392,40 @@ int main(int argc, char** argv) {
             bool gameEnd = false; //If the game has ended
             int thisTurn; //Which player's turn it is
             int DrawChecker = 1; //When this equal 200 the game is called draw
-            std::vector<std::vector<std::string>> thisBoard = {}; //The current state of the board
-            std::string player = "Random"; //If the player is human or AI
+
+            std::string player = "AI"; //If the player is human or AI
             std::string player2 = "AI"; //If the player is human or AI
             std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
-            std::vector<std::vector<double>> startUpRobot; //The initial position of the robot
-            std::future<bool> fut;
-            std::string MoveMade; // Stores the move made to put it in the database
+            std::string MoveMade = {}; // Stores the move made to put it in the database
             bool DatabaseMoveMade = false;
+
+			// Construct object that handles the robot movement
+            Robot robot;
+            robot.prepForPic();
+
+            // Constructs the vision object for ComputerVision and runs the first loop
+            Vision vision(argv);
+            vision.firstLoop();
+
+            // Variables that is needed for the robot movement
+            std::vector<cv::Point2f> calibrate = vision.getCalibrate();
+            double pixToMeters = vision.getPixToMeters();
+            double boardSize = vision.getBoardsize();
+            std::vector<cv::Point2f> newCorners = vision.getNewCorners();
+            std::vector<std::vector<std::string>> boards = vision.getBoard();
+
             validMoves validMoves;
-            alphaBeta alphaBeta(4);
+            validMoves.setBoards(boards);
+
+            alphaBeta alphaBeta(0);
+
+            // Robot movement
+            std::cout << calibrate[0] << std::endl;
+            std::cout << calibrate[1] << std::endl;
+            std::cout << calibrate[2] << std::endl;
+
+            robot.setValues(newCorners, calibrate, boardSize, pixToMeters);
+            robot.robotStartVision();
 
             int TestCounterForDatabase = 0;
 
@@ -411,9 +434,6 @@ int main(int argc, char** argv) {
             int UniqueBoardIDCounter;
             // Skriv true i nr 2 input hvis temp skal uploades til databasen inden man starter spillet
             DatabaseInit(UniqueBoardIDCounter,false); //Initializes the database
-
-
-
 
             // Construct initial board
             std::vector<std::vector<std::string>> boards = startUp();
@@ -434,8 +454,6 @@ int main(int argc, char** argv) {
                     std::cout << "The game is a draw!" << std::endl;
                     break;
                 }
-
-
 
 
                 //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
@@ -474,11 +492,9 @@ int main(int argc, char** argv) {
 
                     printAIMove(DatabaseMoveMade,moveSet,MoveMade,thisTurn); //Prints the move made by the AI
 
-
                     std::string* MoveMadePtr = &MoveMade;
 
                     InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
-
 
 
 
@@ -497,7 +513,6 @@ int main(int argc, char** argv) {
                 }
             }
 
-
             //Prints the winner of the game
             if(gameEnd){
                 GameEnd(redPieces,blackPieces,playerTurn);
@@ -505,7 +520,6 @@ int main(int argc, char** argv) {
             UploadTempToDatabase(UniqueBoardIDCounter, true); // Uploads the temp table to the database
             std::cout << "Moves made by database: " << TestCounterForDatabase << std::endl;
         }
-
     }
 
     else {

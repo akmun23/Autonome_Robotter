@@ -1,15 +1,69 @@
-#ifndef VALIDMOVES_H
-#define VALIDMOVES_H
+#include "alphabeta.h"
 
-#include <climits>
-#include <iostream>
-#include <unistd.h>
-#include<vector>
-#include<string>
-#include <random>
+// The constructor for the alphaBeta class with no defined values
+alphaBeta::alphaBeta() {
+    // Multiply all values by a random number between 0.7 and 1.3
+    std::random_device rd;  // Obtain a random number from hardware
+    std::mt19937 eng(rd()); // Seed the generator
+    std::uniform_real_distribution<> distr(0.7, 1.3); // Define the range for the random number
+    _piece *= distr(eng); // Generate a random number
+    _king *= distr(eng);
+    _lock *= distr(eng);
+    _lockKing *= distr(eng);
+    _forward *= distr(eng);
+    _TwoEmpty *= distr(eng);
+    _OneJump *= distr(eng);
+    _OneEmpty *= distr(eng);
+    _TwoJump *= distr(eng);
+    _depth *= distr(eng);
+}
 
-//Returns a vector of possible jump moves for a player
-std::vector<std::string> jumpPossible(int playerTurn, std::vector<std::vector<std::string>>& boards){
+alphaBeta::alphaBeta(int depth):_depthAI(depth){}
+
+// The constructor for the alphaBeta class with defined values
+alphaBeta::alphaBeta(double piece, double king, double lock, double lockKing, double forward, double TwoEmpty, double OneJump, double OneEmpty, double TwoJump, double depth) {
+    _piece = piece;
+    _king = king;
+    _lock = lock;
+    _lockKing = lockKing;
+    _forward = forward;
+    _TwoEmpty = TwoEmpty;
+    _OneJump = OneJump;
+    _OneEmpty = OneEmpty;
+    _TwoJump = TwoJump;
+    _depth = depth;
+
+    // Finds the id in the database that matches the values
+    query.prepare("SELECT ai_id "
+                  "FROM points "
+                  "WHERE piece = :piece "
+                  "AND king <= :king "
+                  "AND locked = :lock "
+                  "AND lockKing = :lockKing "
+                  "AND forward = :forward "
+                  "AND TwoEmpty = :TwoEmpty "
+                  "AND OneJump = :OneJump "
+                  "AND OneEmpty = :OneEmpty "
+                  "AND TwoJump = :TwoJump "
+                  "AND depth = :depth");
+    query.bindValue(":piece", _piece);
+    query.bindValue(":king", _king);
+    query.bindValue(":lock", _lock);
+    query.bindValue(":lockKing", _lockKing);
+    query.bindValue(":forward", _forward);
+    query.bindValue(":TwoEmpty", _TwoEmpty);
+    query.bindValue(":OneJump", _OneJump);
+    query.bindValue(":OneEmpty", _OneEmpty);
+    query.bindValue(":TwoJump", _TwoJump);
+    query.bindValue(":depth", _depth);
+    query.exec();
+
+    while(query.next()){
+        _id = query.value(0).toInt();
+    }
+}
+
+std::vector<std::string> alphaBeta::jumpPossible(int playerTurn, std::vector<std::vector<std::string>>& boards){
     std::vector<std::string> playerJump = {};
 
     char column = 'a'; //Variable used to set push the correct column where the player starts the turn to the vector playerJump
@@ -123,31 +177,18 @@ std::vector<std::string> jumpPossible(int playerTurn, std::vector<std::vector<st
     return playerJump;
 }
 
-//If a jump has been made, this checks if the same piece is able to jump an additional time
-bool moreMoveCheck(std::vector<std::string>& playerJump, std::string& playerMove) {
-    //Iterates through the vector playerJump and checks if the player's piece is able to jump again
-    //By comparing where the piece just ended with all the possible jumps for the new board-state
-    for (int i = 0; i < playerJump.size(); i += 2) {
-        if(playerMove == playerJump[i]){
-            return true;
-        }
-    }
-
-    return false;
-}
-
-//Returns a vector of possible moves for a player
-std::vector<std::string> movePossible(int playerTurn, std::vector<std::vector<std::string>>& boards, std::vector<std::string>& playerJump, bool& moreMove, std::string& playerMove){
+std::vector<std::string> alphaBeta::movePossible(int playerTurn, std::vector<std::vector<std::string>>& boards){
     char column;
     char column2;
     std::vector<std::string> posMove = {};
+    std::vector<std::string> playerJump = jumpPossible(playerTurn, boards);
 
     //If a jump is possible it goes into this if-statement since a jump is mandatory
     if(playerJump.size() > 0){
         //If the player is able to jump again, it checks all the possible jumps for the new board-state
-        if(moreMove){
+        if(moreMoveCheck()){
             for(int i = 0; i < playerJump.size(); i +=2){
-                if(playerMove == playerJump[i]){
+                if(_playerMove == playerJump[i]){
                     posMove.push_back(playerJump[i]);
                     posMove.push_back(playerJump[i+1]);
                 }
@@ -236,199 +277,9 @@ std::vector<std::string> movePossible(int playerTurn, std::vector<std::vector<st
     return posMove;
 }
 
-//Checks if the piece has jumped
-bool pieceJump(std::string& playerStart, std::string& playerMove, int& playerTurn, std::vector<std::vector<std::string>>& boards){
-    int row = playerStart[1] - '1'; //Starting row
-    int row2 = playerMove[1] - '1'; //Ending row
-    int row3 = row2 + (row-row2)/2; //Middle row
-    char column = playerStart[0]-((playerStart[0]-playerMove[0])/2); //Middle column
-    column = column - 'a';
-
-    //Checks if the piece is able to jump over an enemy piece
-    if(((boards[column][row3] == "R ") || (boards[column][row3] == "RK")) && (playerTurn == 1)){
-        return true;
-    } else if(((boards[column][row3] == "B ") || (boards[column][row3] == "BK")) && (playerTurn == 2)){
-        return true;
-    } else {
-        return false;
-    }
-
-}
-
-//Checks if a piece is able to promote
-bool promotion(std::vector<std::vector<std::string>>& boards, int& playerTurn){
-    //Checks if a normal piece is on the opposing side of the board
-    if(playerTurn == 1){
-        for(int i = 0; i < 8; i++){
-            if(boards[7][i] == "B "){
-                return true;
-            }
-        }
-    } else {
-        for(int i = 0; i < 8; i++){
-            if(boards[0][i] == "R "){
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-// Counts the number of pieces on the board
-int pieceCount(std::vector<std::vector<std::string>>& boards, int& blackPieces, int& redPieces){
-    int count = 0;
-    int count2 = 0;
-    for (int i = 0; i < 8; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            if(boards[i][j] == "R " || boards[i][j] == "RK"){
-                count2++;
-            } else if(boards[i][j] == "B " || boards[i][j] == "BK"){
-                count++;
-            }
-        }
-    }
-
-    redPieces = count2;
-    blackPieces = count;
-
-    return count;
-}
-
-//Changes the board according to the player's move
-bool boardChange(int& playerTurn, std::vector<std::vector<std::string>>& boards, std::string& playerStart, std::string& playerMove, int& redPieces, int& blackPieces){
-    std::string piece;
-    int row = playerStart[1] - '1'; //Starting row
-    int row2 = playerMove[1] - '1'; //Ending row
-    int row3 = row2 + (row-row2)/2; //Middle row if jump
-    int column = playerStart[0] - 'a'; //Starting column
-    int column2 = playerMove[0] - 'a'; //Ending column
-    int column3 = column - (column-column2)/2; //Middle column if jump
-
-    //Changes the board according to the player's move and what piece has been moved
-    piece = boards[column][row];
-    boards[column][row] = "1 ";
-    boards[column2][row2] = piece;
-
-    //Checks if the piece has jumped
-    if(pieceJump(playerStart, playerMove, playerTurn, boards)){
-        //Sets the middle position to empty
-        boards[column3][row3] = "1 ";
-    }
-
-    pieceCount(boards, blackPieces, redPieces);
-
-    //Checks if the piece is able to promote and changes it to a king if it is
-    //Returns true if the piece has been promoted
-    if(promotion(boards, playerTurn)){
-        if(playerTurn == 1){
-            boards[column2][row2] = "BK";
-        } else {
-            boards[column2][row2] = "RK";
-        }
-        return true;
-    }
-
-    //If no promotion has been made, it returns false
-    return false;
-}
-
-bool move(int& playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces, std::string playerStart, std::string playerMove){
-    bool valid = false;
-    bool jumped = false; //If a piece has jumped
-    bool promotion = false; //If a piece has been promoted
-
-    std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
-    std::vector<std::string> jumps = jumpPossible(playerTurn, boards); //Checks all possible jumps
-    bool moreMove = moreMoveCheck(jumps, playerMove); //If the player is able to jump again
-
-    playerStart[0] = tolower(playerStart[0]);
-    playerMove[0] = tolower(playerMove[0]);
-
-    //Checks all possible moves
-    std::vector<std::string> moves = movePossible(playerTurn, boards, jumps, moreMove, playerMove);
-
-    while(!valid){
-        for (int i = 0; i < moves.size(); i += 2) {
-            if(playerStart == moves[i] && playerMove == moves[i+1]){
-                jumped = pieceJump(playerStart, playerMove, playerTurn, boards);
-                promotion = boardChange(playerTurn, boards, playerStart, playerMove, redPieces, blackPieces);
-                moveSet.push_back(playerStart);
-                moveSet.push_back(playerMove);
-                valid = true;
-                break;
-            }
-        }
-
-        if(!valid){
-            std::cout << "Move not valid. Please enter a new move." << std::endl;
-            return false;
-        }
-    }
-
-    //If the player is able to jump again, it returns true without changing the playerTurn
-    jumps = jumpPossible(playerTurn, boards);
-    moreMove = moreMoveCheck(jumps, playerMove);
-    if(moreMove && jumped && !promotion){
-        return true;
-    } else {
-        if(playerTurn == 1){
-            playerTurn = 2;
-        } else {
-            playerTurn = 1;
-        }
-        return true;
-    }
-}
-
-bool DB_move(int& playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces, std::string playerStart, std::string playerMove){ // MoveFunction for database input
-    bool valid = false;
-    bool jumped = false; //If a piece has jumped
-    bool promotion = false; //If a piece has been promoted
-
-    std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
-    std::vector<std::string> jumps = jumpPossible(playerTurn, boards); //Checks all possible jumps
-    bool moreMove = moreMoveCheck(jumps, playerMove); //If the player is able to jump again
-
-    //Checks all possible moves
-    std::vector<std::string> moves = movePossible(playerTurn, boards, jumps, moreMove, playerMove);
-
-    while(!valid){
-        for (int i = 0; i < moves.size(); i += 2) {
-            if(playerStart == moves[i] && playerMove == moves[i+1]){
-                jumped = pieceJump(playerStart, playerMove, playerTurn, boards);
-                promotion = boardChange(playerTurn, boards, playerStart, playerMove, redPieces, blackPieces);
-                moveSet.push_back(playerStart);
-                moveSet.push_back(playerMove);
-                valid = true;
-                break;
-            }
-        }
-
-        if(!valid){
-            std::cout << "Move not valid. Please enter a new move." << std::endl;
-            return false;
-        }
-    }
-
-    //If the player is able to jump again, it returns true without changing the playerTurn
-    jumps = jumpPossible(playerTurn, boards);
-    moreMove = moreMoveCheck(jumps, playerMove);
-    if(moreMove && jumped && !promotion){
-        return true;
-    } else {
-        if(playerTurn == 1){
-            playerTurn = 2;
-        } else {
-            playerTurn = 1;
-        }
-        return true;
-    }
-}
-
-//Gives the board a game score based on the number of pieces and the number of possible moves
-//Used in the alphaBeta function
-int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTurn, int& black, int& red, int& depth){
-    int score = 0;
+// The giveScoreAI function
+int alphaBeta::giveScoreAI(std::vector<std::vector<std::string>>& boards, int& playerTurn, int& black, int& red, int& depth){
+    double score = 0;
 
     std::random_device rd;  // Obtain a random number from hardware
     std::mt19937 eng(rd()); // Seed the generator
@@ -436,63 +287,63 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
     int random = distr(eng); // Generate a random number
 
     // Checks if a jump is possible
+    std::vector<std::string> movePossible1 = movePossible(1, boards);
     std::vector<std::string> jump1 = jumpPossible(1, boards);
-    std::vector<std::string> jump2 = jumpPossible(2, boards);
 
-    bool moreMove = false;
-    std::string move = "";
+    std::vector<std::string> movePossible2 = movePossible(2, boards);
+    std::vector<std::string> jump2 = jumpPossible(2, boards);
 
     //Gives score depending on the number of pieces on the board
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             if(boards[i][j] == "B "){
-                score += 10;
-                score += i/2;
+                score += _piece;
+                score += i/_forward;
                 if((i == 5) && (boards[i+2][j] == "R " || boards[i+2][j] == "RK")){
-                    score += 5;
+                    score += _lock;
                 }
                 if((j == 2) && (boards[i][j-2] == "R " || boards[i][j-2] == "RK")){
-                    score += 5;
+                    score += _lock;
                 } else if((j == 5) && (boards[i][j+2] == "R " || boards[i][j+2] == "RK")){
-                    score += 5;
+                    score += _lock;
                 }
             }
             else if(boards[i][j] == "BK"){
-                score += 20;
+                score += _king;
                 if((i == 5) && (boards[i+2][j] == "R " || boards[i+2][j] == "RK")){
-                    score += 5;
+                    score += _lockKing;
                 } else if((i == 2) && (boards[i-2][j] == "R " || boards[i-2][j] == "RK")){
-                    score += 5;
+                    score += _lockKing;
                 }
                 if((j == 2) && (boards[i][j-2] == "R " || boards[i][j-2] == "RK")){
-                    score += 5;
+                    score += _lockKing;
                 } else if((j == 5) && (boards[i][j+2] == "R " || boards[i][j+2] == "RK")){
-                    score += 5;
+                    score += _lockKing;
                 }
             }
             else if(boards[i][j] == "R "){
-                score -= 10;
-                score -= -(4-(i+1)/2);
+                score -= _piece;
+                score -= -(4-(i+1)/_forward);
                 if((i == 2) && (boards[i-2][j] == "B " || boards[i-2][j] == "BK")){
-                    score -= 5;
+                    score -= _lock;
                 }
                 if((j == 2) && (boards[i][j-2] == "B " || boards[i][j-2] == "BK")){
-                    score -= 5;
+                    score -= _lock;
                 } else if((j == 5) && (boards[i][j+2] == "B " || boards[i][j+2] == "BK")){
-                    score -= 5;
+                    score -= _lock;
                 }
             }
             else if(boards[i][j] == "RK"){
-                score -= 20;
+                score -= _king;
                 if((i == 2) && (boards[i-2][j] == "B " || boards[i-2][j] == "BK")){
-                    score -= 5;
+                    score -= _lockKing;
                 } else if((i == 5) && (boards[i+2][j] == "B " || boards[i+2][j] == "BK")){
-                    score -= 5;
+                    score -= _lockKing;
                 }
                 if((j == 2) && (boards[i][j-2] == "B " || boards[i][j-2] == "BK")){
-                    score -= 5;
+                    score -= _lockKing;
                 } else if((j == 5) && (boards[i][j+2] == "B " || boards[i][j+2] == "BK")){
-                    score -= 5;
+                    score -= _lockKing;
                 }
             }
         }
@@ -502,51 +353,45 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
     //And if the game is in a winning state
 
     if(jump2.empty()){
-        score += 20;
+        score += _TwoEmpty;
         if(!(jump1.empty())){
-            score += 50;
+            score += _OneJump;
         }
     }
 
     if(jump1.empty()){
-        score -= 10;
+        score -= _OneEmpty;
         if(!(jump2.empty())){
-            score -= 80;
+            score -= _TwoJump;
         }
     }
 
-    if(!jump1.empty() && !jump2.empty() && playerTurn == 1){
-        score -= 100;
-    } else if(!jump1.empty() && !jump2.empty() && playerTurn == 2){
-        score += 100;
-    }
-
-    if(red == 0 || movePossible(2, boards, jump2, moreMove, move).empty()){
+    if(red == 0 || movePossible2.empty()){
         score += 10000;
     }
 
     if(jump1.empty()){
-        score -= 20;
+        score -= _TwoEmpty;
         if(!jump2.empty()){
-            score -= 50;
+            score -= _OneJump;
         }
     }
 
     if(jump2.empty()){
-        score += 10;
+        score += _OneEmpty;
         if(!(jump1.empty())){
-            score += 80;
+            score += _TwoJump;
         }
     }
 
-    if(black == 0 || movePossible(1, boards, jump1, moreMove, move).empty()){
+    if(black == 0 || movePossible1.empty()){
         score -= 10000;
     }
 
     if(playerTurn == 1){
-        score += depth;
+        score += depth*_depth;
     } else {
-        score -= depth;
+        score -= depth*_depth;
     }
 
     score *= 1000;
@@ -557,12 +402,14 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
         score -= random;
     }
 
+    int roundedScore = score;
+
     //Returns the score
-    return score;
+    return roundedScore;
 }
 
 // The alphaBeta function
-int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, std::vector<std::vector<std::string>>& boards2, std::vector<std::string>& moveSet, int alpha, int beta, int& blackPieces2, int& redPieces2, int& playerTurn2, std::string playerMove){
+int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, int alpha, int beta, std::string playerMove,int& CounterForTempTable){
     int maxEval; //The highest eval
     int eval; //The eval
     bool jumped; //If a piece has jumped
@@ -570,28 +417,25 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
     int bestPlayer; //Keeps track of the playerTurn for the best board
     int bestBlack; //Keeps track of the blackPieces for the best board
     int bestRed; //Keeps track of the redPieces for the best board
-    int tempBlack = blackPieces; //Keeps track of the blackPieces
-    int tempRed = redPieces; //Keeps track of the redPieces
-    int tempPlayer = playerTurn; //Keeps track of the playerTurn
-    std::vector<std::vector<std::string>> tempBoard = boards; //Keeps track of the board
     std::vector<std::vector<std::string>> bestBoard; //The best board
+    std::vector<std::string> bestMoves; //The best moves
     std::string playerStart; //The start position for the move
     std::vector<std::string> moves; //The moves that have been made during the turn
-    std::vector<std::string> bestMoves; //The best moves
+    setPlayerTurn(playerTurn);
+    setPieceCount(blackPieces, redPieces);
+    setBoards(boards);
+    setMove({}, playerMove);
 
     //The possible moves for the player
-    std::vector<std::string> jumps = jumpPossible(tempPlayer, boards);
-    bool moreMove = moreMoveCheck(jumps, playerMove);
-    std::vector<std::string> posMove = movePossible(tempPlayer, boards, jumps, moreMove, playerMove);
-    moveSet = {}; //Clears the moveSet
+    std::vector<std::string> posMove = validMoves::movePossible();
 
     //If the depth is 0, the game is in a winning state, or no moves are possible, it returns the score of the board
-    if( depth == 0 || posMove.empty() || tempRed == 0 || tempBlack == 0) {
-        return giveBoardScore(boards, tempPlayer, blackPieces, redPieces, depth);
+    if( depth == 0 || posMove.empty() || blackPieces == 0 || redPieces == 0) {
+        return giveScoreAI(boards, playerTurn, blackPieces, redPieces, depth);
     }
 
     //If it is player 1's turn, it checks all the possible moves and returns the best move
-    if(tempPlayer == 1){
+    if(playerTurn == 1){
         maxEval = INT_MIN; //Set the maxEval to the lowest possible value
 
         //Iterates through all possible moves
@@ -600,35 +444,42 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
             //Sets the start and end position for the move
             playerStart = posMove[i];
             playerMove = posMove[i+1];
-
+            std::string MoveMade = playerStart + playerMove;
             //Adds the start and end position to the vector moves
-            moves.push_back(playerStart);
-            moves.push_back(playerMove);
+            setMove(playerStart, playerMove);
+
+            if (depth == 1){
+                // insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
+            }
 
             //Checks if the piece has jumped
-            jumped = pieceJump(playerStart, playerMove, tempPlayer, tempBoard);
+            jumped = pieceJump();
+            // Checks if the piece has been promoted
+            promotion = boardChange();
 
-            //Checks if the piece has been promoted
-            promotion = boardChange(tempPlayer, tempBoard, playerStart, playerMove, tempRed, tempBlack);
-            bool promotion2 = promotion;
+            // Sets the number of pieces for black and red
+            blackPieces = getPieceCount()[0];
+            redPieces = getPieceCount()[1];
 
-            //If the piece is able to jump again the turn doesnt change
-            jumps = jumpPossible(tempPlayer, tempBoard);
-            if(moreMoveCheck(jumps, playerMove) && jumped && !promotion){
-                eval = alphaBeta(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove);
+            validMoves::jumpPossible();
+            bool moreJump = moreMoveCheck();
+
+            // If the piece is able to jump again the turn doesnt change
+            if(moreJump && jumped && !promotion){
+                eval = moveAI(getBoards(), depth, 1, blackPieces, redPieces, alpha, beta, playerMove, CounterForTempTable);
             } else {
-                eval = alphaBeta(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, {});
+                eval = moveAI(getBoards(), depth-1, 2, blackPieces, redPieces, alpha, beta, {}, CounterForTempTable);
             }
 
             //If the eval is higher than the maxEval, it sets the maxEval to eval and sets the bestBoard, bestMoves, bestPieces and playerTurn to the match the board
             if(maxEval < eval){
                 maxEval = eval;
-                bestBoard = tempBoard;
-                bestMoves = moves;
-                bestBlack = tempBlack;
-                bestRed = tempRed;
+                bestBoard = getBoards();
+                bestMoves = {playerStart, playerMove};
+                bestBlack = getPieceCount()[0];
+                bestRed = getPieceCount()[1];
                 alpha = eval;
-                if(moreMoveCheck(jumps, playerMove) && jumped && !promotion2){
+                if(moreJump && jumped && !promotion){
                     bestPlayer = 1;
                 } else {
                     bestPlayer = 2;
@@ -641,21 +492,21 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
             }
 
             //Resets the board, pieces, and moves
-            tempBoard = boards;
-            tempBlack = blackPieces;
-            tempRed = redPieces;
-            tempPlayer = playerTurn;
-            playerStart = {};
-            playerMove = {};
-            moves = {};
+            setBoards(boards);
+            setPieceCount(blackPieces, redPieces);
+            setPlayerTurn(playerTurn);
+            setPlayerTurn(playerTurn);
+            setMove("", playerMove);
         }
 
         //Sets the best values found to the variables that are returned
-        boards2 = bestBoard;
-        moveSet = bestMoves;
-        blackPieces2 = bestBlack;
-        redPieces2 = bestRed;
-        playerTurn2 = bestPlayer;
+        _boards = bestBoard;
+        _playerStart = bestMoves[0];
+        _playerMove = bestMoves[1];
+        _blackPieces = bestBlack;
+        _redPieces = bestRed;
+        _playerTurn = bestPlayer;
+
         return maxEval;
 
         //The same is done for player 2
@@ -664,29 +515,36 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
         for (int i = 0; i < (posMove.size()-1); i += 2) {
             playerStart = posMove[i];
             playerMove = posMove[i+1];
-            moves.push_back(playerStart);
-            moves.push_back(playerMove);
-            jumped = pieceJump(playerStart, playerMove, tempPlayer, tempBoard);
-            promotion = boardChange(tempPlayer, tempBoard, playerStart, playerMove, tempRed, tempBlack);
-            bool promotion2 = promotion;
+            std::string MoveMade = playerStart + playerMove;
+            setMove(playerStart, playerMove);
 
+            if (depth == 1){
+                // insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
+            }
 
-            //If the piece is able to jump again, it finds all possible moves
-            jumps = jumpPossible(tempPlayer, tempBoard);
-            if(moreMoveCheck(jumps, playerMove) && jumped && !promotion){
-                eval = alphaBeta(tempBoard, depth-1, 2, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, playerMove);
+            jumped = pieceJump();
+            promotion = boardChange();
+            // Sets the number of pieces for black and red
+            blackPieces = getPieceCount()[0];
+            redPieces = getPieceCount()[1];
+
+            validMoves::jumpPossible();
+            bool moreJump = moreMoveCheck();
+
+            if(moreJump && jumped && !promotion){
+                eval = moveAI(getBoards(), depth, 2, blackPieces, redPieces, alpha, beta, playerMove,CounterForTempTable);
             } else {
-                eval = alphaBeta(tempBoard, depth-1, 1, tempBlack, tempRed, boards2, moveSet, alpha, beta, redPieces2, blackPieces2, playerTurn2, {});
+                eval = moveAI(getBoards(), depth-1, 1, blackPieces, redPieces, alpha, beta, {},CounterForTempTable);
             }
             if(maxEval > eval){
                 maxEval = eval;
-                bestBoard = tempBoard;
-                bestMoves = moves;
-                bestBlack = tempBlack;
-                bestRed = tempRed;
+                bestBoard = getBoards();
+                bestMoves = {playerStart, playerMove};
+                bestBlack = getPieceCount()[0];
+                bestRed = getPieceCount()[1];
                 beta = eval;
 
-                if(moreMoveCheck(jumps, playerMove) && jumped && !promotion2){
+                if(moreJump && jumped && !promotion){
                     bestPlayer = 2;
                 } else {
                     bestPlayer = 1;
@@ -695,23 +553,126 @@ int alphaBeta(std::vector<std::vector<std::string>> boards, int depth, int playe
             if(eval < alpha){
                 break;
             }
-            tempBoard = boards;
-            tempBlack = blackPieces;
-            tempRed = redPieces;
-            tempPlayer = playerTurn;
-            playerStart = {};
-            playerMove = {};
-            moves = {};
+            setBoards(boards);
+            setPieceCount(blackPieces, redPieces);
+            setPlayerTurn(playerTurn);
+            setPlayerTurn(playerTurn);
+            setMove("", playerMove);
         }
-        boards2 = bestBoard;
-        moveSet = bestMoves;
-        blackPieces2 = bestBlack;
-        redPieces2 = bestRed;
-        playerTurn2 = bestPlayer;
+        _boards = bestBoard;
+        _playerStart = bestMoves[0];
+        _playerMove = bestMoves[1];
+        _blackPieces = bestBlack;
+        _redPieces = bestRed;
+        _playerTurn = bestPlayer;
+
         return maxEval;
     }
-
 }
 
+// Returns the id of the alphaBeta object
+int alphaBeta::getId() {
+    return _id;
+}
 
-#endif // VALIDMOVES_H
+std::vector<std::string> alphaBeta::getMove(){
+    return {_playerStart, _playerMove};
+}
+
+// Changes the values of the alphaBeta object to new random values
+void alphaBeta::evolve(double rate){
+    // Multiply all values by a random number between 0.7 and 1.3
+    std::random_device rd;  // Obtain a random number from hardware
+    std::mt19937 eng(rd()); // Seed the generator
+    std::uniform_real_distribution<> distr(1-rate, 1+rate); // Define the range for the random number
+    _piece *= distr(eng); // Generate a random number
+    _king *= distr(eng);
+    _lock *= distr(eng);
+    _lockKing *= distr(eng);
+    _forward *= distr(eng);
+    _TwoEmpty *= distr(eng);
+    _OneJump *= distr(eng);
+    _OneEmpty *= distr(eng);
+    _TwoJump *= distr(eng);
+    _depth *= distr(eng);
+
+    query.prepare("UPDATE points "
+                  "SET piece = :piece, "
+                  "king = :king, "
+                  "locked = :lock, "
+                  "lockKing = :lockKing, "
+                  "forward = :forward, "
+                  "TwoEmpty = :TwoEmpty, "
+                  "OneJump = :OneJump, "
+                  "OneEmpty = :OneEmpty, "
+                  "TwoJump = :TwoJump, "
+                  "depth = :depth "
+                  "WHERE ai_id = :id");
+    query.bindValue(":piece", _piece);
+    query.bindValue(":king", _king);
+    query.bindValue(":lock", _lock);
+    query.bindValue(":lockKing", _lockKing);
+    query.bindValue(":forward", _forward);
+    query.bindValue(":TwoEmpty", _TwoEmpty);
+    query.bindValue(":OneJump", _OneJump);
+    query.bindValue(":OneEmpty", _OneEmpty);
+    query.bindValue(":TwoJump", _TwoJump);
+    query.bindValue(":depth", _depth);
+    query.bindValue(":id", _id);
+    query.exec();
+}
+
+// Resets the wins for the AI
+void alphaBeta::resetWins(){
+    query.prepare("UPDATE winner "
+                  "SET wins = 0, loses = 0, draws = 0 "
+                  "WHERE ai_id = :id");
+    query.bindValue(":id", _id);
+    query.exec();
+}
+
+// Insert the object into the database
+void alphaBeta::dbInsert(){
+    query.prepare("INSERT INTO points(piece, king, locked, lockKing, forward, TwoEmpty, OneJump, OneEmpty, TwoJump, depth) "
+                  "VALUES (:piece, :king, :lock, :lockKing, :forward, :TwoEmpty, :OneJump, :OneEmpty, :TwoJump, :depth)");
+    query.bindValue(":piece", _piece);
+    query.bindValue(":king", _king);
+    query.bindValue(":lock", _lock);
+    query.bindValue(":lockKing", _lockKing);
+    query.bindValue(":forward", _forward);
+    query.bindValue(":TwoEmpty", _TwoEmpty);
+    query.bindValue(":OneJump", _OneJump);
+    query.bindValue(":OneEmpty", _OneEmpty);
+    query.bindValue(":TwoJump", _TwoJump);
+    query.bindValue(":depth", _depth);
+    query.exec();
+
+    query.exec("SELECT LAST_INSERT_ID() FROM points");
+    while(query.next()){
+        _id = query.value(0).toDouble();
+    };
+
+    query.prepare("INSERT INTO winner(ai_id) "
+                  "VALUES (:id)");
+    query.bindValue(":id", _id);
+    query.exec();
+}
+
+// Adds a winner to the database
+void alphaBeta::addWinner(){
+    query.prepare("INSERT INTO allTime(ai_id, piece, king, locked, lockKing, forward, TwoEmpty, OneJump, OneEmpty, TwoJump, depth) "
+                  "VALUES (:id, :piece, :king, :lock, :lockKing, :forward, :TwoEmpty, :OneJump, :OneEmpty, :TwoJump, :depth)");
+    query.bindValue(":id", _id);
+    query.bindValue(":piece", _piece);
+    query.bindValue(":king", _king);
+    query.bindValue(":lock", _lock);
+    query.bindValue(":lockKing", _lockKing);
+    query.bindValue(":forward", _forward);
+    query.bindValue(":TwoEmpty", _TwoEmpty);
+    query.bindValue(":OneJump", _OneJump);
+    query.bindValue(":OneEmpty", _OneEmpty);
+    query.bindValue(":TwoJump", _TwoJump);
+    query.bindValue(":depth", _depth);
+    query.exec();
+}
+
