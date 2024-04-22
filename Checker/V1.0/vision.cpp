@@ -77,7 +77,7 @@ void Vision::detectAndDrawChessboardCorners() {
 }
 
 // Calculates the unit vectors for the x and y axis
-void Vision::calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis){
+std::vector<std::vector<double>> Vision::calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis){
     // Calculates the vectors for the x and y axis
     std::vector<double> vec1 = {xaxis.x - orego.x, xaxis.y - orego.y};
     std::vector<double> vec2 = {yaxis.x - orego.x, yaxis.y - orego.y};
@@ -89,6 +89,8 @@ void Vision::calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xax
     // Calculates the unit vectors for the x and y axis
     std::vector<double> unit1 = {(vec1[0] / length1), (vec1[1] / length1)};
     std::vector<double> unit2 = {(vec2[0] / length2), (vec2[1] / length2)};
+
+    return {unit1, unit2};
 }
 
 // Shifts the corners to the middle of the checker pieces instead of the inner corner
