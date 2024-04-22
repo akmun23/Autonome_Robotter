@@ -381,14 +381,14 @@ int main(int argc, char** argv) {
         //Database settings
         bool ResetDB = false; //If the database should be reset
         bool LoadTempBeforeStart = false; //If there are a full temp table from previous games that should be loaded before the game starts
-        bool UploadTempToDB = true; //If the temp table should be uploaded to the database after the game ends
+        bool UploadTempToDB = false; //If the temp table should be uploaded to the database after the game ends
         // Skriv true i input hvis databasens indhold skal slettes
         resetDB(ResetDB); // Resets the database
 
         for (int ii = 1; ii <= 1; ++ii) {
 
             int CounterForTempTable = 1;
-            int depth = 6; //Depth of the alphaBeta algorithm
+            int depth = 2; //Depth of the alphaBeta algorithm
             int playerTurn = 1; //Which player's turn it is
             int blackPieces = 12; //Initial number of black pieces
             int redPieces = 12; //Initial number of red pieces
@@ -413,7 +413,7 @@ int main(int argc, char** argv) {
             DatabaseInit(UniqueBoardIDCounter,LoadTempBeforeStart); //Initializes the database
 
             // Construct initial board
-            //std::vector<std::vector<std::string>> boards = startUp();
+            std::vector<std::vector<std::string>> boards = startUp();
             validMoves.setBoards(boards);
 
             while(true){ //Game loop
@@ -453,7 +453,7 @@ int main(int argc, char** argv) {
 
                         }
                         else if (playerTurn == 1 && player == "AI" || playerTurn == 2 && player2 == "AI"){
-                            alphaBeta.moveAI(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
+                            alphaBeta.findMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
                             moveSet = alphaBeta.getMove();
                         }
                     }
