@@ -17,7 +17,7 @@ include_directories( ${OpenCV_INCLUDE_DIRS} )
 add_executable(main main.cpp
     boardUpdate.h BoardUpdate.cpp
 
-    AtmegaCom.h
+    AtmegaCom.h AtmegaCom.cpp
     CheckersDatabase.h FunktionerTilDatabase.cpp
     mainfunctions.h mainfunctions.cpp
 
@@ -26,7 +26,8 @@ add_executable(main main.cpp
     alphabeta.h alphabeta.cpp
     validmoves.h validmoves.cpp
     vision.h vision.cpp
-    robot.h robot.cpp)
+    robot.h robot.cpp
+    )
     
     
     
