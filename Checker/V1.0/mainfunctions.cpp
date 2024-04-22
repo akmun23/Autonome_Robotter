@@ -54,9 +54,8 @@ void MoveDBMain(std::string& BoardState, int& playerTurn, std::vector<std::vecto
     std::string DBmove = MovePlayer(BoardState, playerTurn); // Database best move on current board
     if (DBmove == "No moves"){
         std::cout << "No moves found" << std::endl;
-        alphab.moveAI(boards, 1, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
+        alphab.makeMove(boards, 1, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
         moveSet = alphab.getMove();
-        validm.DB_move(moveSet[0], moveSet[1]);
     } else {
         std::cout << "AI move from database: " << DBmove << std::endl;
         moveSet = {DBmove.substr(0,2), DBmove.substr(2,2)};

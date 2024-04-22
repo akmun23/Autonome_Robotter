@@ -20,10 +20,10 @@ void Vision::detectAndDrawCentersOfCircles(){
 
     //![houghcircles]
     cv::HoughCircles(gray, _circles, cv::HOUGH_GRADIENT, 1,
-                 gray.rows/100,  // change this value to detect circles with different distances to each other
-                 110, 25, 5, 20 // change the last two parameters
-                 // (min_radius & max_radius) to detect larger circles
-                 );
+                     gray.rows/100,  // change this value to detect circles with different distances to each other
+                     110, 25, 5, 20 // change the last two parameters
+                     // (min_radius & max_radius) to detect larger circles
+                     );
     //![houghcircles]
 
     //![draw]
@@ -37,7 +37,6 @@ void Vision::detectAndDrawCentersOfCircles(){
         int radius = c[2];
         circle(_src, center, radius+2, cv::Scalar(0,0,0), -1, cv::LINE_AA);
     }
-    cv::imshow("detected board", _src);
 }
 
 void Vision::detectAndDrawChessboardCorners() {
@@ -49,8 +48,8 @@ void Vision::detectAndDrawChessboardCorners() {
 
         //CALIB_CB_FAST_CHECK saves a lot of time on images (Removed for better accuracy)
         bool patternfound = findChessboardCorners(gray, patternsize, corners, 0 +
-                            cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE
-                            + cv::CALIB_CB_FILTER_QUADS);
+                                                                                  cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE
+                                                                                  + cv::CALIB_CB_FILTER_QUADS);
         if(patternfound){
             cornerSubPix(gray, corners, cv::Size(11, 11), cv::Size(-1, -1),
                          cv::TermCriteria(cv::TermCriteria::MAX_ITER|cv::TermCriteria::EPS, 30, 0.1));
@@ -87,20 +86,20 @@ void Vision::calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xax
     double length2 = sqrt(pow(vec2[0], 2) + pow(vec2[1], 2));
 
     // Calculates the unit vectors for the x and y axis
-    std::vector<double> unit1 = {(vec1[0] / length1), (vec1[1] / length1)};
-    std::vector<double> unit2 = {(vec2[0] / length2), (vec2[1] / length2)};
+    _unit1 = {(vec1[0] / length1), (vec1[1] / length1)};
+    _unit2 = {(vec2[0] / length2), (vec2[1] / length2)};
 }
 
 // Shifts the corners to the middle of the checker pieces instead of the inner corner
 void Vision::newChessCorners(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis){
     double move = 0.015;
     // Calculates the unit vectors for the x and y axis
-    std::vector<std::vector<double>> unitVectors = calcUnitVec2D(yaxis, orego, xaxis);
+    calcUnitVec2D(yaxis, orego, xaxis);
 
     // Moves the pieces 1.5 cm
-    _newCorners[1] = cv::Point2f(orego.x + (-move * unitVectors[0][0] - move * unitVectors[1][0]), orego.y + (-move * unitVectors[0][1] - move * unitVectors[1][1]));
-    _newCorners[0] = cv::Point2f(xaxis.x + ( move * unitVectors[0][0] - move * unitVectors[1][0]), xaxis.y + ( move * unitVectors[0][1] - move * unitVectors[1][1]));
-    _newCorners[2] = cv::Point2f(yaxis.x + (-move * unitVectors[0][0] + move * unitVectors[1][0]), yaxis.y + (-move * unitVectors[0][1] + move * unitVectors[1][1]));
+    _newCorners[1] = cv::Point2f(orego.x + (-move * _unit1[0] - move * _unit2[0]), orego.y + (-move * _unit1[1] - move * _unit2[1]));
+    _newCorners[0] = cv::Point2f(xaxis.x + ( move * _unit1[0] - move * _unit2[0]), xaxis.y + ( move * _unit1[1] - move * _unit2[1]));
+    _newCorners[2] = cv::Point2f(yaxis.x + (-move * _unit1[0] + move * _unit2[0]), yaxis.y + (-move * _unit1[1] + move * _unit2[1]));
 }
 
 // Finds the coordinates for the circles in the given coordinate frame
@@ -110,14 +109,9 @@ std::vector<double> Vision::findCoordInFrame(cv::Point2f varpoint){
     cv::Point2f xAxis = _newCorners[0];
     cv::Point2f yAxis = _newCorners[2];
 
-    // Calculates the unit vectors for the x and y axis
-    std::vector<std::vector<double>> units = calcUnitVec2D(yAxis, orego, xAxis);
-    std::vector<double> unit1 = units[0];
-    std::vector<double> unit2 = units[1];
-
     // Calculates the new coordinates for the circle
-    double newPointx = ((varpoint.x-orego.x)*unit1[0] + (varpoint.y-orego.y)*unit1[1]);
-    double newPointy = ((varpoint.x-orego.x)*unit2[0] + (varpoint.y-orego.y)*unit2[1]);
+    double newPointx = ((varpoint.x-orego.x)*_unit1[0] + (varpoint.y-orego.y)*_unit1[1]);
+    double newPointy = ((varpoint.x-orego.x)*_unit2[0] + (varpoint.y-orego.y)*_unit2[1]);
 
     return {newPointx, newPointy};
 }
@@ -126,7 +120,7 @@ void Vision::cameraFeed(){
     //read video
     std::string path;
     cv::VideoCapture capture;
-    capture.open("/dev/video0", cv::CAP_V4L2);
+    capture.open("/dev/video2", cv::CAP_V4L2);
     capture.set(cv::CAP_PROP_FRAME_WIDTH, 1920);
     capture.set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
 
@@ -151,7 +145,6 @@ void Vision::cameraFeed(){
         if (bSuccess == false)
         {
             std::cout << "Video camera is disconnected" << std::endl;
-            std::cin.get(); //Wait for any key press
             break;
         }
 
@@ -236,9 +229,9 @@ void Vision::startBoard(){
     // Also outputs the placement of the checker pieces
     for(int i = 0; i < 8; i++){
         if(i%2 == 0){
-            _boards.push_back({"1 ", "  ", "1 ", "  ", "1 ", "  ", "1 ", "  "});
-        } else {
             _boards.push_back({"  ", "1 ", "  ", "1 ", "  ", "1 ", "  ", "1 "});
+        } else {
+            _boards.push_back({"1 ", "  ", "1 ", "  ", "1 ", "  ", "1 ", "  "});
         }
         for (int j = 0; j < 8; j++) {
             for (int k = 0; k < _circleChecked.size(); k++) {
@@ -246,12 +239,12 @@ void Vision::startBoard(){
                 if(((_circleChecked[k][0] - 0.012) <  (j*0.03)) && ((_circleChecked[k][0] + 0.012) > (j*0.03) && ((_circleChecked[k][1] - 0.012) < (i*0.03)) && ((_circleChecked[k][1] + 0.012) > (i*0.03)))){
                     // If the piece is located at the black end of the board then the value is saved as the color of a black piece else it is stored as the color of a red piece
                     if(_circleChecked[k][1] < 0.1){
-                        _boards[i][j] = "B ";
+                        _boards[i][7-j] = "B ";
                         bBlack += _colors[k][0];
                         gBlack += _colors[k][1];
                         rBlack += _colors[k][2];
                     } else if(_circleChecked[k][1] > 0.14){
-                        _boards[i][j] = "R ";
+                        _boards[i][7-j] = "R ";
                         bRed += _colors[k][0];
                         gRed += _colors[k][1];
                         rRed += _colors[k][2];
@@ -371,7 +364,6 @@ std::vector<std::string> Vision::boardLoop(std::vector<std::vector<std::string>>
 
     while(count > 24){
         cameraFeed();
-
         // Detects the circles and their colors in the img
         detectAndDrawCentersOfCircles();
 
@@ -406,10 +398,10 @@ std::vector<std::string> Vision::boardLoop(std::vector<std::vector<std::string>>
                     if(((_circleChecked[k][0] - 0.015) <  (j*0.03)) && ((_circleChecked[k][0] + 0.015) > (j*0.03)) && ((_circleChecked[k][1] - 0.015) < (i*0.03)) && ((_circleChecked[k][1] + 0.015) > (i*0.03))){
                         // If the color of the circle is within the tolerance of the color of a black or red checker piece then the checker piece is placed on the board
                         if((_black[0]-tolerance < _colors[k][0]) && (_black[0]+tolerance > _colors[k][0]) && (_black[1]-tolerance < _colors[k][1]) && (_black[1]+tolerance > _colors[k][1]) && (_black[2]-tolerance < _colors[k][2]) && (_black[2]+tolerance > _colors[k][2])){
-                            chessBoard[i][j] = "B ";
+                            chessBoard[i][7-j] = "B ";
                             count++;
                         } else if((_red[0]-tolerance < _colors[k][0]) && (_red[0]+tolerance > _colors[k][0]) && (_red[1]-tolerance < _colors[k][1]) && (_red[1]+tolerance > _colors[k][1]) && (_red[2]-tolerance < _colors[k][2]) && (_red[2]+tolerance > _colors[k][2])){
-                            chessBoard[i][j] = "R ";
+                            chessBoard[i][7-j] = "R ";
                             count++;
                         }
                     }
@@ -488,4 +480,8 @@ std::vector<cv::Point2f> Vision::getNewCorners(){
 
 std::vector<std::vector<std::string>> Vision::getBoard(){
     return _boards;
+}
+
+void Vision::setArguments(char** argv){
+    _argv = argv;
 }

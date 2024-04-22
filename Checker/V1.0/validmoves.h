@@ -16,6 +16,7 @@ class validMoves
     int _redPieces = 12;
     std::vector<std::string> _playerJump = {};
     std::vector<std::vector<std::string>> _boards;
+
 public:
     validMoves();
     validMoves(std::string playerStart, std::string playerMove, int playerTurn, int &blackPieces, int &redPieces, std::vector<std::vector<std::string>> &boards);
