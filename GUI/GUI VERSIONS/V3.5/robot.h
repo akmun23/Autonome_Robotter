@@ -41,6 +41,8 @@ class Robot : public Vision, public Matrix
     Matrix _robot = Matrix(4,4);
     std::vector<std::string> _moveSet;
     int _playerTurn;
+    std::vector<double> _unit1;
+    std::vector<double> _unit2;
 
 public:
     Robot();
@@ -65,6 +67,8 @@ public:
     bool robotMove(std::vector<std::string> moveSet, std::vector<std::vector<std::string>> boards, int playerTurn);
 
     void prepForPic();
+
+    void calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis) override;
 
 };
 

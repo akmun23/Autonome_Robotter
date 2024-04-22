@@ -3,7 +3,6 @@
 #include<string>
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
-#include <future>
 
 #include "validmoves.h"
 #include "mainfunctions.h"
@@ -232,23 +231,17 @@ int main(int argc, char** argv) {
             bool gameEnd = false; //If the game has ended
             int thisTurn; //Which player's turn it is
             int DrawChecker = 1; //When this equal 200 the game is called draw
-            std::vector<std::vector<std::string>> thisBoard = {}; //The current state of the board
             std::string player = "AI"; //If the player is human or AI
             std::string player2 = "AI"; //If the player is human or AI
             std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
-            std::vector<std::vector<double>> startUpRobot; //The initial position of the robotRobot
-            std::future<bool> fut;
             std::string MoveMade = {}; // Stores the move made to put it in the database
             bool DatabaseMoveMade = false;
-            //std::vector<std::vector<std::string>> boards = startUp();
 
-            std::vector<double> teachPos;
-            //prepForPic(true, teachPos);
+            Robot robot;
+            robot.prepForPic();
 
-            // Constructs the vision object for ComputerVision
+            // Constructs the vision object for ComputerVision and runs the first loop
             Vision vision(argv);
-
-            // Finds the new corners of the chessboard
             vision.firstLoop();
 
             // Variables that is needed for the robot movement
@@ -268,8 +261,7 @@ int main(int argc, char** argv) {
             std::cout << calibrate[1] << std::endl;
             std::cout << calibrate[2] << std::endl;
 
-            Robot robot(newCorners, calibrate, boardSize, pixToMeters);
-
+            robot.setValues(newCorners, calibrate, boardSize, pixToMeters);
             robot.robotStartVision();
 
             int TestCounterForDatabase = 0;
@@ -321,7 +313,7 @@ int main(int argc, char** argv) {
                             MoveRandom(moveSet, DatabaseMoveMade, validMoves); // Random move
 
                         } else if (playerTurn == 1 && player == "AI" || playerTurn == 2 && player2 == "AI"){
-                            alphaBeta.moveAI(boards, 9, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
+                            alphaBeta.moveAI(boards, 5, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
                             moveSet = alphaBeta.getMove();
                             validMoves.DB_move(moveSet[0], moveSet[1]);
                         }
