@@ -1,7 +1,6 @@
 #include "AtmegaCom.h"
-    bool atmegaCom(char InputNumber){
-
-    int serial_port = open("/dev/ttyUSB0", O_RDWR);                     // Her åbner vi serie port forbindelsen
+bool atmegaCom(char InputNumber){
+    int serial_port = open("/dev/ttyUSB2", O_RDWR);                     // Her åbner vi serie port forbindelsen
 
     // Check for errors
     if (serial_port < 0) {
@@ -13,7 +12,6 @@
         printf("Error %i from tcgetattr: %s\n", errno, strerror(errno));
     }
 
-
     tty.c_cflag &= ~PARENB;                                             // Her slår vi parity bit fra
 
     tty.c_cflag &= ~CSTOPB;                                             // Sætter at der skal være 1 stop bit
@@ -22,7 +20,6 @@
     tty.c_cflag |= CS8;                                                 // Her sætter vi vores port til at bruge 8 bits data
 
     tty.c_cflag &= ~CRTSCTS;                                            // Disable RTS/CTS som betyder at man har 2 ekstra ledninger til at fortælle hvornår den skal sende og modtage det har vi ikke så den er slået fra
-
 
     tty.c_cflag |= CREAD | CLOCAL;                                      // CREAD betyder at vi kan læse fra porten og CLOCAL betyder at vi ignorerer modem control lines
 
@@ -48,10 +45,8 @@
 
     tty.c_cc[VMIN] = 1;                                                 // Venter på at mindst 1 byte er læst ind før den går videre altså den venter her for evigt indtil den får en byte data
 
-
     cfsetispeed(&tty, B9600);                                           // Sætter in og output baud rate til 9600
     cfsetospeed(&tty, B9600);
-
 
     if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {                   // Gemmer de nye settings vi har defineret indtil nu og tjekker for fejl
         printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
@@ -69,13 +64,7 @@
     printf("Read %i bytes. Received message: %s", n, read_buf);         // Her printer vi hvor mange bytes vi har læst og hvad vi har læst
     std::cout << std::endl;
 
-
-
-
     return true;
 
     close(serial_port);
 }
-
-
-

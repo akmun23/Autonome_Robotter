@@ -1,44 +1,49 @@
 #include "CheckersDatabase.h"
 
 //////////////////////////////////////////////// Main databasen ///////////////////////////////////////////////////////////////////
-void UploadTempToDatabase(int& UniqueBoardIDCounter){
+void UploadTempToDatabase(int& UniqueBoardIDCounter, bool Toggle){
 
-    QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
-    QSqlQuery query = QSqlQuery(db);
-
-
-    //////////////// BEGGE DISSE 2 SKAL RETTES SÅ DE KØRER PÅ DEN NYE TEMP TABEL /////////////////////////////
-
-    // Den her kommando giver måske for mange outputs find ud af hvornår sidst have temp ca 800 rækker og den her gav ca 6000
-    query.exec(" select UniqueBoard.board_id, Temp.tempBoard_id"     // Her finder vi alle de bræt der ikke er nye
-               " from Temp "
-               " left JOIN UniqueBoard "
-               " ON UniqueBoard.BoardState = Temp.BoardState"
-               " where UniqueBoard.BoardState IS NOT NULL;");                               // Her finder vi alle de bræt der er i uniqueboard ved at finde de bræt der ikke er lig null i boardstate efter join
-
-    while (query.next()) {
-        int BoardID = query.value(0).toInt();
-        int TempBoardID = query.value(0).toInt();
-        InserNewMoveToOldBoard(BoardID,TempBoardID);                                // Indsætter de nye træk i de gamle brætter
-
+    if (Toggle == false){
+        return;
     }
+    else {
+        QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
+        QSqlQuery query = QSqlQuery(db);
 
-    query.exec(" select Temp.tempBoard_id, Temp.BoardState"  // Her der finder vi alle de bræt der er nye
-               " from Temp "
-               " left JOIN UniqueBoard "
-               " ON UniqueBoard.BoardState = Temp.BoardState"
-               " where UniqueBoard.BoardState IS NULL");                           // Her finder vi alle de bræt der ikke er i uniqueboard ved at finde de bræt der er lig null i boardstate efter join
-    while (query.next()) {
-        int TempBoardID = query.value(0).toInt();
-        QString BoardState = query.value(1).toString();
-                                                                                    // Da dette er alle de nye ikke tjekkes for noget men bare indsættes
-        InsertBoardToDatabase(BoardState);                                          // Indsætter brættet i uniqueboard
 
-        InsertNewMoveToNewBoard(TempBoardID,UniqueBoardIDCounter);                         // Indsætter no moves i movesP1
+        //////////////// BEGGE DISSE 2 SKAL RETTES SÅ DE KØRER PÅ DEN NYE TEMP TABEL /////////////////////////////
 
-        UniqueBoardIDCounter++;
+        // Den her kommando giver måske for mange outputs find ud af hvornår sidst have temp ca 800 rækker og den her gav ca 6000
+        query.exec(" select UniqueBoard.board_id, Temp.tempBoard_id"     // Her finder vi alle de bræt der ikke er nye
+                   " from Temp "
+                   " left JOIN UniqueBoard "
+                   " ON UniqueBoard.BoardState = Temp.BoardState"
+                   " where UniqueBoard.BoardState IS NOT NULL;");                               // Her finder vi alle de bræt der er i uniqueboard ved at finde de bræt der ikke er lig null i boardstate efter join
+
+        while (query.next()) {
+            int BoardID = query.value(0).toInt();
+            int TempBoardID = query.value(0).toInt();
+            InserNewMoveToOldBoard(BoardID,TempBoardID);                                // Indsætter de nye træk i de gamle brætter
+
+        }
+
+        query.exec(" select Temp.tempBoard_id, Temp.BoardState"  // Her der finder vi alle de bræt der er nye
+                   " from Temp "
+                   " left JOIN UniqueBoard "
+                   " ON UniqueBoard.BoardState = Temp.BoardState"
+                   " where UniqueBoard.BoardState IS NULL");                           // Her finder vi alle de bræt der ikke er i uniqueboard ved at finde de bræt der er lig null i boardstate efter join
+        while (query.next()) {
+            int TempBoardID = query.value(0).toInt();
+            QString BoardState = query.value(1).toString();
+                                                                                        // Da dette er alle de nye ikke tjekkes for noget men bare indsættes
+            InsertBoardToDatabase(BoardState);                                          // Indsætter brættet i uniqueboard
+
+            InsertNewMoveToNewBoard(TempBoardID,UniqueBoardIDCounter);                         // Indsætter no moves i movesP1
+
+            UniqueBoardIDCounter++;
+        }
+        return;
     }
-    return;
 }
 
 void InsertBoardToDatabase(QString& BoardState){                                // funktion til at indsætte bræt i uniqueboard

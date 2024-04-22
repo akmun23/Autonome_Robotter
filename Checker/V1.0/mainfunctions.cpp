@@ -24,7 +24,7 @@ void DatabaseInit(int& UniqueBoardIDCounter, bool UploadTemp){
     //Til hvis temp er fuld og skal uploades inden den bliver slettet
     if(UploadTemp == true){
         std::cout << "Startet" << std::endl;
-        UploadTempToDatabase(UniqueBoardIDCounter); // Uploads the temp table to the database
+        UploadTempToDatabase(UniqueBoardIDCounter,true); // Uploads the temp table to the database
         std::cout << "Uploaded" << std::endl;
     }
     RefreshTempTable(); // Refreshes the Temp table
@@ -81,7 +81,7 @@ void MoveRandom(std::vector<std::string>& moveSet, bool& DatabaseMoveMade, valid
     std::string moveTo = PossibleJumps[RandomNumber+1];
     validm.DB_move(moveFrom, moveTo);
     moveSet = {moveFrom, moveTo};
-    DatabaseMoveMade = true;
+    DatabaseMoveMade = false;
 }
 
 void printAIMove(bool& DatabaseMoveMade, std::vector<std::string>& moveSet, std::string& MoveMade, int& thisTurn){
