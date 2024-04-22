@@ -9,7 +9,7 @@
 #include <string>
 
 // Boards and Moves
-void UploadTempToDatabase(int& UniqueBoardIDCounter);
+void UploadTempToDatabase(int& UniqueBoardIDCounter, bool Toggle);
 
 void UpdateMoveWinRate(QString& Move, int& BoardID, double& WinOrLoss, int& PlayerId);
 
