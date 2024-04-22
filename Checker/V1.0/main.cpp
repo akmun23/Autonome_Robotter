@@ -371,8 +371,8 @@ int main(int argc, char** argv) {
         QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
         db.setHostName("localhost");
         db.setDatabaseName("CheckersDatabase");
-        db.setUserName("Pascal");  // Change to username
-        db.setPassword("Superbror22!");  // Change to password
+        db.setUserName("IndsætBrugernavn");  // Change to username
+        db.setPassword("IndsætPassword!");  // Change to password
         db.open();
 
         QSqlQuery query;
@@ -458,7 +458,7 @@ int main(int argc, char** argv) {
 
                         }
                         else if (playerTurn == 1 && player == "AI" || playerTurn == 2 && player2 == "AI"){
-                            alphaBeta.moveAI(boards, 2, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
+                            alphaBeta.moveAI(boards, 4, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
                             moveSet = alphaBeta.getMove();
                             validMoves.DB_move(moveSet[0], moveSet[1]);
                         }
@@ -482,14 +482,13 @@ int main(int argc, char** argv) {
 
 
 
-                    DrawChecker++;
 
 
                     int depth = 7;
 
                     printGameState(ii,DrawChecker,redPieces,blackPieces,playerTurn,boards,depth,alphaBeta); //Prints the game state
 
-
+                    DrawChecker++;
                     i++;
 
                 } else { //If no valid moves, or no more pieces on the board

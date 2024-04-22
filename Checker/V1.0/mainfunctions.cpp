@@ -105,6 +105,7 @@ void printGameState(int ii, int DrawChecker, int redPieces, int blackPieces, int
     std::cout << std::endl;
     checkerBoard(boards);
     std::cout << "Game score is: " << alphab.giveScoreAI(boards, playerTurn, blackPieces, redPieces, depth) << std::endl;
+    std::cout << "----------------------------------" << std::endl;
     std::cout << std::endl;
 }
 

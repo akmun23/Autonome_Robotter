@@ -448,8 +448,8 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
             //Adds the start and end position to the vector moves
             setMove(playerStart, playerMove);
 
-            if (depth == 1){
-                // insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
+            if (depth == 1 || depth == 2){
+                insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
             }
 
             //Checks if the piece has jumped
@@ -518,8 +518,8 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
             std::string MoveMade = playerStart + playerMove;
             setMove(playerStart, playerMove);
 
-            if (depth == 1){
-                // insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
+            if (depth == 1 || depth == 2){
+                insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
             }
 
             jumped = pieceJump();
