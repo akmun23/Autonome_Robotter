@@ -1,7 +1,7 @@
 #include "alphabeta.h"
 
 // The constructor for the alphaBeta class with no defined values
-alphaBeta::alphaBeta() {
+alphaBeta::alphaBeta(validMoves* vm):_vm(vm){
     // Multiply all values by a random number between 0.7 and 1.3
     std::random_device rd;  // Obtain a random number from hardware
     std::mt19937 eng(rd()); // Seed the generator
@@ -18,10 +18,11 @@ alphaBeta::alphaBeta() {
     _depth *= distr(eng);
 }
 
-alphaBeta::alphaBeta(int depth):_depthAI(depth){}
+alphaBeta::alphaBeta(validMoves* vm, int depth):_depthAI(depth), _vm(vm){}
 
 // The constructor for the alphaBeta class with defined values
-alphaBeta::alphaBeta(double piece, double king, double lock, double lockKing, double forward, double TwoEmpty, double OneJump, double OneEmpty, double TwoJump, double depth) {
+alphaBeta::alphaBeta(validMoves* vm, double piece, double king, double lock, double lockKing, double forward, double TwoEmpty, double OneJump, double OneEmpty, double TwoJump, double depth) {
+    _vm = vm;
     _piece = piece;
     _king = king;
     _lock = lock;
@@ -409,7 +410,7 @@ int alphaBeta::giveScoreAI(std::vector<std::vector<std::string>>& boards, int& p
 }
 
 // The alphaBeta function
-int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, int alpha, int beta, std::string playerMove,int& CounterForTempTable){
+int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, int alpha, int beta, std::string playerMove,int& CounterForTempTable){
     int maxEval; //The highest eval
     int eval; //The eval
     bool jumped; //If a piece has jumped
@@ -466,9 +467,9 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
 
             // If the piece is able to jump again the turn doesnt change
             if(moreJump && jumped && !promotion){
-                eval = moveAI(getBoards(), depth, 1, blackPieces, redPieces, alpha, beta, playerMove, CounterForTempTable);
+                eval = findMove(getBoards(), depth, 1, blackPieces, redPieces, alpha, beta, playerMove, CounterForTempTable);
             } else {
-                eval = moveAI(getBoards(), depth-1, 2, blackPieces, redPieces, alpha, beta, {}, CounterForTempTable);
+                eval = findMove(getBoards(), depth-1, 2, blackPieces, redPieces, alpha, beta, {}, CounterForTempTable);
             }
 
             //If the eval is higher than the maxEval, it sets the maxEval to eval and sets the bestBoard, bestMoves, bestPieces and playerTurn to the match the board
@@ -495,7 +496,6 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
             setBoards(boards);
             setPieceCount(blackPieces, redPieces);
             setPlayerTurn(playerTurn);
-            setPlayerTurn(playerTurn);
             setMove("", playerMove);
         }
 
@@ -506,6 +506,7 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
         _blackPieces = bestBlack;
         _redPieces = bestRed;
         _playerTurn = bestPlayer;
+        setPlayerTurn(bestPlayer);
 
         return maxEval;
 
@@ -532,9 +533,9 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
             bool moreJump = moreMoveCheck();
 
             if(moreJump && jumped && !promotion){
-                eval = moveAI(getBoards(), depth, 2, blackPieces, redPieces, alpha, beta, playerMove,CounterForTempTable);
+                eval = findMove(getBoards(), depth, 2, blackPieces, redPieces, alpha, beta, playerMove,CounterForTempTable);
             } else {
-                eval = moveAI(getBoards(), depth-1, 1, blackPieces, redPieces, alpha, beta, {},CounterForTempTable);
+                eval = findMove(getBoards(), depth-1, 1, blackPieces, redPieces, alpha, beta, {},CounterForTempTable);
             }
             if(maxEval > eval){
                 maxEval = eval;
@@ -553,9 +554,10 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
             if(eval < alpha){
                 break;
             }
+
+            //Resets the board, pieces, and moves
             setBoards(boards);
             setPieceCount(blackPieces, redPieces);
-            setPlayerTurn(playerTurn);
             setPlayerTurn(playerTurn);
             setMove("", playerMove);
         }
@@ -565,7 +567,7 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
         _blackPieces = bestBlack;
         _redPieces = bestRed;
         _playerTurn = bestPlayer;
-
+        setPlayerTurn(bestPlayer);
         return maxEval;
     }
 }
@@ -674,5 +676,10 @@ void alphaBeta::addWinner(){
     query.bindValue(":TwoJump", _TwoJump);
     query.bindValue(":depth", _depth);
     query.exec();
+}
+
+void alphaBeta::makeMove(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, int alpha, int beta, std::string playerMove,int& CounterForTempTable){
+    findMove(boards, depth, playerTurn, blackPieces, redPieces, alpha, beta, playerMove, CounterForTempTable);
+    _vm -> DB_move(_playerStart, _playerMove);
 }
 

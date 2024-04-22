@@ -27,6 +27,8 @@ class Vision
     cv::Point2f _magentaFunc;
     std::vector<std::vector<double>> _circleChecked;
     std::vector<std::vector<std::string>> _boards;
+    std::vector<double> _unit1;
+    std::vector<double> _unit2;
 
 public:
     Vision();
@@ -38,7 +40,7 @@ public:
     void detectAndDrawChessboardCorners();
 
     // Calculates the unit vectors for the x and y axis
-    std::vector<std::vector<double>> calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis);
+    virtual void calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis);
 
     // Shifts the corners to the middle of the checker pieces instead of the inner corner
     void newChessCorners(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis);
@@ -70,6 +72,8 @@ public:
     std::vector<cv::Point2f> getNewCorners();
 
     std::vector<std::vector<std::string>> getBoard();
+
+    void setArguments(char** argv);
 };
 
 #endif // VISION_H

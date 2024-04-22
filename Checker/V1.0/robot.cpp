@@ -1,8 +1,6 @@
 #include "robot.h"
 
-Robot::Robot(){
-
-}
+Robot::Robot(){}
 
 void Robot::setValues(std::vector<cv::Point2f> newCorners, std::vector<cv::Point2f> calibrate, double factor, double pixToMeters){
     _newCorners = newCorners;
@@ -18,6 +16,21 @@ void Robot::setMatrixValues(Matrix& m, std::vector<double> v){
             m.at(r,c) = v[r*m.getCols() + c];
         }
     }
+}
+
+// Calculates the unit vectors for the x and y axis
+void Robot::calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis){
+    // Calculates the vectors for the x and y axis
+    std::vector<double> vec1 = {xaxis.x - orego.x, xaxis.y - orego.y};
+    std::vector<double> vec2 = {yaxis.x - orego.x, yaxis.y - orego.y};
+
+    // Calculates the length of the vectors
+    double length1 = sqrt(pow(vec1[0], 2) + pow(vec1[1], 2));
+    double length2 = sqrt(pow(vec2[0], 2) + pow(vec2[1], 2));
+
+    // Calculates the unit vectors for the x and y axis
+    _unit1 = {(vec1[0] / length1), (vec1[1] / length1)};
+    _unit2 = {(vec2[0] / length2), (vec2[1] / length2)};
 }
 
 // Finds the median of the three vectors
@@ -40,20 +53,19 @@ void Robot::robotStartVision(){
     cv::Point2f xaxisPicture = cv::Point2f(_calibrate[1].x*_pixToMeters, _calibrate[1].y*_pixToMeters);
     cv::Point2f yaxisPicture = cv::Point2f(_calibrate[2].x*_pixToMeters, _calibrate[2].y*_pixToMeters);
 
-    std::vector<std::vector<double>> unitVecRobot =  calcUnitVec2D(yaxis, orego, xaxis);
-    std::vector<std::vector<double>> unitVecCamera = calcUnitVec2D(yaxisPicture, oregoPicture, xaxisPicture);
-    std::vector<std::vector<double>> unitVecChess =  calcUnitVec2D(_newCorners[0], _newCorners[1], _newCorners[2]);
-
+    calcUnitVec2D(yaxis, orego, xaxis);
     // Makes a transformation matrix for the robot
-    setMatrixValues(_robot, {unitVecRobot[0][0], unitVecRobot[1][0], 0, orego.x, unitVecRobot[0][1], unitVecRobot[1][1], 0, orego.y, 0, 0, 1, 0, 0, 0, 0, 1});
+    setMatrixValues(_robot, {_unit1[0], _unit2[0], 0, orego.x, _unit1[1], _unit2[1], 0, orego.y, 0, 0, 1, 0, 0, 0, 0, 1});
 
+    calcUnitVec2D(yaxisPicture, oregoPicture, xaxisPicture);
     // Makes a transformation matrix for the camera
     Matrix Camera(4, 4);
-    setMatrixValues(Camera, {unitVecCamera[0][0], unitVecCamera[1][0], 0, 0, unitVecCamera[0][1], unitVecCamera[1][1], 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
+    setMatrixValues(Camera, {_unit1[0], _unit2[0], 0, 0, _unit1[1], _unit2[1], 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
 
+    calcUnitVec2D(_newCorners[0], _newCorners[1], _newCorners[2]);
     // Makes a transformation matrix for the chess board
     Matrix Chess(4, 4);
-    setMatrixValues(Chess, {unitVecChess[0][0], unitVecChess[1][0], 0, _newCorners[1].x-oregoPicture.x, unitVecChess[0][1], unitVecChess[1][1], 0, _newCorners[1].y-oregoPicture.y, 0, 0, 1, 0, 0, 0, 0, 1});
+    setMatrixValues(Chess, {_unit1[0], _unit2[0], 0, _newCorners[1].x-oregoPicture.x, _unit1[1], _unit2[1], 0, _newCorners[1].y-oregoPicture.y, 0, 0, 1, 0, 0, 0, 0, 1});
 
     // Calculates the transformation matrix from the camera to the chessboard
     _CamToChess = Camera*Chess;
@@ -346,5 +358,5 @@ bool Robot::robotMove(std::vector<std::string> moveSet, std::vector<std::vector<
 }
 
 void Robot::prepForPic(){
-    rtde_control.moveJ({0.5, -1.57, -1.57, -1.57, 1.57, 0}, 2, 0.5);
+    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, 0}, 2, 0.5);
 }

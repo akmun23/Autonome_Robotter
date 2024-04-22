@@ -14,7 +14,7 @@
 //using namespace ur_rtde;
 int main(int argc, char** argv) {
 
-    std::string RunMode = "DatabaseSimulation"; // Options are "Evolutions", "RobotWithVision" or "DatabaseSimulation"
+    std::string RunMode = "Evolutions"; // Options are "Evolutions", "RobotWithVision" or "DatabaseSimulation"
 
     if (RunMode == "Evolutions"){
 
@@ -31,6 +31,7 @@ int main(int argc, char** argv) {
         resetDB(false); // Resets the database
 
         //for (int ii = 1; ii <= 100; ++ii) {
+        validMoves validMoves;
 
         std::vector<alphaBeta> alphaBetas;
         // If the database has no entries, create 36 alphaBeta objects
@@ -41,10 +42,10 @@ int main(int argc, char** argv) {
             query.exec("SELECT * FROM points");
             for(int i = 0; i < count; i++){
                 query.next();
-                alphaBetas.push_back(alphaBeta(query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
+                alphaBetas.push_back(alphaBeta(&validMoves, query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
             }
             for (int i = 0; i < 36-count; i++) {
-                alphaBetas.push_back(alphaBeta());
+                alphaBetas.push_back(alphaBeta(&validMoves));
                 alphaBetas[i].dbInsert();
             }
         } else {
@@ -52,7 +53,7 @@ int main(int argc, char** argv) {
             query.exec("SELECT * FROM points");
             int i = 0;
             while(query.next()){
-                alphaBetas.push_back(alphaBeta(query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
+                alphaBetas.push_back(alphaBeta(&validMoves, query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
                 i++;
             }
         }
@@ -73,14 +74,14 @@ int main(int argc, char** argv) {
                     bool draw = false;
                     int thisTurn; //Which player's turn it is
                     int DrawChecker = 1; //When this equal 200 the game is called draw
-                    std::vector<std::vector<std::string>> thisBoard = {}; //The current state of the board
-                    std::string player = "AI"; //If the player is human or AI
-                    std::string player2 = "AI"; //If the player is human or AI
                     std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
-                    validMoves validMoves;
-                    alphaBeta alphaBeta(4);
+
                     // Construct initial board
                     std::vector<std::vector<std::string>> boards = startUp();
+                    validMoves.setBoards(boards);
+                    validMoves.setPlayerTurn(playerTurn);
+                    validMoves.setPieceCount(blackPieces, redPieces);
+
                     while(true){
                         thisTurn = playerTurn; //Which player's turn it is
 
@@ -88,22 +89,24 @@ int main(int argc, char** argv) {
                             draw = true;
                             break;
                         }
-                        std::vector<std::string> jumps = validMoves.jumpPossible();
-                        bool moreMove = false;
-                        std::string moveTo = "";
 
                         //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
-                        if(((validMoves.movePossible().size())/2) > 0 && redPieces > 0 && blackPieces > 0){
-                            std::vector<std::vector<std::string>> tempBoard = boards; // To be used in robotMove
+                        if((validMoves.movePossible().size()) > 0 && redPieces > 0 && blackPieces > 0){
                             if(playerTurn == 1){
-                                alphaBetas[i].moveAI(boards, 5, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {},trash); //AI's move
+                                alphaBetas[i].makeMove(boards, 5, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {},trash); //AI's move
+                                moveSet = alphaBetas[i].getMove();
                             } else {
-                                alphaBetas[j].moveAI(boards, 5, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {},trash); //AI's move
+                                alphaBetas[j].makeMove(boards, 5, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {},trash); //AI's move
+                                moveSet = alphaBetas[j].getMove();
                             }
                         } else { //If no valid moves, or no more pieces on the board
                             gameEnd = true; //Game has ended
                             break;
                         }
+                        playerTurn = validMoves.getPlayerTurn();
+                        boards = validMoves.getBoards();
+                        blackPieces = validMoves.getPieceCount()[0];
+                        redPieces = validMoves.getPieceCount()[1];
                         DrawChecker++;
                     }
                                     // Checks how the game ended and gives points to the winning AI
@@ -169,7 +172,7 @@ int main(int argc, char** argv) {
             while(i < size){
                 if(i < 4){
                     query.next();
-                    winners.push_back(alphaBeta(query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
+                    winners.push_back(alphaBeta(&validMoves, query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
                 } else {
                     query.next();
                     remove.push_back(query.value(0).toInt());
@@ -205,7 +208,7 @@ int main(int argc, char** argv) {
                 query.exec("SELECT * FROM points");
                while(query.next()) {
                     for (int i = 0; i < 8; i++) {
-                        alphaBetas.push_back(alphaBeta(query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
+                        alphaBetas.push_back(alphaBeta(&validMoves, query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
                     }
                 }
                 // Evolve the 32 new alphaBeta objects
@@ -265,8 +268,10 @@ int main(int argc, char** argv) {
 
                 validMoves validMoves;
                 validMoves.setBoards(boards);
+                validMoves.setPlayerTurn(playerTurn);
+                validMoves.setPieceCount(blackPieces, redPieces);
 
-                alphaBeta alphaBeta(0);
+                alphaBeta alphaBeta(&validMoves, 0);
 
                 // Robot movement
                 std::cout << calibrate[0] << std::endl;
@@ -287,8 +292,6 @@ int main(int argc, char** argv) {
                 DatabaseInit(UniqueBoardIDCounter,false); //Initializes the database
 
                 while(true){ //Game loop
-                    boards = validMoves.getBoards(); // Construct initial board
-
                     std::string BoardState = "";
                     loadBoardToString(boards,BoardState);
 
@@ -326,9 +329,8 @@ int main(int argc, char** argv) {
                                 MoveRandom(moveSet, DatabaseMoveMade, validMoves); // Random move
 
                             } else if (playerTurn == 1 && player == "AI" || playerTurn == 2 && player2 == "AI"){
-                                alphaBeta.moveAI(boards, 9, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
+                                alphaBeta.makeMove(boards, 9, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
                                 moveSet = alphaBeta.getMove();
-                                validMoves.DB_move(moveSet[0], moveSet[1]);
                             }
                         }
 
@@ -385,9 +387,6 @@ int main(int argc, char** argv) {
 
         for (int ii = 1; ii <= 1; ++ii) {
 
-
-
-
             int CounterForTempTable = 1;
             int depth = 6; //Depth of the alphaBeta algorithm
             int playerTurn = 1; //Which player's turn it is
@@ -414,7 +413,7 @@ int main(int argc, char** argv) {
             DatabaseInit(UniqueBoardIDCounter,LoadTempBeforeStart); //Initializes the database
 
             // Construct initial board
-            std::vector<std::vector<std::string>> boards = startUp();
+            //std::vector<std::vector<std::string>> boards = startUp();
             validMoves.setBoards(boards);
 
             while(true){ //Game loop
@@ -456,7 +455,6 @@ int main(int argc, char** argv) {
                         else if (playerTurn == 1 && player == "AI" || playerTurn == 2 && player2 == "AI"){
                             alphaBeta.moveAI(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
                             moveSet = alphaBeta.getMove();
-                            validMoves.DB_move(moveSet[0], moveSet[1]);
                         }
                     }
 
