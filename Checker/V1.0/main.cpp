@@ -372,8 +372,8 @@ int main(int argc, char** argv) {
         QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
         db.setHostName("localhost");
         db.setDatabaseName("CheckersDatabase");
-        db.setUserName("Pascal");  // Change to username
-        db.setPassword("Superbror22!");  // Change to password
+        db.setUserName("IndsætBrugernavn");  // Change to username
+        db.setPassword("IndsætPassword!");  // Change to password
         db.open();
 
         QSqlQuery query;
@@ -494,12 +494,15 @@ int main(int argc, char** argv) {
 
                     InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
 
-                    DrawChecker++;
+
+
+
 
                     int depth = 7;
 
                     printGameState(ii,DrawChecker,redPieces,blackPieces,playerTurn,boards,depth,alphaBeta); //Prints the game state
 
+                    DrawChecker++;
                     i++;
 
                 } else { //If no valid moves, or no more pieces on the board
