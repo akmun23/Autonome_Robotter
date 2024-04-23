@@ -7,8 +7,8 @@ Vision::Vision(char** argv):_argv(argv){
 }
 
 void Vision::detectAndDrawCentersOfCircles(){
-    _circles = {};
-    _colors = {};
+    _circles.clear();
+    _colors.clear();
     //![convert_to_gray]
     cv::Mat gray;
     cv::cvtColor(_src, gray, cv::COLOR_BGR2GRAY);
@@ -21,7 +21,7 @@ void Vision::detectAndDrawCentersOfCircles(){
     //![houghcircles]
     cv::HoughCircles(gray, _circles, cv::HOUGH_GRADIENT, 1,
                  gray.rows/100,  // change this value to detect circles with different distances to each other
-                 110, 25, 5, 20 // change the last two parameters
+                 300, 25, 5, 35 // change the last two parameters
                  // (min_radius & max_radius) to detect larger circles
                  );
     //![houghcircles]
@@ -72,6 +72,7 @@ void Vision::detectAndDrawChessboardCorners() {
         // The length of the individual squares of the board are calculated to calibrate the game program.
         std::cout << "Boardsize: " << _boardSize << std::endl;
     }
+
     _axis = {corners[0], corners[6], corners[42], corners[48]};
 }
 
@@ -103,12 +104,18 @@ void Vision::newChessCorners(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f x
 }
 
 // Finds the coordinates for the circles in the given coordinate frame
-std::vector<double> Vision::findCoordInFrame(cv::Point2f varpoint){
+void Vision::findCoordInFrame(cv::Point2f varpoint, int& iterator){
     // Calculates the new coordinates for the circle
     double newPointx = ((varpoint.x-_newCorners[1].x)*_unit1[0] + (varpoint.y-_newCorners[1].y)*_unit1[1]);
     double newPointy = ((varpoint.x-_newCorners[1].x)*_unit2[0] + (varpoint.y-_newCorners[1].y)*_unit2[1]);
 
-    return {newPointx, newPointy};
+    if((newPointx > -0.02) && (newPointx < 0.225) && (newPointy > -0.02) && (newPointy < 0.225)){
+        _circleChecked.push_back({newPointx, newPointy});
+        iterator++;
+    } else {
+        _circles.erase(_circles.begin()+iterator);
+        _colors.erase(_colors.begin()+iterator);
+    }
 }
 
 void Vision::cameraFeed(){
@@ -159,15 +166,15 @@ void Vision::cameraFeed(){
             break;
         }
     }
-    _src = cv::imread(path);
+    // _src = cv::imread(path);
 }
 
 // Finds the coordinates for the three calibration circles
 void Vision::calibrationCircles(){
     // Preset values for the three calibration circles
-    cv::Vec3b green = {175, 223, 210};
+    cv::Vec3b green = {175, 223, 200};
     cv::Vec3b yellow = {130, 220, 235};
-    cv::Vec3b magenta = {200, 138, 190};
+    cv::Vec3b magenta = {200, 138, 160};
     bool greenFound = false;
     bool yellowFound = false;
     bool magentaFound = false;
@@ -271,14 +278,10 @@ void Vision::startBoard(){
 // Runs the first time the board is detected and finds the orientation of the board
 void Vision::firstLoop(){
     // Detects the circles and the chessboard corners
-    calibrationCircles();
-
-    _circles = {};
-    _colors = {};
-
     cameraFeed();
     detectAndDrawCentersOfCircles();
     detectAndDrawChessboardCorners();
+    calibrationCircles();
 
     // Startup variables
     int checkLoop = 0;
@@ -291,36 +294,29 @@ void Vision::firstLoop(){
         bool xaxis = false;
         bool yaxis = false;
 
-        // Keeps count of how many circles are removed since they are outside the board
-        int remove = 0;
-
         // The first time it loops through all circles and removes the ones that are outside the board
         if(checkLoop == 0){
             while(1){
-                for (int i = 0; i < _circles.size()+remove; i++) {
-                    _circleChecked.push_back(findCoordInFrame(cv::Point2f(_circles[i-remove][0]*_pixToMeters, _circles[i-remove][1]*_pixToMeters)));
-                    if((_circleChecked[i-remove][0] > -0.02) && (_circleChecked[i-remove][0] < 0.225) && (_circleChecked[i-remove][1] > -0.02) && (_circleChecked[i-remove][1] < 0.225)){
-                        continue;
-                    }
-                    _circleChecked.erase(std::next(_circleChecked.begin(), i-remove));
-                    _circles.erase(std::next(_circles.begin(), i-remove));
-                    _colors.erase(std::next(_colors.begin(), i-remove));
-                    remove++;
+                int i = 0;
+                while(_circleChecked.size() < 24){
+                    findCoordInFrame(cv::Point2f(_circles[i][0]*_pixToMeters, _circles[i][1]*_pixToMeters), i);
                 }
                 if(_circleChecked.size() != 24){
                     cameraFeed();
                     detectAndDrawCentersOfCircles();
                     detectAndDrawChessboardCorners();
-                    std::cout << "Only " << _circleChecked.size() << "circles detected. Trying new picture" << std::endl;
-                    _circleChecked = {};
+                    std::cout << "Only " << _circleChecked.size() << "circles detected. Trying new picture" << std::endl;                  
+                    _circleChecked.clear();
+                    i = 0;
                 } else {
                     break;
                 }
             }
         } else { // The other times it only checks the circles that are inside the board
-            _circleChecked = {};
+            _circleChecked.clear();
+            int i = 0;
             for (int i = 0; i < _circles.size(); ++i) {
-                _circleChecked.push_back(findCoordInFrame(cv::Point2f(_circles[i][0]*_pixToMeters, _circles[i][1]*_pixToMeters)));
+                findCoordInFrame(cv::Point2f(_circles[i][0]*_pixToMeters, _circles[i][1]*_pixToMeters), i);
             }
         }
 
@@ -371,16 +367,21 @@ std::vector<std::string> Vision::boardLoop(std::vector<std::vector<std::string>>
         _circleChecked = {};
         int remove = 0;
 
-        // Removes the circles that are outside the board
-        for(int i = 0; i < _circles.size()+remove; i++) {
-            _circleChecked.push_back(findCoordInFrame(cv::Point2f(_circles[i-remove][0]*_pixToMeters, _circles[i-remove][1]*_pixToMeters)));
-            if((_circleChecked[i-remove][0] > -0.02) && (_circleChecked[i-remove][0] < 0.225) && (_circleChecked[i-remove][1] > -0.02) && (_circleChecked[i-remove][1] < 0.225)){
-                continue;
+        while(1){
+            int i = 0;
+            _circleChecked.clear();
+            while(_circleChecked.size() < 24){
+                findCoordInFrame(cv::Point2f(_circles[i][0]*_pixToMeters, _circles[i][1]*_pixToMeters), i);
             }
-            _circleChecked.erase(std::next(_circleChecked.begin(), i-remove));
-            _circles.erase(std::next(_circles.begin(), i-remove));
-            _colors.erase(std::next(_colors.begin(), i-remove));
-            remove++;
+            if(_circleChecked.size() != 24){
+                cameraFeed();
+                detectAndDrawCentersOfCircles();
+                detectAndDrawChessboardCorners();
+                std::cout << "Only " << _circleChecked.size() << "circles detected. Trying new picture" << std::endl;
+                i = 0;
+            } else {
+                break;
+            }
         }
 
         // Prints a new board with the checker pieces by iterating through the board and checking the color of the checker pieces

@@ -9,7 +9,7 @@
 
 class Vision
 {
-    cv::Mat _src;
+    cv::Mat _src = cv::imread("/home/aksel/Downloads/picture1.jpg");
     std::vector<cv::Point2f> _newCorners ={{0,0}, {0,0}, {0,0}};
     double _pixToMeters;
     double _boardSize;
@@ -25,7 +25,7 @@ class Vision
     cv::Point2f _greenFunc;
     cv::Point2f _yellowFunc;
     cv::Point2f _magentaFunc;
-    std::vector<std::vector<double>> _circleChecked;
+    std::vector<std::vector<double>> _circleChecked = {};
     std::vector<std::vector<std::string>> _boards;
     std::vector<double> _unit1;
     std::vector<double> _unit2;
@@ -46,7 +46,7 @@ public:
     void newChessCorners(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis);
 
     // Finds the coordinates for the circles in the given coordinate frame
-    std::vector<double> findCoordInFrame(cv::Point2f varpoint);
+    void findCoordInFrame(cv::Point2f varpoint, int& iterator);
 
     // Finds the coordinates for the three calibration circles
     void calibrationCircles();

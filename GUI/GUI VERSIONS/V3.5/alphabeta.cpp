@@ -423,7 +423,7 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
     std::vector<std::string> moves; //The moves that have been made during the turn
     setPlayerTurn(playerTurn);
     setPieceCount(blackPieces, redPieces);
-    setBoards(boards);
+    setBoard(boards);
     setMove({}, playerMove);
 
     //The possible moves for the player
@@ -492,7 +492,7 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
             }
 
             //Resets the board, pieces, and moves
-            setBoards(boards);
+            setBoard(boards);
             setPieceCount(blackPieces, redPieces);
             setPlayerTurn(playerTurn);
             setPlayerTurn(playerTurn);
@@ -553,7 +553,7 @@ int alphaBeta::moveAI(std::vector<std::vector<std::string>> boards, int depth, i
             if(eval < alpha){
                 break;
             }
-            setBoards(boards);
+            setBoard(boards);
             setPieceCount(blackPieces, redPieces);
             setPlayerTurn(playerTurn);
             setPlayerTurn(playerTurn);

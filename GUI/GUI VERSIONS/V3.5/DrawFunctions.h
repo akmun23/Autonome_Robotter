@@ -33,10 +33,10 @@ std::vector<std::vector<std::string>> boards;
 
 bool startUpMain = true; //Bool, true if code is being run for the first time.
 
-validMoves validMoves;
-alphaBeta alphaBeta(0);
 Robot robot;
 Vision vision;
+validMoves validMoves;
+alphaBeta alphaBeta(0);
 
 //Updates text displayed, depending player turn.
 void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves, string moveStart, string moveEnd){
@@ -64,7 +64,7 @@ void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves
 
 }
 
-void drawGameMode(Mat img){
+void drawGameMode(Mat& img){
 
     Rect gameModeRectPVP((img.cols/2) - 200, (img.rows/2) - 40, 100, 50);
     Rect gameModeRectAI((img.cols/2) - 50, (img.rows/2) - 40, 100, 50);
@@ -109,7 +109,7 @@ void winAnimation(string winName, Mat img, bool redWon, vector<Rect> rectangles)
 }
 
 //Draws all elements of the GUI.
-void Draw(Mat img, bool& startUpMain){
+void Draw(Mat& img, bool& startUpMain){
     int redGrave = 0;
     int blackGrave = 0;
     int lineNum = 0;

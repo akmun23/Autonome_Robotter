@@ -14,10 +14,10 @@
 
 using namespace ur_rtde;
 
-class Robot : public Vision, public Matrix
+class Robot : public Matrix
 {
-    RTDEControlInterface rtde_control = RTDEControlInterface("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
-    RTDEReceiveInterface rtde_receive = RTDEReceiveInterface("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
+    RTDEControlInterface rtde_control = RTDEControlInterface("192.168.50.164", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
+    RTDEReceiveInterface rtde_receive = RTDEReceiveInterface("192.168.50.164", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
 
     std::vector<double> _yaxis1 = {0.4076880, -0.0492708, 0.125247};
     std::vector<double> _yaxis2 = {0.4077010, -0.0492651, 0.125247};
@@ -33,7 +33,7 @@ class Robot : public Vision, public Matrix
     std::vector<cv::Point2f> _calibrate;
     double _factor;
     double _pixToMeters;
-    double _piece;
+    double _piece = 0;
     double _chess;
     double _table;
     double _hover;
@@ -68,7 +68,7 @@ public:
 
     void prepForPic();
 
-    void calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis) override;
+    void calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis);
 
 };
 

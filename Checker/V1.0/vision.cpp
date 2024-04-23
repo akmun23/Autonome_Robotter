@@ -86,8 +86,8 @@ void Vision::calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xax
     double length2 = sqrt(pow(vec2[0], 2) + pow(vec2[1], 2));
 
     // Calculates the unit vectors for the x and y axis
-    std::vector<double> unit1 = {(vec1[0] / length1), (vec1[1] / length1)};
-    std::vector<double> unit2 = {(vec2[0] / length2), (vec2[1] / length2)};
+    _unit1 = {(vec1[0] / length1), (vec1[1] / length1)};
+    _unit2 = {(vec2[0] / length2), (vec2[1] / length2)};
 
 }
 
@@ -95,7 +95,7 @@ void Vision::calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xax
 void Vision::newChessCorners(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis){
     double move = 0.015;
     // Calculates the unit vectors for the x and y axis
-    calcUnitVec2D(yaxis, orego, xaxis);
+    Vision::calcUnitVec2D(yaxis, orego, xaxis);
 
     // Moves the pieces 1.5 cm
     _newCorners[1] = cv::Point2f(orego.x + (-move * _unit1[0] - move * _unit2[0]), orego.y + (-move * _unit1[1] - move * _unit2[1]));

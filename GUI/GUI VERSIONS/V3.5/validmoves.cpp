@@ -471,8 +471,8 @@ std::vector<std::string> validMoves::getMove(){
     return {_playerStart, _playerMove};
 }
 
-void validMoves::setBoards(std::vector<std::vector<std::string>> boards){
-    _boards = boards;
+void validMoves::setBoard(std::vector<std::vector<std::string>> board){
+    _boards = board;
 }
 
 void validMoves::setMove(std::string playerStart, std::string playerMove){

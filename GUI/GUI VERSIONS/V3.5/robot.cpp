@@ -89,14 +89,17 @@ void Robot::robotStartVision(){
     rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, pieceLocation.at(2,2)}, 2, 0.5);
     std::vector<double> target = rtde_receive.getActualTCPPose();
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), target[2], target[3], target[4], target[5]}, 1, 0.2);
-    rtde_control.speedL({0,0,-0.01, 0, 0, 0});
-    while(rtde_receive.getActualTCPForce()[2] < 30){}
+/*
+    rtde_control.speedL({0, 0,-0.01, 0, 0, 0});
+    while(rtde_receive.getActualTCPForce()[2] < 30){
+    }
     target = rtde_receive.getActualTCPPose();
     _piece = target[2]+0.0015;
     rtde_control.speedStop();
+*/
 
     // Moves robot above the found piece
-    rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), 0, target[3], target[4], target[5]}, 1, 0.2);
 
     // Sets up to move to middle of chess board
     setMatrixValues(checker, {1, 0, 0, (3.5*_factor), 0, 1, 0, (3.5*_factor), 0, 0, 1, 0, 0, 0, 0, 1});
@@ -106,10 +109,12 @@ void Robot::robotStartVision(){
 
     // Finds heigh of chessboard on table
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
+/*
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){}
     _chess = rtde_receive.getActualTCPPose()[2]+0.0015;
     rtde_control.speedStop();
+*/
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
 
     // Sets up to move to graveyard
@@ -120,10 +125,12 @@ void Robot::robotStartVision(){
 
     // Finds height of graveyard on table
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
+/*
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){}
     _table = rtde_receive.getActualTCPPose()[2]+0.0015;
     rtde_control.speedStop();
+*/
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
 
     rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, pieceLocation.at(2,2)}, 2, 0.5);
@@ -268,7 +275,7 @@ bool Robot::robotMove(std::vector<std::string> moveSet, std::vector<std::vector<
     _moveSet = moveSet;
     _playerTurn = playerTurn;
 
-    char column = moveSet[0][0]; //Starting column
+    int column = _moveSet[0][0]; //Starting column
     column = column - 'a';
     int row = moveSet[0][1] - '1'; //Starting row
 
