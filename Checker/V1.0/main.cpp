@@ -14,7 +14,7 @@
 //using namespace ur_rtde;
 int main(int argc, char** argv) {
 
-    std::string RunMode = "Evolutions"; // Options are "Evolutions", "RobotWithVision" or "DatabaseSimulation"
+    std::string RunMode = "DatabaseSimulation"; // Options are "Evolutions", "RobotWithVision" or "DatabaseSimulation"
 
     if (RunMode == "Evolutions"){
 
@@ -379,10 +379,10 @@ int main(int argc, char** argv) {
         QSqlQuery query;
 
         //Database settings
-        bool ResetDB = false; //If the database should be reset
-        bool LoadTempBeforeStart = false; //If there are a full temp table from previous games that should be loaded before the game starts
-        bool UploadTempToDB = false; //If the temp table should be uploaded to the database after the game ends
-        // Skriv true i input hvis databasens indhold skal slettes
+        bool ResetDB = false; //If the database should be reset set this to true
+        bool LoadTempBeforeStart = false; //If there are a full temp table from previous games that should be loaded before the game starts set this to true
+        bool UploadTempToDB = true; //If the temp table should be uploaded to the database after the game ends set this to true
+
         resetDB(ResetDB); // Resets the database
 
         for (int ii = 1; ii <= 1; ++ii) {
@@ -402,7 +402,7 @@ int main(int argc, char** argv) {
             std::string MoveMade = {}; // Stores the move made to put it in the database
             bool DatabaseMoveMade = false;
             validMoves validMoves;
-            alphaBeta alphaBeta(0);
+            alphaBeta alphaBeta(&validMoves,0);
 
             int TestCounterForDatabase = 0;
 
@@ -446,6 +446,7 @@ int main(int argc, char** argv) {
                         if (playerTurn == 1 && player == "DB" || playerTurn == 2 && player2 == "DB"){
 
                             MoveDBMain(BoardState, playerTurn, boards, redPieces, blackPieces, moveSet, CounterForTempTable, DrawChecker, DatabaseMoveMade, TestCounterForDatabase,validMoves,alphaBeta); // Database AI's move
+
                         }
                         else if (playerTurn == 1 && player == "Random" || playerTurn == 2 && player2 == "Random"){
 
@@ -453,7 +454,7 @@ int main(int argc, char** argv) {
 
                         }
                         else if (playerTurn == 1 && player == "AI" || playerTurn == 2 && player2 == "AI"){
-                            alphaBeta.findMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
+                            alphaBeta.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
                             moveSet = alphaBeta.getMove();
                         }
                     }
@@ -468,12 +469,10 @@ int main(int argc, char** argv) {
 
                     printAIMove(DatabaseMoveMade,moveSet,MoveMade,thisTurn); //Prints the move made by the AI
 
-                    std::string* MoveMadePtr = &MoveMade;
+                    MoveMade = moveSet[0]+moveSet[1];
+                    std::string *MoveMadePtr = &MoveMade;
 
                     InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
-
-
-
 
 
 
