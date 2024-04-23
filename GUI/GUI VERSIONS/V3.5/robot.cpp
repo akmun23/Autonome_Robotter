@@ -50,8 +50,8 @@ void Robot::robotStartVision(){
 
     // Defines the frame for the camera
     cv::Point2f oregoPicture = cv::Point2f(_calibrate[0].x*_pixToMeters, _calibrate[0].y*_pixToMeters);
-    cv::Point2f xaxisPicture = cv::Point2f(_calibrate[1].x*_pixToMeters, _calibrate[1].y*_pixToMeters);
-    cv::Point2f yaxisPicture = cv::Point2f(_calibrate[2].x*_pixToMeters, _calibrate[2].y*_pixToMeters);
+    cv::Point2f xaxisPicture = cv::Point2f(_calibrate[2].x*_pixToMeters, _calibrate[2].y*_pixToMeters);
+    cv::Point2f yaxisPicture = cv::Point2f(_calibrate[1].x*_pixToMeters, _calibrate[1].y*_pixToMeters);
 
     calcUnitVec2D(yaxis, orego, xaxis);
     // Makes a transformation matrix for the robot
@@ -89,15 +89,12 @@ void Robot::robotStartVision(){
     rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, pieceLocation.at(2,2)}, 2, 0.5);
     std::vector<double> target = rtde_receive.getActualTCPPose();
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), target[2], target[3], target[4], target[5]}, 1, 0.2);
-/*
+
     rtde_control.speedL({0, 0,-0.01, 0, 0, 0});
-    while(rtde_receive.getActualTCPForce()[2] < 30){
-    }
+    while(rtde_receive.getActualTCPForce()[2] < 30){}
     target = rtde_receive.getActualTCPPose();
     _piece = target[2]+0.0015;
     rtde_control.speedStop();
-*/
-
     // Moves robot above the found piece
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), 0, target[3], target[4], target[5]}, 1, 0.2);
 
@@ -109,12 +106,10 @@ void Robot::robotStartVision(){
 
     // Finds heigh of chessboard on table
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
-/*
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){}
     _chess = rtde_receive.getActualTCPPose()[2]+0.0015;
     rtde_control.speedStop();
-*/
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
 
     // Sets up to move to graveyard
@@ -125,12 +120,10 @@ void Robot::robotStartVision(){
 
     // Finds height of graveyard on table
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
-/*
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){}
     _table = rtde_receive.getActualTCPPose()[2]+0.0015;
     rtde_control.speedStop();
-*/
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
 
     rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, pieceLocation.at(2,2)}, 2, 0.5);
