@@ -378,13 +378,17 @@ int main(int argc, char** argv) {
 
         QSqlQuery query;
 
-        // Skriv true i input hvis databasens indhold skal slettes
-        resetDB(false); // Resets the database
+        //Database settings
+        bool ResetDB = false; //If the database should be reset set this to true
+        bool LoadTempBeforeStart = false; //If there are a full temp table from previous games that should be loaded before the game starts set this to true
+        bool UploadTempToDB = true; //If the temp table should be uploaded to the database after the game ends set this to true
+
+        resetDB(ResetDB); // Resets the database
 
         for (int ii = 1; ii <= 1; ++ii) {
 
             int CounterForTempTable = 1;
-
+            int depth = 2; //Depth of the alphaBeta algorithm
             int playerTurn = 1; //Which player's turn it is
             int blackPieces = 12; //Initial number of black pieces
             int redPieces = 12; //Initial number of red pieces
@@ -392,39 +396,13 @@ int main(int argc, char** argv) {
             int thisTurn; //Which player's turn it is
             int DrawChecker = 1; //When this equal 200 the game is called draw
 
-            std::string player = "AI"; //If the player is human or AI
+            std::string player = "Random"; //If the player is human or AI
             std::string player2 = "AI"; //If the player is human or AI
             std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
             std::string MoveMade = {}; // Stores the move made to put it in the database
             bool DatabaseMoveMade = false;
-
-			// Construct object that handles the robot movement
-            Robot robot;
-            robot.prepForPic();
-
-            // Constructs the vision object for ComputerVision and runs the first loop
-            Vision vision(argv);
-            vision.firstLoop();
-
-            // Variables that is needed for the robot movement
-            std::vector<cv::Point2f> calibrate = vision.getCalibrate();
-            double pixToMeters = vision.getPixToMeters();
-            double boardSize = vision.getBoardsize();
-            std::vector<cv::Point2f> newCorners = vision.getNewCorners();
-            std::vector<std::vector<std::string>> boards = vision.getBoard();
-
             validMoves validMoves;
-            validMoves.setBoards(boards);
-
-            alphaBeta alphaBeta(0);
-
-            // Robot movement
-            std::cout << calibrate[0] << std::endl;
-            std::cout << calibrate[1] << std::endl;
-            std::cout << calibrate[2] << std::endl;
-
-            robot.setValues(newCorners, calibrate, boardSize, pixToMeters);
-            robot.robotStartVision();
+            alphaBeta alphaBeta(&validMoves,0);
 
             int TestCounterForDatabase = 0;
 
@@ -432,10 +410,10 @@ int main(int argc, char** argv) {
 
             int UniqueBoardIDCounter;
             // Skriv true i nr 2 input hvis temp skal uploades til databasen inden man starter spillet
-            DatabaseInit(UniqueBoardIDCounter,false); //Initializes the database
+            DatabaseInit(UniqueBoardIDCounter,LoadTempBeforeStart); //Initializes the database
 
             // Construct initial board
-            //std::vector<std::vector<std::string>> boards = startUp();
+            std::vector<std::vector<std::string>> boards = startUp();
             validMoves.setBoards(boards);
 
             while(true){ //Game loop
@@ -456,7 +434,7 @@ int main(int argc, char** argv) {
 
 
                 //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
-                if(((validMoves.movePossible().size())/2) > 0 && redPieces > 0 && blackPieces > 0){
+                if((validMoves.movePossible().size()) > 0 && redPieces > 0 && blackPieces > 0){
                     std::cout << "Player " << playerTurn << "'s turn:" << std::endl; //Prints which player's turn it is
                     std::vector<std::vector<std::string>> tempBoard = boards; // To be used in robotMove
 
@@ -468,6 +446,7 @@ int main(int argc, char** argv) {
                         if (playerTurn == 1 && player == "DB" || playerTurn == 2 && player2 == "DB"){
 
                             MoveDBMain(BoardState, playerTurn, boards, redPieces, blackPieces, moveSet, CounterForTempTable, DrawChecker, DatabaseMoveMade, TestCounterForDatabase,validMoves,alphaBeta); // Database AI's move
+
                         }
                         else if (playerTurn == 1 && player == "Random" || playerTurn == 2 && player2 == "Random"){
 
@@ -475,7 +454,7 @@ int main(int argc, char** argv) {
 
                         }
                         else if (playerTurn == 1 && player == "AI" || playerTurn == 2 && player2 == "AI"){
-                            alphaBeta.makeMove(boards, 2, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
+                            alphaBeta.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
                             moveSet = alphaBeta.getMove();
                         }
                     }
@@ -490,15 +469,12 @@ int main(int argc, char** argv) {
 
                     printAIMove(DatabaseMoveMade,moveSet,MoveMade,thisTurn); //Prints the move made by the AI
 
-                    std::string* MoveMadePtr = &MoveMade;
+                    MoveMade = moveSet[0]+moveSet[1];
+                    std::string *MoveMadePtr = &MoveMade;
 
                     InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
 
 
-
-
-
-                    int depth = 7;
 
                     printGameState(ii,DrawChecker,redPieces,blackPieces,playerTurn,boards,depth,alphaBeta); //Prints the game state
 
@@ -515,7 +491,7 @@ int main(int argc, char** argv) {
             if(gameEnd){
                 GameEnd(redPieces,blackPieces,playerTurn);
             }
-            UploadTempToDatabase(UniqueBoardIDCounter, true); // Uploads the temp table to the database
+            UploadTempToDatabase(UniqueBoardIDCounter, UploadTempToDB); // Uploads the temp table to the database
             std::cout << "Moves made by database: " << TestCounterForDatabase << std::endl;
         }
     }
