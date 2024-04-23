@@ -14,7 +14,7 @@
 //using namespace ur_rtde;
 int main(int argc, char** argv) {
 
-    std::string RunMode = "Evolutions"; // Options are "Evolutions", "RobotWithVision" or "DatabaseSimulation"
+    std::string RunMode = "RobotWithVision"; // Options are "Evolutions", "RobotWithVision" or "DatabaseSimulation"
 
     if (RunMode == "Evolutions"){
 
@@ -241,7 +241,7 @@ int main(int argc, char** argv) {
                 int thisTurn; //Which player's turn it is
                 int DrawChecker = 1; //When this equal 200 the game is called draw
                 std::vector<std::vector<std::string>> thisBoard = {}; //The current state of the board
-                std::string player = "AI"; //If the player is human or AI
+                std::string player = "p"; //If the player is human or AI
                 std::string player2 = "AI"; //If the player is human or AI
                 std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
                 std::vector<std::vector<double>> startUpRobot; //The initial position of the robotRobot
@@ -251,11 +251,12 @@ int main(int argc, char** argv) {
                 //std::vector<std::vector<std::string>> boards = startUp();
 
                 std::vector<double> teachPos;
-                //prepForPic(true, teachPos);
+
 
                 // Constructs the vision object for ComputerVision
                 Vision vision(argv);
-
+                Robot robot;
+                robot.prepForPic();
                 // Finds the new corners of the chessboard
                 vision.firstLoop();
 
@@ -278,7 +279,6 @@ int main(int argc, char** argv) {
                 std::cout << calibrate[1] << std::endl;
                 std::cout << calibrate[2] << std::endl;
 
-                Robot robot;
                 robot.setValues(newCorners, calibrate, boardSize, pixToMeters);
                 robot.robotStartVision();
 

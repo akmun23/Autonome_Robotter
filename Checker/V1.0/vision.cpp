@@ -104,14 +104,9 @@ void Vision::newChessCorners(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f x
 
 // Finds the coordinates for the circles in the given coordinate frame
 std::vector<double> Vision::findCoordInFrame(cv::Point2f varpoint){
-    // Saves the coordinates for the origin, x-axis and y-axis
-    cv::Point2f orego = _newCorners[1];
-    cv::Point2f xAxis = _newCorners[0];
-    cv::Point2f yAxis = _newCorners[2];
-
     // Calculates the new coordinates for the circle
-    double newPointx = ((varpoint.x-orego.x)*_unit1[0] + (varpoint.y-orego.y)*_unit1[1]);
-    double newPointy = ((varpoint.x-orego.x)*_unit2[0] + (varpoint.y-orego.y)*_unit2[1]);
+    double newPointx = ((varpoint.x-_newCorners[1].x)*_unit1[0] + (varpoint.y-_newCorners[1].y)*_unit1[1]);
+    double newPointy = ((varpoint.x-_newCorners[1].x)*_unit2[0] + (varpoint.y-_newCorners[1].y)*_unit2[1]);
 
     return {newPointx, newPointy};
 }
@@ -170,9 +165,9 @@ void Vision::cameraFeed(){
 // Finds the coordinates for the three calibration circles
 void Vision::calibrationCircles(){
     // Preset values for the three calibration circles
-    cv::Vec3b green = {175, 223, 210};
-    cv::Vec3b yellow = {135, 230, 245};
-    cv::Vec3b magenta = {200, 138, 195};
+    cv::Vec3b green = {175, 223, 200};
+    cv::Vec3b yellow = {130, 220, 235};
+    cv::Vec3b magenta = {200, 138, 160};
     bool greenFound = false;
     bool yellowFound = false;
     bool magentaFound = false;
@@ -276,10 +271,14 @@ void Vision::startBoard(){
 // Runs the first time the board is detected and finds the orientation of the board
 void Vision::firstLoop(){
     // Detects the circles and the chessboard corners
+    calibrationCircles();
+
+    _circles = {};
+    _colors = {};
+
     cameraFeed();
     detectAndDrawCentersOfCircles();
     detectAndDrawChessboardCorners();
-    calibrationCircles();
 
     // Startup variables
     int checkLoop = 0;

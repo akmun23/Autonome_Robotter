@@ -358,5 +358,5 @@ bool Robot::robotMove(std::vector<std::string> moveSet, std::vector<std::vector<
 }
 
 void Robot::prepForPic(){
-    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, 0}, 2, 0.5);
+    rtde_control.moveJ({-1, -0.75, -1.57, -1.57, 1.57, 0}, 2, 0.5);
 }

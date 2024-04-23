@@ -349,12 +349,20 @@ int main(int argc, char** argv){
         //start:
         if(startUpMain){
             do{
+
                 vision.setArguments(argv);
                 robot.prepForPic();
                 vision.firstLoop();
                 robot.setValues(vision.getNewCorners(), vision.getCalibrate(), vision.getBoardsize(), vision.getPixToMeters());
+
+                std::cout << "Magenta: " << vision.getCalibrate()[0] << std::endl;
+                std::cout << "Green: " << vision.getCalibrate()[1] << std::endl;
+                std::cout << "Yellow: " << vision.getCalibrate()[2] << std::endl;
+
+                robot.robotStartVision();
                 std::vector<std::vector<std::string>> boards = vision.getBoard();
                 validMoves.setBoards(boards);
+
                 thisTurn = 1;
                 drawGameMode(img);
                 imshow(winName, img);
