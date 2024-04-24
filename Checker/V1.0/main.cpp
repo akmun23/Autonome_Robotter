@@ -1,36 +1,54 @@
+
 #include <iostream>
 #include<vector>
 #include<string>
 #include "boardUpdate.h"
-//#include "robotMove.h"
+//#include "computerPos.h"
+#include "qa.hpp"
+
+#include "mainfunctions.h"
 #include "validMoves.h"
+#include "CheckersDatabase.h"
+#include "computerVision.h"
+#include "robotMove.h"
+#include "matrix.h"
+
+
 #include <unistd.h>
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
-#include "CheckersDatabase.h"
-//#include <future>
+#include <opencv2/opencv.hpp>
+#include "opencv2/imgproc.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/calib3d.hpp"
+#include "opencv2/imgcodecs.hpp"
 
-using namespace ur_rtde;
+#include <future>
+
+
+
+
+//using namespace ur_rtde;
 
 int main() {
+
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
     db.setDatabaseName("CheckersDatabase");
-    db.setUserName("Indsætbrugernavn");  // Change to username
+    db.setUserName("IndsætBrugernavn");  // Change to username
     db.setPassword("IndsætPassword!");  // Change to password
     db.open();
 
     QSqlQuery query;
+    while(1);
 
-    //Det her er er til vis man vil reset dataen i databasen
-    /*
-    query.exec("DELETE FROM MovesP1 WHERE board_id >= 0");
-    query.exec("DELETE FROM MovesP2 WHERE board_id >= 0");
-    query.exec("DELETE FROM UniqueBoard WHERE board_id >= 0");
-    query.exec("ALTER TABLE UniqueBoard AUTO_INCREMENT = 1");
-    query.exec("INSERT INTO UniqueBoard (BoardState) VALUES ('22222222222211111111444444444444')");
-    */
-    for (int ii = 1; ii <= 10000; ++ii) {
+    // Skriv true i input hvis databasens indhold skal slettes
+    resetDB(false); // Resets the database
+
+    for (int ii = 1; ii <= 100; ++ii) {
+
+
+
 
             int CounterForTempTable = 1;
 
@@ -48,14 +66,14 @@ int main() {
             std::future<bool> fut;
             std::string MoveMade; // Stores the move made to put it in the database
             bool DatabaseMoveMade = false;
-            std::string OldBoard = "22222222222211111111444444444444";
 
             int TestCounterForDatabase = 0;
 
             int i = 0;
 
-
-            RefreshTempTable(playerTurn); // Refreshes the Temp table
+            int UniqueBoardIDCounter;
+            // Skriv true i nr 2 input hvis temp skal uploades til databasen inden man starter spillet
+            DatabaseInit(UniqueBoardIDCounter,false); //Initializes the database
 
 
 
@@ -64,10 +82,17 @@ int main() {
             std::vector<std::vector<std::string>> boards = startUp();
 
             while(true){ //Game loop
+
+                std::string BoardState = "";
+                loadBoardToString(boards,BoardState);
+
+
+                std::string* outputPtr = &BoardState;
+
                 thisTurn = playerTurn; //Which player's turn it is
 
-                if (DrawChecker == 175){ // Tjekker om der er gået 175 træk uden en vinder
-                    query.exec("UPDATE Temp SET WinOrLoss = 0.5"); // Sætter en halv ind i wincase for uafgjort
+                if (DrawChecker == 200){ // Tjekker om der er gået 175 træk uden en vinder
+                    query.exec("UPDATE TempMoves SET WinOrLoss = 0.5"); // Sætter en halv ind i wincase for uafgjort
                     std::cout << "The game is a draw!" << std::endl;
                     break;
                 }
@@ -75,6 +100,8 @@ int main() {
                 std::vector<std::string> jumps = jumpPossible(playerTurn, boards);
                 bool moreMove = false;
                 std::string moveTo = "";
+
+
 
                 //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
                 if(((movePossible(playerTurn, boards, jumps, moreMove, moveTo).size())/2) > 0 && redPieces > 0 && blackPieces > 0){
@@ -88,89 +115,29 @@ int main() {
                     } else {
                         if (playerTurn == 1 && player == "DB" || playerTurn == 2 && player2 == "DB"){
 
-                            std::string DBmove = MovePlayer(OldBoard, playerTurn); // Database best move on current board
-
-                            if (DBmove == "No moves"){
-                                std::cout << "No moves found" << std::endl;
-                                alphaBeta(boards, 5, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
-                            }
-                            else{
-                                std::cout << "AI move from database: " << DBmove << std::endl;
-                                std::string DBmoveFrom = DBmove.substr(0,2);
-                                std::string DBmoveTo = DBmove.substr(2,2);
-                                DB_move(playerTurn, boards, redPieces, blackPieces, DBmoveFrom, DBmoveTo); //Database AI's move
-                                MoveMade = DBmove;
-                                TestCounterForDatabase++;
-                                DatabaseMoveMade = true;
-
-                            }
+                            MoveDBMain(BoardState, playerTurn, boards, redPieces, blackPieces, moveSet, MoveMade, CounterForTempTable, DrawChecker, DatabaseMoveMade, TestCounterForDatabase); // Database AI's move
                         }
-                        else {
-                            alphaBeta(boards, 3, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {}); //AI's move
+                        else if (playerTurn == 1 && player == "Random" || playerTurn == 2 && player2 == "Random"){
+
+                            MoveRandom(playerTurn, boards, redPieces, blackPieces, moveSet, MoveMade, DatabaseMoveMade, jumps, moreMove, moveTo); // Random move
+
                         }
-                        std::cout << "Kører loopet" << std::endl;
-                    }
-
-                    /*
-                    if (i > 0){
-                        fut.get();
-                    }
-
-
-
-                    // Moves the robot
-                    if(i == 0){
-                        // Set up the robot
-                        startUpRobot = robotStart();
-                        atmegaCom('6'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
-                        sleep(1); // Venter 1 sekund
-                        atmegaCom('8'); // Sender et signal for at gripperen skal åbne
-                        fut = std::async(robotMove, moveSet, startUpRobot, tempBoard, thisTurn);
-                    } else {
-                        fut = std::async(robotMove, moveSet, startUpRobot, tempBoard, thisTurn);
-                    }
-                    */
-
-                    //Prints the moves made by the AI
-                    if(!DatabaseMoveMade){
-                        for (int i = 0; i < moveSet.size(); i += 2) {
-                            std::cout << "Player " << thisTurn << "  moves from: " << moveSet[i] << std::endl;
-                            std::cout << "Player " << thisTurn << " moves to: " << moveSet[i+1] << std::endl;
-                            MoveMade = moveSet[i] + moveSet[i+1];
-                        }
-                    }
-                    DatabaseMoveMade = false;
-
-
-                    std::string output;
-
-                    for (int i = 0; i < 8; ++i) {
-                        for (int j = 0; j < 8; ++j) {
-                            if(boards[i][j] == "1 "){
-                                output += "1";
-                            } else if(boards[i][j] == "B "){
-                                output += "2";
-                            } else if(boards[i][j] == "BK"){
-                                output += "3";
-                            } else if(boards[i][j] == "R "){
-                                output += "4";
-                            } else if(boards[i][j] == "RK"){
-                                output += "5";
-                            }
+                        else if (playerTurn == 1 && player == "AI" || playerTurn == 2 && player2 == "AI"){
+                            alphaBeta(boards, 2, playerTurn, redPieces, blackPieces, boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {},CounterForTempTable,DrawChecker); //AI's move
                         }
                     }
 
-                    std::string* outputPtr = &output;
+                    // Skriv true i første input for at køre robotten
+                    MoveRobot(false,fut,tempBoard,thisTurn,moveSet,startUpRobot,i); //Robot movement
+
+                    printAIMove(DatabaseMoveMade,moveSet,MoveMade,thisTurn); //Prints the move made by the AI
+
+
                     std::string* MoveMadePtr = &MoveMade;
 
+                    InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
 
-                    if (CheckDuplicateMoves(output, MoveMade, thisTurn)){
-                        InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
-                        AddBoard(output, OldBoard,CounterForTempTable);
-                        CounterForTempTable++;
-                    }
 
-                    OldBoard = output;
 
 
                     DrawChecker++;
@@ -178,15 +145,7 @@ int main() {
 
                     int depth = 7;
 
-                    //Prints data from the state of the game and prints the board
-                    std::cout << "It is game nr: " << ii << std::endl;
-                    std::cout << "It is turn: " << DrawChecker << std::endl;
-                    std::cout << "There are " << redPieces << " red pieces left." << std::endl;
-                    std::cout << "There are " << blackPieces << " black pieces left." << std::endl;
-                    std::cout << std::endl;
-                    checkerBoard(boards);
-                    std::cout << "Game score is: " << giveBoardScore(boards, playerTurn, blackPieces, redPieces, depth) << std::endl;
-                    std::cout << std::endl;
+                    printGameState(ii,DrawChecker,redPieces,blackPieces,playerTurn,boards,depth); //Prints the game state
 
 
                     i++;
@@ -200,26 +159,47 @@ int main() {
 
         //Prints the winner of the game
         if(gameEnd){
-            if(redPieces == 0){
-                query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 1");
-                query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 2");
-                std::cout << "Player 1 wins! No more red pieces" << std::endl;
-            } else if(blackPieces == 0){
-                query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 2");
-                query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 1");
-                std::cout << "Player 2 wins! No more black pieces" << std::endl;
-            } else if(playerTurn == 1){
-                query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 2");
-                query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 1");
-                std::cout << "Player 2 wins! No more moves for black" << std::endl;
-            } else if(playerTurn == 2){
-                query.exec("UPDATE Temp SET WinOrLoss = 1 WHERE PlayerId = 1");
-                query.exec("UPDATE Temp SET WinOrLoss = 0 WHERE PlayerId = 2");
-                std::cout << "Player 1 wins! No more moves for red" << std::endl;
-            }
+            GameEnd(redPieces,blackPieces,playerTurn);
         }
-        //UpdateMoveWinrate(CounterForTempTable);
+        UploadTempToDatabase(UniqueBoardIDCounter); // Uploads the temp table to the database
         std::cout << "Moves made by database: " << TestCounterForDatabase << std::endl;
     }
+
+    // Loads in the image
+    cv::Mat img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/visionTest6.jpg");
+
+    // Variables that is needed for the robot movement
+    std::vector<cv::Point2f> newCorners;
+    std::vector<cv::Point2f> calibrate;
+    double pixToMeters;
+    double boardSize;
+
+    // The chessboard
+    std::vector<std::vector<std::string>> chessBoard;
+
+    // Finds the new corners of the chessboard
+    std::vector<Vec3b> colours = firstLoop(newCorners, img, chessBoard, calibrate, pixToMeters, boardSize);
+
+    // Robot movement
+    std::cout << calibrate[0] << std::endl;
+    std::cout << calibrate[1] << std::endl;
+    std::cout << calibrate[2] << std::endl;
+
+    std::vector<std::vector<double>> startUp = robotStartVision(newCorners, calibrate, boardSize, pixToMeters);
+
+    int playerTurn = 1;
+    robotMove({"c3", "e5"}, startUp, chessBoard, playerTurn);
+
+
+    playerTurn = 2;
+    img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards5.jpg");
+    std::vector<std::string> move = boardLoop(colours[0], colours[1], newCorners, img, chessBoard, playerTurn);
+    std::cout << move[0] << " " << move[1] << std::endl;
+
+    playerTurn = 1;
+    img = imread("/home/aksel/Documents/GitHub/Autonome_Robotter/ComputerVision_versions/Images/boards6.jpg");
+    move = boardLoop(colours[0], colours[1], newCorners, img, chessBoard, playerTurn);
+    std::cout << move[0] << " " << move[1] << std::endl;
+
     return 0;
 }
