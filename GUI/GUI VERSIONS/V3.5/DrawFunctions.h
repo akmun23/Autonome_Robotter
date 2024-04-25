@@ -29,14 +29,16 @@ int thisTurn; //Which player's turn it is
 int blackPieces = 12; //Initial number of black pieces
 int redPieces = 12; //Initial number of red pieces
 int depth = 7; //Depth of the minimax algorithm
-std::vector<std::vector<std::string>> boards;
+std::vector<std::vector<std::string>> boards; //2D vec of strings, that represent the board state.
+Rect takePicture = Rect(img.cols/2+img.cols/4, img.rows-50, 50, 50);
 
 bool startUpMain = true; //Bool, true if code is being run for the first time.
 
+
 Robot robot;
 Vision vision;
-validMoves validMoves;
-alphaBeta alphaBeta(0);
+validMoves validM;
+alphaBeta alphaBeta(&validM, 0);
 
 //Updates text displayed, depending player turn.
 void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves, string moveStart, string moveEnd){
@@ -61,7 +63,6 @@ void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves
             putText(img, outputString, Point(700, 90 + (i - (scores.size() < 5 ? 0 : scores.size()-5)) * 25), FONT_HERSHEY_COMPLEX_SMALL, 1, Scalar(0,0,0), 1);
         }
     }
-
 }
 
 void drawGameMode(Mat& img){
@@ -278,8 +279,8 @@ void Draw(Mat& img, bool& startUpMain){
         }
     }
 
-    rectangle(img, Point(img.cols-img.cols/4, img.rows-75), Point(img.cols - 50 , img.rows-25), Scalar(0,0,0), -1);
-    putText(img, "Take picture", Point(img.cols-img.cols/4 , img.rows-50), FONT_HERSHEY_COMPLEX, 1, Scalar(255,255,255), 1);
+    // Draw takePicture button
+    rectangle(img, takePicture, Scalar(0,0,0), 2);
 }
 
 //Checks if a jump is possible for an element of given vector at a given position.
@@ -521,7 +522,7 @@ bool isGameWon(vector<Circle> checkerVec, vector<Circle> enemyCheckerVec, int tu
         if(piecesLeft(rectangles, enemyCheckerVec) < 1){
             return true;
         }
-        else if(validMoves.movePossible().size() < 1){
+        else if(validM.movePossible().size() < 1){
             return true;
         }
         else{
@@ -532,7 +533,7 @@ bool isGameWon(vector<Circle> checkerVec, vector<Circle> enemyCheckerVec, int tu
         if(piecesLeft(rectangles, enemyCheckerVec) < 1){
             return true;
         }
-        else if(validMoves.movePossible().size() < 1){
+        else if(validM.movePossible().size() < 1){
             return true;
         }
         else{

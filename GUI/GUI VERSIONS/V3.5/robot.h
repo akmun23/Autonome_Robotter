@@ -14,10 +14,10 @@
 
 using namespace ur_rtde;
 
-class Robot : public Matrix
+class Robot : public Vision, public Matrix
 {
-    RTDEControlInterface rtde_control = RTDEControlInterface("192.168.50.164", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
-    RTDEReceiveInterface rtde_receive = RTDEReceiveInterface("192.168.50.164", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
+    RTDEControlInterface rtde_control = RTDEControlInterface("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
+    RTDEReceiveInterface rtde_receive = RTDEReceiveInterface("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
 
     std::vector<double> _yaxis1 = {0.4076880, -0.0492708, 0.125247};
     std::vector<double> _yaxis2 = {0.4077010, -0.0492651, 0.125247};
@@ -34,9 +34,9 @@ class Robot : public Matrix
     double _factor;
     double _pixToMeters;
     double _piece = 0;
-    double _chess;
-    double _table;
-    double _hover;
+    double _chess = 0;
+    double _table = 0;
+    double _hover = 0;
     Matrix _CamToChess = Matrix(4,4);
     Matrix _robot = Matrix(4,4);
     std::vector<std::string> _moveSet;
@@ -46,8 +46,6 @@ class Robot : public Matrix
 
 public:
     Robot();
-
-    void setValues(std::vector<cv::Point2f> newCorners, std::vector<cv::Point2f> calibrate, double factor, double pixToMeters);
 
     // Function to set the values of a matrix from the Matrix class
     void setMatrixValues(Matrix& m, std::vector<double> v);
@@ -68,7 +66,7 @@ public:
 
     void prepForPic();
 
-    void calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis);
+    void calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis) override;
 
 };
 

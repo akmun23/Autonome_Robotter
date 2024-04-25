@@ -2,7 +2,6 @@
 #ifndef ALPHABETA_H
 #define ALPHABETA_H
 
-// #include "CheckersDatabase.h"
 #include "validmoves.h"
 #include <string>
 #include <vector>
@@ -35,21 +34,26 @@ class alphaBeta : public validMoves
     int _playerTurn;
     int _CounterForTempTable;
 
+    validMoves * _vm;
+
 public:
     QSqlQuery query;
-    alphaBeta();
-    alphaBeta(int depth);
-    alphaBeta(double piece, double king, double lock, double lockKing, double forward, double TwoEmpty, double OneJump, double OneEmpty, double TwoJump, double depth);
+    alphaBeta(validMoves* vm);
+    alphaBeta(validMoves* vm, int depth);
+    alphaBeta(validMoves* vm, double piece, double king, double lock, double lockKing, double forward, double TwoEmpty, double OneJump, double OneEmpty, double TwoJump, double depth);
+
     std::vector<std::string> jumpPossible(int playerTurn, std::vector<std::vector<std::string>>& boards);
     std::vector<std::string> movePossible(int playerTurn, std::vector<std::vector<std::string>>& boards);
+
     int giveScoreAI(std::vector<std::vector<std::string>>& boards, int& playerTurn, int& black, int& red, int& depth);
-    int moveAI(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, int alpha, int beta, std::string playerMove, int &CounterForTempTable);
+    int findMove(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, int alpha, int beta, std::string playerMove, int &CounterForTempTable);
     int getId();
     std::vector<std::string> getMove();
     void evolve(double rate);
     void resetWins();
     void dbInsert();
     void addWinner();
+    void makeMove(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, int alpha, int beta, std::string playerMove,int& CounterForTempTable);
 };
 
 #endif // ALPHABETA_H

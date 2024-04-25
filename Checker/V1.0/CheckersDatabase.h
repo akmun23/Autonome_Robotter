@@ -11,7 +11,7 @@
 // Boards and Moves
 void UploadTempToDatabase(int& UniqueBoardIDCounter, bool Toggle);
 
-void UpdateMoveWinRate(QString& Move, int& BoardID, double& WinOrLoss, int& PlayerId);
+void UpdateMoveWinRate(QString& Move, int& BoardID, float& WinOrLoss, int& PlayerId);
 
 //Player Moves
 std::string MovePlayer(std::string& BoardState,int& PlayerTurn);
@@ -28,8 +28,8 @@ void InsertNewMoveToNewBoard(int& Move, int& BoardID);
 void InserNewMoveToOldBoard(int& BoardID, int& TempBoardID);
 void InsertToTemp(std::string& BoardState, std::string& Move, int& Counter, int PlayerId);
 void insertAlphaBetaToTemp(std::vector<std::vector<std::string>>& tempBoard, std::string& MoveMade, int& tempPlayer, int& CounterForTempTable);
-void InsertMove(int board_id, QString Move, int PlayerID, double WinOrLoss);
-void HandleNewMoves(QString Move, int PlayerID, double WinOrLoss, int BoardID);
+void InsertMove(int board_id, QString Move, int PlayerID, float WinOrLoss);
+void HandleNewMoves(QString Move, int PlayerID, float WinOrLoss, int BoardID);
 //qDebug() << "SqLite error:" << query.lastError().text() << ", SqLite error code:" << query.lastError().number(); // debug komando
 
 

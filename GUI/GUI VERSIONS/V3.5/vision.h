@@ -9,12 +9,10 @@
 
 class Vision
 {
-    cv::Mat _src = cv::imread("/home/aksel/Downloads/picture1.jpg");
+    cv::Mat _src;
     std::vector<cv::Point2f> _newCorners ={{0,0}, {0,0}, {0,0}};
     double _pixToMeters;
-    double _boardSize;
-    std::vector<std::vector<std::string>> _chessBoard;
-    cv::Mat _firstLoop;
+    double _boardSize = 0.03;
     std::vector<cv::Vec3b> _colours;
     char** _argv;
     cv::Vec3b _black;
@@ -25,15 +23,15 @@ class Vision
     cv::Point2f _greenFunc;
     cv::Point2f _yellowFunc;
     cv::Point2f _magentaFunc;
-    std::vector<std::vector<double>> _circleChecked = {};
-    std::vector<std::vector<std::string>> _boards;
+    std::vector<cv::Point2f> _circleChecked;
+    std::vector<std::vector<std::string>> _boards = {{}};
     std::vector<double> _unit1;
     std::vector<double> _unit2;
 
 public:
     Vision();
 
-    Vision(char** argv);
+    Vision(char **argv);
 
     void detectAndDrawCentersOfCircles();
 
@@ -52,7 +50,7 @@ public:
     void calibrationCircles();
 
     // Finds the colors of the checker pieces on the board
-    void startBoard();
+    bool startBoard();
 
     // Opens camera and takes picture after 1 second
     void cameraFeed();
@@ -73,7 +71,7 @@ public:
 
     std::vector<std::vector<std::string>> getBoard();
 
-    void setArguments(char** argv);
+    void setArguments(char **argv);
 };
 
 #endif // VISION_H
