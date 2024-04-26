@@ -4,8 +4,8 @@
 
 
 # Configuration directories and files
-SourceDirectory: /home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt
-BuildDirectory: /home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt/build
+SourceDirectory: /home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5
+BuildDirectory: /home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build
 
 # Where to place the cost data store
 CostDataFile: 
@@ -14,7 +14,7 @@ CostDataFile:
 Site: mads-hyrup-P03RGS
 
 # Build name is osname-revision-compiler, i.e. Linux-2.4.2-2smp-c++
-BuildName: Linux-g++
+BuildName: Linux-clang++-16
 
 # Subprojects
 LabelsForSubprojects: 
@@ -27,8 +27,8 @@ SubmitInactivityTimeout:
 NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
-ConfigureCommand: "/usr/bin/cmake" "/home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt"
-MakeCommand: /usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}" -- -i
+ConfigureCommand: "/usr/bin/cmake" "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5"
+MakeCommand: /usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}"
 DefaultCTestConfigurationType: Release
 
 # version control
@@ -63,8 +63,8 @@ UpdateOptions:
 UpdateType: 
 
 # Compiler info
-Compiler: /usr/bin/g++
-CompilerVersion: 13.2.0
+Compiler: /usr/bin/clang++-16
+CompilerVersion: 16.0.6
 
 # Dynamic analysis (MemCheck)
 PurifyCommand: 

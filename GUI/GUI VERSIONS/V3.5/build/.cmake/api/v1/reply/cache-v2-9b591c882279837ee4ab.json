@@ -30,58 +30,6 @@
 			"value" : ""
 		},
 		{
-			"name" : "Boost_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "ADVANCED",
-					"value" : "1"
-				},
-				{
-					"name" : "HELPSTRING",
-					"value" : "The directory containing a CMake configuration file for Boost."
-				}
-			],
-			"type" : "PATH",
-			"value" : "/usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0"
-		},
-		{
-			"name" : "Boost_INCLUDE_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Path to a file."
-				}
-			],
-			"type" : "PATH",
-			"value" : "/usr/include"
-		},
-		{
-			"name" : "Boost_SYSTEM_LIBRARY_RELEASE",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : ""
-				}
-			],
-			"type" : "STRING",
-			"value" : "/usr/lib/x86_64-linux-gnu/libboost_system.so.1.74.0"
-		},
-		{
-			"name" : "Boost_THREAD_LIBRARY_RELEASE",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : ""
-				}
-			],
-			"type" : "STRING",
-			"value" : "/usr/lib/x86_64-linux-gnu/libboost_thread.so.1.74.0"
-		},
-		{
 			"name" : "CMAKE_ADDR2LINE",
 			"properties" : 
 			[
@@ -95,7 +43,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/addr2line"
+			"value" : "/usr/bin/llvm-addr2line-16"
 		},
 		{
 			"name" : "CMAKE_AR",
@@ -111,7 +59,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/ar"
+			"value" : "/usr/bin/llvm-ar-16"
 		},
 		{
 			"name" : "CMAKE_BUILD_TYPE",
@@ -135,7 +83,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt/build"
+			"value" : "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -172,22 +120,6 @@
 			],
 			"type" : "INTERNAL",
 			"value" : "4"
-		},
-		{
-			"name" : "CMAKE_COLOR_MAKEFILE",
-			"properties" : 
-			[
-				{
-					"name" : "ADVANCED",
-					"value" : "1"
-				},
-				{
-					"name" : "HELPSTRING",
-					"value" : "Enable/Disable color output during build."
-				}
-			],
-			"type" : "BOOL",
-			"value" : "ON"
 		},
 		{
 			"name" : "CMAKE_COMMAND",
@@ -243,7 +175,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/g++"
+			"value" : "/usr/bin/clang++-16"
 		},
 		{
 			"name" : "CMAKE_CXX_COMPILER_AR",
@@ -255,11 +187,27 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "A wrapper around 'ar' adding the appropriate '--plugin' option for the GCC compiler"
+					"value" : "LLVM archiver"
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/gcc-ar-13"
+			"value" : "/usr/bin/llvm-ar-16"
+		},
+		{
+			"name" : "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "`clang-scan-deps` dependency scanner"
+				}
+			],
+			"type" : "FILEPATH",
+			"value" : "/usr/bin/clang-scan-deps-16"
 		},
 		{
 			"name" : "CMAKE_CXX_COMPILER_RANLIB",
@@ -271,11 +219,11 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "A wrapper around 'ranlib' adding the appropriate '--plugin' option for the GCC compiler"
+					"value" : "Generate index for LLVM archive"
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/gcc-ranlib-13"
+			"value" : "/usr/bin/llvm-ranlib-16"
 		},
 		{
 			"name" : "CMAKE_CXX_FLAGS",
@@ -371,7 +319,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/gcc"
+			"value" : "/usr/bin/clang-16"
 		},
 		{
 			"name" : "CMAKE_C_COMPILER_AR",
@@ -383,11 +331,27 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "A wrapper around 'ar' adding the appropriate '--plugin' option for the GCC compiler"
+					"value" : "LLVM archiver"
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/gcc-ar-13"
+			"value" : "/usr/bin/llvm-ar-16"
+		},
+		{
+			"name" : "CMAKE_C_COMPILER_CLANG_SCAN_DEPS",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "`clang-scan-deps` dependency scanner"
+				}
+			],
+			"type" : "FILEPATH",
+			"value" : "/usr/bin/clang-scan-deps-16"
 		},
 		{
 			"name" : "CMAKE_C_COMPILER_RANLIB",
@@ -399,11 +363,11 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "A wrapper around 'ranlib' adding the appropriate '--plugin' option for the GCC compiler"
+					"value" : "Generate index for LLVM archive"
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/gcc-ranlib-13"
+			"value" : "/usr/bin/llvm-ranlib-16"
 		},
 		{
 			"name" : "CMAKE_C_FLAGS",
@@ -499,7 +463,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "CMAKE_DLLTOOL-NOTFOUND"
+			"value" : "/usr/bin/llvm-dlltool-16"
 		},
 		{
 			"name" : "CMAKE_EXECUTABLE_FORMAT",
@@ -627,7 +591,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt/build/CMakeFiles/pkgRedirects"
+			"value" : "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -639,7 +603,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "Unix Makefiles"
+			"value" : "Ninja"
 		},
 		{
 			"name" : "CMAKE_GENERATOR_INSTANCE",
@@ -678,18 +642,6 @@
 			"value" : ""
 		},
 		{
-			"name" : "CMAKE_HAVE_LIBC_PTHREAD",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Test CMAKE_HAVE_LIBC_PTHREAD"
-				}
-			],
-			"type" : "INTERNAL",
-			"value" : "1"
-		},
-		{
 			"name" : "CMAKE_HOME_DIRECTORY",
 			"properties" : 
 			[
@@ -699,7 +651,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt"
+			"value" : "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -751,11 +703,11 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "Path to a program."
+					"value" : "Program used to build from build.ninja files."
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/gmake"
+			"value" : "/usr/bin/ninja"
 		},
 		{
 			"name" : "CMAKE_MODULE_LINKER_FLAGS",
@@ -851,7 +803,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/nm"
+			"value" : "/usr/bin/llvm-nm-16"
 		},
 		{
 			"name" : "CMAKE_NUMBER_OF_MAKEFILES",
@@ -879,7 +831,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/objcopy"
+			"value" : "/usr/bin/llvm-objcopy-16"
 		},
 		{
 			"name" : "CMAKE_OBJDUMP",
@@ -895,7 +847,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/objdump"
+			"value" : "/usr/bin/llvm-objdump-16"
 		},
 		{
 			"name" : "CMAKE_PLATFORM_INFO_INITIALIZED",
@@ -1019,7 +971,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/ranlib"
+			"value" : "/usr/bin/llvm-ranlib-16"
 		},
 		{
 			"name" : "CMAKE_READELF",
@@ -1035,7 +987,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/readelf"
+			"value" : "/usr/bin/llvm-readelf-16"
 		},
 		{
 			"name" : "CMAKE_ROOT",
@@ -1255,7 +1207,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/strip"
+			"value" : "/usr/bin/llvm-strip-16"
 		},
 		{
 			"name" : "CMAKE_TAPI",
@@ -1670,18 +1622,6 @@
 			"value" : "1500"
 		},
 		{
-			"name" : "FIND_PACKAGE_MESSAGE_DETAILS_Boost",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Details about finding Boost"
-				}
-			],
-			"type" : "INTERNAL",
-			"value" : "[/usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake][cfound components: system thread ][v1.74.0()]"
-		},
-		{
 			"name" : "FIND_PACKAGE_MESSAGE_DETAILS_OpenCV",
 			"properties" : 
 			[
@@ -1691,7 +1631,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "[/usr][v4.6.0()]"
+			"value" : "[/usr/local][v4.9.0()]"
 		},
 		{
 			"name" : "GITCOMMAND",
@@ -1739,7 +1679,7 @@
 				}
 			],
 			"type" : "STRING",
-			"value" : "/usr/bin/cmake --build . --config \"${CTEST_CONFIGURATION_TYPE}\" -- -i"
+			"value" : "/usr/bin/cmake --build . --config \"${CTEST_CONFIGURATION_TYPE}\""
 		},
 		{
 			"name" : "MEMORYCHECK_COMMAND",
@@ -1783,7 +1723,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "/usr/lib/x86_64-linux-gnu/cmake/opencv4"
+			"value" : "/usr/local/lib/cmake/opencv4"
 		},
 		{
 			"name" : "P4COMMAND",
@@ -1811,7 +1751,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt/build"
+			"value" : "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build"
 		},
 		{
 			"name" : "Project_GUI_IS_TOP_LEVEL",
@@ -1835,43 +1775,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt"
-		},
-		{
-			"name" : "Projekt_GUI_BINARY_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Value Computed by CMake"
-				}
-			],
-			"type" : "STATIC",
-			"value" : "/home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt/build"
-		},
-		{
-			"name" : "Projekt_GUI_IS_TOP_LEVEL",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Value Computed by CMake"
-				}
-			],
-			"type" : "STATIC",
-			"value" : "ON"
-		},
-		{
-			"name" : "Projekt_GUI_SOURCE_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Value Computed by CMake"
-				}
-			],
-			"type" : "STATIC",
-			"value" : "/home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt"
+			"value" : "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5"
 		},
 		{
 			"name" : "SITE",
@@ -1916,82 +1820,6 @@
 			],
 			"type" : "INTERNAL",
 			"value" : "TRUE"
-		},
-		{
-			"name" : "boost_atomic_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "ADVANCED",
-					"value" : "1"
-				},
-				{
-					"name" : "HELPSTRING",
-					"value" : "The directory containing a CMake configuration file for boost_atomic."
-				}
-			],
-			"type" : "PATH",
-			"value" : "/usr/lib/x86_64-linux-gnu/cmake/boost_atomic-1.74.0"
-		},
-		{
-			"name" : "boost_headers_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "ADVANCED",
-					"value" : "1"
-				},
-				{
-					"name" : "HELPSTRING",
-					"value" : "The directory containing a CMake configuration file for boost_headers."
-				}
-			],
-			"type" : "PATH",
-			"value" : "/usr/lib/x86_64-linux-gnu/cmake/boost_headers-1.74.0"
-		},
-		{
-			"name" : "boost_system_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "ADVANCED",
-					"value" : "1"
-				},
-				{
-					"name" : "HELPSTRING",
-					"value" : "The directory containing a CMake configuration file for boost_system."
-				}
-			],
-			"type" : "PATH",
-			"value" : "/usr/lib/x86_64-linux-gnu/cmake/boost_system-1.74.0"
-		},
-		{
-			"name" : "boost_thread_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "ADVANCED",
-					"value" : "1"
-				},
-				{
-					"name" : "HELPSTRING",
-					"value" : "The directory containing a CMake configuration file for boost_thread."
-				}
-			],
-			"type" : "PATH",
-			"value" : "/usr/lib/x86_64-linux-gnu/cmake/boost_thread-1.74.0"
-		},
-		{
-			"name" : "ur_rtde_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "The directory containing a CMake configuration file for ur_rtde."
-				}
-			],
-			"type" : "PATH",
-			"value" : "/usr/local/lib/cmake/ur_rtde"
 		}
 	],
 	"kind" : "cache",
