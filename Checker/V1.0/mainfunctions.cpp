@@ -1,14 +1,4 @@
 #include "mainfunctions.h"
-#include "boardUpdate.h"
-#include "CheckersDatabase.h"
-#include "validMoves.h"
-#include "AtmegaCom.h"
-#include "robotMove.h"
-#include <QCoreApplication>
-#include <QtSql>
-#include <QSqlDatabase>
-#include <iostream>
-#include <string>
 
 void resetDB(bool choise){
     if(choise == true){
@@ -20,10 +10,7 @@ void resetDB(bool choise){
         query.exec("DELETE FROM UniqueBoard WHERE board_id >= 0");
         query.exec("ALTER TABLE UniqueBoard AUTO_INCREMENT = 1");
     }
-
-
 }
-
 
 void DatabaseInit(int& UniqueBoardIDCounter, bool UploadTemp){
 
@@ -37,7 +24,7 @@ void DatabaseInit(int& UniqueBoardIDCounter, bool UploadTemp){
     //Til hvis temp er fuld og skal uploades inden den bliver slettet
     if(UploadTemp == true){
         std::cout << "Startet" << std::endl;
-        UploadTempToDatabase(UniqueBoardIDCounter); // Uploads the temp table to the database
+        UploadTempToDatabase(UniqueBoardIDCounter,true); // Uploads the temp table to the database
         std::cout << "Uploaded" << std::endl;
     }
     RefreshTempTable(); // Refreshes the Temp table
@@ -45,8 +32,6 @@ void DatabaseInit(int& UniqueBoardIDCounter, bool UploadTemp){
 }
 
 void loadBoardToString(std::vector<std::vector<std::string>> boards, std::string& output){
-
-
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
             if(boards[i][j] == "1 "){
@@ -65,68 +50,37 @@ void loadBoardToString(std::vector<std::vector<std::string>> boards, std::string
 
 }
 
-void MoveDBMain(std::string& BoardState, int& playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces, std::vector<std::string>& moveSet, std::string& MoveMade, int& CounterForTempTable, int& DrawChecker, bool& DatabaseMoveMade, int& TestCounterForDatabase){
-
+void MoveDBMain(std::string& BoardState, int& playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces, std::vector<std::string>& moveSet, int& CounterForTempTable, int& DrawChecker, bool& DatabaseMoveMade, int& TestCounterForDatabase, validMoves& validm, alphaBeta alphab){
     std::string DBmove = MovePlayer(BoardState, playerTurn); // Database best move on current board
     if (DBmove == "No moves"){
         std::cout << "No moves found" << std::endl;
-        alphaBeta(boards, 1, playerTurn, redPieces, blackPieces,boards, moveSet, INT_MIN, INT_MAX, blackPieces, redPieces, playerTurn, {},CounterForTempTable,DrawChecker); //AI's move
-    }
-    else{
+        //alphab.makeMove(boards, 1, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
+        moveSet = alphab.getMove();
+    } else {
         std::cout << "AI move from database: " << DBmove << std::endl;
-        std::string DBmoveFrom = DBmove.substr(0,2);
-        std::string DBmoveTo = DBmove.substr(2,2);
-        DB_move(playerTurn, boards, redPieces, blackPieces, DBmoveFrom, DBmoveTo); //Database AI's move
-        MoveMade = DBmove;
+        moveSet = {DBmove.substr(0,2), DBmove.substr(2,2)};
+        validm.DB_move(moveSet[0], moveSet[1]); //Database AI's move
         TestCounterForDatabase++;
         DatabaseMoveMade = true;
-
     }
 }
 
-void MoveRandom(int& playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces, std::vector<std::string>& moveSet, std::string& MoveMade, bool& DatabaseMoveMade, std::vector<std::string>& jumps, bool moreMove, std::string moveTo){
-    std::vector<std::string> MovesToPickFrom;
-    std::vector<std::string> PossibleJumps = movePossible(playerTurn, boards, jumps, moreMove, moveTo);
-    for(int i = 0; i < PossibleJumps.size(); i+=2){
-        MovesToPickFrom.push_back(PossibleJumps[i] + PossibleJumps[i+1]);
-    }
+void MoveRandom(std::vector<std::string>& moveSet, bool& DatabaseMoveMade, validMoves& validm){
+    std::vector<std::string> PossibleJumps = validm.movePossible();
 
     std::random_device rd;  // Obtain a random number from hardware
     std::mt19937 eng(rd()); // Seed the generator
-    std::uniform_int_distribution<> distr(0, MovesToPickFrom.size()-1); // Define the range for the random number
+    std::uniform_int_distribution<> distr(0, PossibleJumps.size()-1); // Define the range for the random number
     int RandomNumber = distr(eng); // Generate a random number
-    std::string ChosenMove = MovesToPickFrom[RandomNumber]; // Generate a random number
-    std::cout << "Chosen move: " << ChosenMove << std::endl;
-    std::string moveFrom = ChosenMove.substr(0,2);
-    std::string moveTo2 = ChosenMove.substr(2,2);
-    DB_move(playerTurn, boards, redPieces, blackPieces, moveFrom, moveTo2);
-    MoveMade = ChosenMove;
-    DatabaseMoveMade = true;
-}
-
-
-void MoveRobot(bool RunChecker,std::future<bool>& fut, std::vector<std::vector<std::string>>& tempBoard, int& thisTurn, std::vector<std::string>& moveSet, std::vector<std::vector<double>>& startUpRobot, int& i){
-
-    if (RunChecker == true){
-        if (i > 0){
-            fut.get();
-        }
-
-
-
-        // Moves the robot
-        if(i == 0){
-            // Set up the robot
-            startUpRobot = robotStart();
-            atmegaCom('6'); // Sender et signal for at reset hvis gripperen er stoppet midt i et træk
-            sleep(1); // Venter 1 sekund
-            atmegaCom('8'); // Sender et signal for at gripperen skal åbne
-            fut = std::async(robotMove, moveSet, startUpRobot, tempBoard, thisTurn);
-        } else {
-            fut = std::async(robotMove, moveSet, startUpRobot, tempBoard, thisTurn);
-        }
+    if(RandomNumber%2 != 0){
+        RandomNumber = RandomNumber - 1;
     }
 
+    std::string moveFrom = PossibleJumps[RandomNumber];
+    std::string moveTo = PossibleJumps[RandomNumber+1];
+    validm.DB_move(moveFrom, moveTo);
+    moveSet = {moveFrom, moveTo};
+    DatabaseMoveMade = false;
 }
 
 void printAIMove(bool& DatabaseMoveMade, std::vector<std::string>& moveSet, std::string& MoveMade, int& thisTurn){
@@ -141,7 +95,19 @@ void printAIMove(bool& DatabaseMoveMade, std::vector<std::string>& moveSet, std:
     DatabaseMoveMade = false;
 }
 
-void printGameState(int ii, int DrawChecker, int redPieces, int blackPieces, int playerTurn, std::vector<std::vector<std::string>>& boards, int depth){
+void SimMove(std::vector<std::string>& moveSet, bool& DatabaseMoveMade, validMoves& validm, int& PlayerTurn, std::vector<int>& PlayerSimChoise, int& DrawChecker,std::vector<std::string>& PossibleJumps){
+
+
+    std::string moveFrom = PossibleJumps[PlayerSimChoise[DrawChecker]*2];
+    std::string moveTo = PossibleJumps[PlayerSimChoise[DrawChecker]*2+1];
+    validm.DB_move(moveFrom, moveTo);
+    moveSet = {moveFrom, moveTo};
+    DatabaseMoveMade = false;
+
+}
+
+
+void printGameState(int ii, int DrawChecker, int redPieces, int blackPieces, int playerTurn, std::vector<std::vector<std::string>>& boards, int depth, alphaBeta alphab){
     //Prints data from the state of the game and prints the board
     std::cout << "It is game nr: " << ii << std::endl;
     std::cout << "It is turn: " << DrawChecker << std::endl;
@@ -149,10 +115,10 @@ void printGameState(int ii, int DrawChecker, int redPieces, int blackPieces, int
     std::cout << "There are " << blackPieces << " black pieces left." << std::endl;
     std::cout << std::endl;
     checkerBoard(boards);
-    std::cout << "Game score is: " << giveBoardScore(boards, playerTurn, blackPieces, redPieces, depth) << std::endl;
+    std::cout << "Game score is: " << alphab.giveScoreAI(boards, playerTurn, blackPieces, redPieces, depth) << std::endl;
+    std::cout << "----------------------------------" << std::endl;
     std::cout << std::endl;
 }
-
 
 void GameEnd(int redPieces, int blackPieces, int playerTurn){
 
@@ -162,19 +128,18 @@ void GameEnd(int redPieces, int blackPieces, int playerTurn){
     if(redPieces == 0){
         query.exec("UPDATE TempMoves SET WinOrLoss = 1 WHERE PlayerId = 1");
         query.exec("UPDATE TempMoves SET WinOrLoss = 0 WHERE PlayerId = 2");
-        std::cout << "Player 1 wins! No more red pieces" << std::endl;
+        //std::cout << "Player 1 wins! No more red pieces" << std::endl;
     } else if(blackPieces == 0){
         query.exec("UPDATE TempMoves SET WinOrLoss = 1 WHERE PlayerId = 2");
         query.exec("UPDATE TempMoves SET WinOrLoss = 0 WHERE PlayerId = 1");
-        std::cout << "Player 2 wins! No more black pieces" << std::endl;
+        //std::cout << "Player 2 wins! No more black pieces" << std::endl;
     } else if(playerTurn == 1){
         query.exec("UPDATE TempMoves SET WinOrLoss = 1 WHERE PlayerId = 2");
         query.exec("UPDATE TempMoves SET WinOrLoss = 0 WHERE PlayerId = 1");
-        std::cout << "Player 2 wins! No more moves for black" << std::endl;
+        //std::cout << "Player 2 wins! No more moves for black" << std::endl;
     } else if(playerTurn == 2){
         query.exec("UPDATE TempMoves SET WinOrLoss = 1 WHERE PlayerId = 1");
         query.exec("UPDATE TempMoves SET WinOrLoss = 0 WHERE PlayerId = 2");
-        std::cout << "Player 1 wins! No more moves for red" << std::endl;
+        //std::cout << "Player 1 wins! No more moves for red" << std::endl;
     }
-
 }

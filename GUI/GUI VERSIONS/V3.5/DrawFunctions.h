@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+=======
+#include "alphabeta.h"
+#include "boardUpdate.h"
+#include "robot.h"
+#include "validmoves.h"
+
+>>>>>>> evolutionAI
 #include <iostream>
 #include <opencv4/opencv2/opencv.hpp>
 #include <opencv4/opencv2/core.hpp>
@@ -10,10 +18,11 @@ using namespace cv;
 Mat3b img(500, 1000, Vec3b(255, 255, 255)); //Creates drawing surface, img.
 vector<Rect> rectangles; //Vec consisting of instances of "Rect", as segments of board.
 vector<Circle> bCheckers, rCheckers; //Vec consisting of instances of "Circle" for black checkers.
-vector<int> latestScores;
-vector<std::string> moveSet = {}; //The moves that have been made during the turn
+vector<int> latestScores = {};
+vector<std::string> moveSet = {"",""}; //The moves that have been made during the turn
 Rect blackGraveyardRect(600, 75, 50, 50); //Instance of Rect, used as a graveyard Rect.
 Rect redGraveyardRect(600, 175, 50, 50);
+Rect takePicture(Point(redGraveyardRect.x - 30, redGraveyardRect.y + 100), Point(redGraveyardRect.x + 80, redGraveyardRect.y + 150));
 Rect promotionRect(600, 225, 50, 50);
 Mat graveyardDownSized;
 
@@ -23,9 +32,20 @@ string moveStart = "", moveEnd = "";
 int thisTurn; //Which player's turn it is
 int blackPieces = 12; //Initial number of black pieces
 int redPieces = 12; //Initial number of red pieces
+<<<<<<< HEAD
 int depth = 5;
+=======
+int depth = 7; //Depth of the minimax algorithm
+std::vector<std::vector<std::string>> boards; //2D vec of strings, that represent the board state.
+>>>>>>> evolutionAI
 
 bool startUpMain = true; //Bool, true if code is being run for the first time.
+
+
+Robot robot;
+Vision vision;
+validMoves validM;
+alphaBeta alphaBeta(&validM, 0);
 
 //Updates text displayed, depending player turn.
 void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves, string moveStart, string moveEnd){
@@ -41,7 +61,11 @@ void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves
     if(turnVal > 0){
         outputString = moveStart + " To " + moveEnd + ": ";
         moves.push_back(outputString);
+<<<<<<< HEAD
         scores.push_back(giveBoardScore(boards, thisTurn, blackPieces, redPieces, depth));
+=======
+        scores.push_back(alphaBeta.giveScoreAI(boards, thisTurn, blackPieces, redPieces, depth)/1000);
+>>>>>>> evolutionAI
 
         rectangle(img, Point(700,75), Point(1000,200), Scalar(255,255,255), -1);
 
@@ -50,10 +74,9 @@ void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves
             putText(img, outputString, Point(700, 90 + (i - (scores.size() < 5 ? 0 : scores.size()-5)) * 25), FONT_HERSHEY_COMPLEX_SMALL, 1, Scalar(0,0,0), 1);
         }
     }
-
 }
 
-void drawGameMode(Mat img){
+void drawGameMode(Mat& img){
 
     Rect gameModeRectPVP((img.cols/2) - 200, (img.rows/2) - 40, 100, 50);
     Rect gameModeRectAI((img.cols/2) - 50, (img.rows/2) - 40, 100, 50);
@@ -98,7 +121,7 @@ void winAnimation(string winName, Mat img, bool redWon, vector<Rect> rectangles)
 }
 
 //Draws all elements of the GUI.
-void Draw(Mat img, bool& startUpMain){
+void Draw(Mat& img, bool& startUpMain){
     int redGrave = 0;
     int blackGrave = 0;
     int lineNum = 0;
@@ -202,9 +225,14 @@ void Draw(Mat img, bool& startUpMain){
     }
 
     //COPY
+<<<<<<< HEAD
         Rect moveRect(Point(redGraveyardRect.x - 30, redGraveyardRect.y + 100), Point(redGraveyardRect.x + 80, redGraveyardRect.y + 150));
         rectangle(img, moveRect, Scalar(0,0,0), -1);
         putText(img, "Take Picture", Point(moveRect.x + 8, moveRect.y + 30), FONT_HERSHEY_COMPLEX_SMALL, 0.6, Scalar(255,255,255));
+=======
+    rectangle(img, takePicture, Scalar(0,0,0), -1);
+    putText(img, "Take Picture", Point(takePicture.x + 8, takePicture.y + 30), FONT_HERSHEY_COMPLEX_SMALL, 0.6, Scalar(255,255,255));
+>>>>>>> evolutionAI
     //
 
     //Draws checkers on new positions.
@@ -274,6 +302,8 @@ void Draw(Mat img, bool& startUpMain){
             }
         }
     }
+
+
 }
 
 //Checks if a jump is possible for an element of given vector at a given position.
@@ -512,12 +542,19 @@ void promotionGUI(vector<Circle> checkerVector){
 }
 
 bool isGameWon(vector<Circle> checkerVec, vector<Circle> enemyCheckerVec, int turn){
+<<<<<<< HEAD
 
+=======
+>>>>>>> evolutionAI
     if(checkerVec == rCheckers){
         if(piecesLeft(rectangles, enemyCheckerVec) < 1){
             return true;
         }
+<<<<<<< HEAD
         else if(movePossible(turn, boards, jumpPossible(turn, boards), false, "").size() < 1){
+=======
+        else if(validM.movePossible().size() < 1){
+>>>>>>> evolutionAI
             return true;
         }
         else{
@@ -528,7 +565,11 @@ bool isGameWon(vector<Circle> checkerVec, vector<Circle> enemyCheckerVec, int tu
         if(piecesLeft(rectangles, enemyCheckerVec) < 1){
             return true;
         }
+<<<<<<< HEAD
         else if(movePossible(turn, boards, jumpPossible(turn, boards), false, "").size() < 1){
+=======
+        else if(validM.movePossible().size() < 1){
+>>>>>>> evolutionAI
             return true;
         }
         else{

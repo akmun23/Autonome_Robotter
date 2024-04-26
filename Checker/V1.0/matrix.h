@@ -1,18 +1,20 @@
 #pragma once
-
 #ifndef MATRIX_H
 #define MATRIX_H
 
 #include <vector>
 #include <memory>
+#include <iostream>
 
 class Matrix
 {
-    std::vector<double> _data;
+    std::vector<float> _data;
     int _rows;
     int _cols;
 public:
-    Matrix(int rows, int cols, double val = 0);
+    Matrix();
+
+    Matrix(int rows, int cols, float val = 0);
 
     Matrix(Matrix& m);
 
@@ -22,11 +24,11 @@ public:
 
     virtual void print();
 
-    double read(int r, int c);
+    float read(int r, int c);
 
-    void set(int r, int c, double val);
+    void set(int r, int c, float val);
 
-    double& at(int r, int c);
+    float& at(int r, int c);
 
     Matrix add(Matrix& matrix);
 
@@ -34,7 +36,7 @@ public:
 
     virtual void transpose();
 
-    double& operator()(int r, int);
+    float& operator()(int r, int);
 
     Matrix operator+(Matrix m);
 

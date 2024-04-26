@@ -1,0 +1,125 @@
+# This file is configured by CMake automatically as DartConfiguration.tcl
+# If you choose not to use CMake, this file may be hand configured, by
+# filling in the required variables.
+
+
+# Configuration directories and files
+<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/DartConfiguration.tcl
+SourceDirectory: /home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5
+BuildDirectory: /home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build
+=======
+SourceDirectory: /home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5
+BuildDirectory: /home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build/Desktop-Debug
+>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/DartConfiguration.tcl
+
+# Where to place the cost data store
+CostDataFile: 
+
+# Site is something like machine.domain, i.e. pragmatic.crd
+Site: pascal-Aspire-A515-56G
+
+# Build name is osname-revision-compiler, i.e. Linux-2.4.2-2smp-c++
+<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/DartConfiguration.tcl
+BuildName: Linux-clang++-16
+=======
+BuildName: Linux-g++-11
+>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/DartConfiguration.tcl
+
+# Subprojects
+LabelsForSubprojects: 
+
+# Submission information
+SubmitURL: http://
+SubmitInactivityTimeout: 
+
+# Dashboard start time
+NightlyStartTime: 00:00:00 EDT
+
+# Commands for the build/test/submit cycle
+<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/DartConfiguration.tcl
+ConfigureCommand: "/usr/bin/cmake" "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5"
+MakeCommand: /usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}"
+=======
+ConfigureCommand: "/home/pascal/Qt/Tools/CMake/bin/cmake" "/home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5"
+MakeCommand: /home/pascal/Qt/Tools/CMake/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}"
+>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/DartConfiguration.tcl
+DefaultCTestConfigurationType: Release
+
+# version control
+UpdateVersionOnly: 
+
+# CVS options
+# Default is "-d -P -A"
+CVSCommand: 
+CVSUpdateOptions: 
+
+# Subversion options
+SVNCommand: 
+SVNOptions: 
+SVNUpdateOptions: 
+
+# Git options
+GITCommand: 
+GITInitSubmodules: 
+GITUpdateOptions: 
+GITUpdateCustom: 
+
+# Perforce options
+P4Command: 
+P4Client: 
+P4Options: 
+P4UpdateOptions: 
+P4UpdateCustom: 
+
+# Generic update command
+UpdateCommand: 
+UpdateOptions: 
+UpdateType: 
+
+# Compiler info
+<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/DartConfiguration.tcl
+Compiler: /usr/bin/clang++-16
+CompilerVersion: 16.0.6
+=======
+Compiler: /usr/bin/g++-11
+CompilerVersion: 11.4.0
+>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/DartConfiguration.tcl
+
+# Dynamic analysis (MemCheck)
+PurifyCommand: 
+ValgrindCommand: 
+ValgrindCommandOptions: 
+DrMemoryCommand: 
+DrMemoryCommandOptions: 
+CudaSanitizerCommand: 
+CudaSanitizerCommandOptions: 
+MemoryCheckType: 
+MemoryCheckSanitizerOptions: 
+MemoryCheckCommand: /snap/bin/valgrind
+MemoryCheckCommandOptions: 
+MemoryCheckSuppressionFile: 
+
+# Coverage
+CoverageCommand: /usr/bin/gcov
+CoverageExtraFlags: -l
+
+# Testing options
+# TimeOut is the amount of time in seconds to wait for processes
+# to complete during testing.  After TimeOut seconds, the
+# process will be summarily terminated.
+# Currently set to 25 minutes
+TimeOut: 1500
+
+# During parallel testing CTest will not start a new test if doing
+# so would cause the system load to exceed this value.
+TestLoad: 
+
+UseLaunchers: 
+CurlOptions: 
+# warning, if you add new options here that have to do with submit,
+# you have to update cmCTestSubmitCommand.cxx
+
+# For CTest submissions that timeout, these options
+# specify behavior for retrying the submission
+CTestSubmitRetryDelay: 5
+CTestSubmitRetryCount: 3
