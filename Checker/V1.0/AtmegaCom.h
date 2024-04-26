@@ -10,7 +10,19 @@
 #include <termios.h> // Contains POSIX terminal control definitions
 #include <unistd.h> // write(), read(), close()
 
-bool atmegaCom(char InputNumber);
+
+
+class AtmegaCom
+{
+private:
+
+    int _serial_port;
+
+public:
+    AtmegaCom();
+    void sendmsg(char InputNumber);
+};
+
 
 
 

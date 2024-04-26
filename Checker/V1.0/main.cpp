@@ -254,7 +254,8 @@ int main(int argc, char** argv) {
 
 
                 // Constructs the vision object for ComputerVision
-                // Robot robot;
+                // AtmegaCom atmegaCom;
+                // Robot robot(&atmegaCom);
                 // robot.setArguments(argv);
                 // robot.prepForPic();
                 // Finds the new corners of the chessboard

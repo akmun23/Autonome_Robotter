@@ -44,8 +44,10 @@ class Robot : public Vision, public Matrix
     std::vector<float> _unit1;
     std::vector<float> _unit2;
 
+    AtmegaCom* _AtmegaCom;
+
 public:
-    Robot();
+    Robot(AtmegaCom* AtmegaCom);
 
     // Function to set the values of a matrix from the Matrix class
     void setMatrixValues(Matrix& m, std::vector<float> v);

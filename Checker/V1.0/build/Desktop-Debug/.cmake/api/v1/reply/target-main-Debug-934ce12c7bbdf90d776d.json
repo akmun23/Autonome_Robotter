@@ -42,7 +42,7 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 30,
+				"line" : 31,
 				"parent" : 0
 			},
 			{
@@ -614,7 +614,7 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "FunktionerTilDatabase.cpp",
+			"path" : "CheckersDatabase.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{

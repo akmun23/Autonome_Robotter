@@ -1,4 +1,3 @@
-#pragma once
 #ifndef CHECKERSDATABASE_H
 #define CHECKERSDATABASE_H
 

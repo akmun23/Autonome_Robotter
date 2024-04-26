@@ -1,6 +1,65 @@
 #include "CheckersDatabase.h"
 
 //////////////////////////////////////////////// Main databasen ///////////////////////////////////////////////////////////////////
+void InsertMove(int board_id, QString Move, int PlayerID, float WinOrLoss){
+    QSqlDatabase db = QSqlDatabase::database("QMYSQL");
+    QSqlQuery query = QSqlQuery(db);
+
+    if (PlayerID == 1){
+        query.prepare(  " INSERT INTO MovesP1"
+                      " (board_id, Move, WinRate, WinCases, UseCases) "
+                      " VALUES "
+                      " (:board_id, :Move, :WinRate, :WinCases, 1)");
+        query.bindValue(":board_id", board_id);
+        query.bindValue(":Move", Move);
+        query.bindValue(":WinRate", 50);        // Skal sættes til WinOrLoss * 100
+        query.bindValue(":WinCases", 0.5);      // Skal sættes til WinOrLoss
+        query.exec();
+    }
+    else if (PlayerID == 2){
+        query.prepare(  " INSERT INTO MovesP2"
+                      " (board_id, Move, WinRate, WinCases, UseCases) "
+                      " VALUES "
+                      " (:board_id, :Move, :WinRate, :WinCases, 1)");
+        query.bindValue(":board_id", board_id);
+        query.bindValue(":Move", Move);
+        query.bindValue(":WinRate", 50);        // Skal sættes til WinOrLoss * 100
+        query.bindValue(":WinCases", 0.5);      // Skal sættes til WinOrLoss
+        query.exec();
+    }
+}
+
+void HandleNewMoves(QString Move, int PlayerID, float WinOrLoss, int BoardID){
+    QSqlDatabase db = QSqlDatabase::database("QMYSQL");
+    QSqlQuery query = QSqlQuery(db);
+
+    if (PlayerID == 1){
+
+        query.exec( " select Move "
+                   " from MovesP1 "
+                   " where board_id = " + QString::number(BoardID) );
+        while (query.next()) {
+            if (Move == query.value(0).toString()){
+                //UpdateMoveWinRate(Move, BoardID, WinOrLoss, PlayerID);
+                return;
+            }
+        }
+        InsertMove(BoardID, Move, PlayerID, WinOrLoss);
+    }
+    else if (PlayerID == 2){
+        query.exec( " select Move "
+                   " from MovesP2 "
+                   " where board_id = " + QString::number(BoardID) );
+        while (query.next()) {
+            if (Move == query.value(0).toString()){
+                //UpdateMoveWinRate(Move, BoardID, WinOrLoss, PlayerID);
+                return;
+            }
+        }
+        InsertMove(BoardID, Move, PlayerID, WinOrLoss);
+    }
+}
+
 void UploadTempToDatabase(int& UniqueBoardIDCounter, bool Toggle){
 
     if (Toggle == false){
@@ -103,7 +162,7 @@ void InserNewMoveToOldBoard(int& BoardID, int& TempBoardID){
                "from TempMoves "
                "where tempBoard_id = " + QString::number(TempBoardID));
     while (query.next()) {
-        HandleNewMoves(query.value(0).toString(), query.value(1).toInt(), query.value(2).toDouble(),BoardID);
+        HandleNewMoves(query.value(0).toString(), query.value(1).toInt(), query.value(2).toFloat(),BoardID);
     }
     query.prepare("DELETE FROM TempMoves WHERE tempBoard_id = :tempBoard_id");
     query.bindValue(":tempBoard_id", TempBoardID);
@@ -114,64 +173,7 @@ void InserNewMoveToOldBoard(int& BoardID, int& TempBoardID){
     query.exec();
 }
 
-void HandleNewMoves(QString Move, int PlayerID, float WinOrLoss, int BoardID){
-    QSqlDatabase db = QSqlDatabase::database("QMYSQL");
-    QSqlQuery query = QSqlQuery(db);
 
-    if (PlayerID == 1){
-
-        query.exec( " select Move "
-                   " from MovesP1 "
-                   " where board_id = " + QString::number(BoardID) );
-        while (query.next()) {
-            if (Move == query.value(0).toString()){
-                //UpdateMoveWinRate(Move, BoardID, WinOrLoss, PlayerID);
-                return;
-            }
-        }
-        InsertMove(BoardID, Move, PlayerID, WinOrLoss);
-    }
-    else if (PlayerID == 2){
-        query.exec( " select Move "
-                   " from MovesP2 "
-                   " where board_id = " + QString::number(BoardID) );
-        while (query.next()) {
-            if (Move == query.value(0).toString()){
-                //UpdateMoveWinRate(Move, BoardID, WinOrLoss, PlayerID);
-                return;
-            }
-        }
-        InsertMove(BoardID, Move, PlayerID, WinOrLoss);
-    }
-}
-
-void InsertMove(int board_id, QString Move, int PlayerID, float WinOrLoss){
-    QSqlDatabase db = QSqlDatabase::database("QMYSQL");
-    QSqlQuery query = QSqlQuery(db);
-
-    if (PlayerID == 1){
-        query.prepare(  " INSERT INTO MovesP1"
-                      " (board_id, Move, WinRate, WinCases, UseCases) "
-                      " VALUES "
-                      " (:board_id, :Move, :WinRate, :WinCases, 1)");
-        query.bindValue(":board_id", board_id);
-        query.bindValue(":Move", Move);
-        query.bindValue(":WinRate", 50);        // Skal sættes til WinOrLoss * 100
-        query.bindValue(":WinCases", 0.5);      // Skal sættes til WinOrLoss
-        query.exec();
-    }
-    else if (PlayerID == 2){
-        query.prepare(  " INSERT INTO MovesP2"
-                      " (board_id, Move, WinRate, WinCases, UseCases) "
-                      " VALUES "
-                      " (:board_id, :Move, :WinRate, :WinCases, 1)");
-        query.bindValue(":board_id", board_id);
-        query.bindValue(":Move", Move);
-        query.bindValue(":WinRate", 50);        // Skal sættes til WinOrLoss * 100
-        query.bindValue(":WinCases", 0.5);      // Skal sættes til WinOrLoss
-        query.exec();
-    }
-}
 
 void UpdateMoveWinRate(QString& Move, int& BoardID, float& WinOrLoss, int& PlayerId){  // funktion til at opdatere træk i MovesP1 eller MovesP2
 
