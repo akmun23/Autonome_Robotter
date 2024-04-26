@@ -19,6 +19,7 @@ vector<int> latestScores = {};
 vector<std::string> moveSet = {"",""}; //The moves that have been made during the turn
 Rect blackGraveyardRect(600, 75, 50, 50); //Instance of Rect, used as a graveyard Rect.
 Rect redGraveyardRect(600, 175, 50, 50);
+Rect takePicture(Point(redGraveyardRect.x - 30, redGraveyardRect.y + 100), Point(redGraveyardRect.x + 80, redGraveyardRect.y + 150));
 Rect promotionRect(600, 225, 50, 50);
 Mat graveyardDownSized;
 
@@ -30,7 +31,6 @@ int blackPieces = 12; //Initial number of black pieces
 int redPieces = 12; //Initial number of red pieces
 int depth = 7; //Depth of the minimax algorithm
 std::vector<std::vector<std::string>> boards; //2D vec of strings, that represent the board state.
-Rect takePicture = Rect(img.cols/2+img.cols/4, img.rows-50, 50, 50);
 
 bool startUpMain = true; //Bool, true if code is being run for the first time.
 
@@ -211,6 +211,12 @@ void Draw(Mat& img, bool& startUpMain){
             (i%8 == 7) ? lineNum++ : lineNum;
         }
     }
+
+    //COPY
+    rectangle(img, takePicture, Scalar(0,0,0), -1);
+    putText(img, "Take Picture", Point(takePicture.x + 8, takePicture.y + 30), FONT_HERSHEY_COMPLEX_SMALL, 0.6, Scalar(255,255,255));
+    //
+
     //Draws checkers on new positions.
     for(int j = 0; j < 12; j++){
         for(int i = 0; i < 64; i++){
@@ -279,8 +285,7 @@ void Draw(Mat& img, bool& startUpMain){
         }
     }
 
-    // Draw takePicture button
-    rectangle(img, takePicture, Scalar(0,0,0), 2);
+
 }
 
 //Checks if a jump is possible for an element of given vector at a given position.

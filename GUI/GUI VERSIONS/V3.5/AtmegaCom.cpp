@@ -1,7 +1,7 @@
 #include "AtmegaCom.h"
 
 AtmegaCom::AtmegaCom() {
-    _serial_port = open("/dev/ttyUSB2", O_RDWR);                     // Her åbner vi serie port forbindelsen
+    _serial_port = open("/dev/ttyUSB0", O_RDWR);                     // Her åbner vi serie port forbindelsen
 
     // Check for errors
     if (_serial_port < 0) {
