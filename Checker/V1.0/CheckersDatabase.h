@@ -30,6 +30,11 @@ void InsertToTemp(std::string& BoardState, std::string& Move, int& Counter, int 
 void insertAlphaBetaToTemp(std::vector<std::vector<std::string>>& tempBoard, std::string& MoveMade, int& tempPlayer, int& CounterForTempTable);
 void InsertMove(int board_id, QString Move, int PlayerID, double WinOrLoss);
 void HandleNewMoves(QString Move, int PlayerID, double WinOrLoss, int BoardID);
+
+void LoadSimVectors(std::vector<int>& Player1SimChoise,std::vector<int>& Player2SimChoise);
+void IncreaseSimu(const int& drawChecker, bool& AlreadyIncreased, std::vector<int>& Player1SimChoise);
+void IncreaseOponentSimu(const int& drawChecker, std::vector<int>& Player2SimChoise);
+
 //qDebug() << "SqLite error:" << query.lastError().text() << ", SqLite error code:" << query.lastError().number(); // debug komando
 
 

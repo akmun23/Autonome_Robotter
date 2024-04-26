@@ -95,6 +95,18 @@ void printAIMove(bool& DatabaseMoveMade, std::vector<std::string>& moveSet, std:
     DatabaseMoveMade = false;
 }
 
+void SimMove(std::vector<std::string>& moveSet, bool& DatabaseMoveMade, validMoves& validm, int& PlayerTurn, std::vector<int>& PlayerSimChoise, int& DrawChecker,std::vector<std::string>& PossibleJumps){
+
+
+    std::string moveFrom = PossibleJumps[PlayerSimChoise[DrawChecker]*2];
+    std::string moveTo = PossibleJumps[PlayerSimChoise[DrawChecker]*2+1];
+    validm.DB_move(moveFrom, moveTo);
+    moveSet = {moveFrom, moveTo};
+    DatabaseMoveMade = false;
+
+}
+
+
 void printGameState(int ii, int DrawChecker, int redPieces, int blackPieces, int playerTurn, std::vector<std::vector<std::string>>& boards, int depth, alphaBeta alphab){
     //Prints data from the state of the game and prints the board
     std::cout << "It is game nr: " << ii << std::endl;
@@ -116,18 +128,18 @@ void GameEnd(int redPieces, int blackPieces, int playerTurn){
     if(redPieces == 0){
         query.exec("UPDATE TempMoves SET WinOrLoss = 1 WHERE PlayerId = 1");
         query.exec("UPDATE TempMoves SET WinOrLoss = 0 WHERE PlayerId = 2");
-        std::cout << "Player 1 wins! No more red pieces" << std::endl;
+        //std::cout << "Player 1 wins! No more red pieces" << std::endl;
     } else if(blackPieces == 0){
         query.exec("UPDATE TempMoves SET WinOrLoss = 1 WHERE PlayerId = 2");
         query.exec("UPDATE TempMoves SET WinOrLoss = 0 WHERE PlayerId = 1");
-        std::cout << "Player 2 wins! No more black pieces" << std::endl;
+        //std::cout << "Player 2 wins! No more black pieces" << std::endl;
     } else if(playerTurn == 1){
         query.exec("UPDATE TempMoves SET WinOrLoss = 1 WHERE PlayerId = 2");
         query.exec("UPDATE TempMoves SET WinOrLoss = 0 WHERE PlayerId = 1");
-        std::cout << "Player 2 wins! No more moves for black" << std::endl;
+        //std::cout << "Player 2 wins! No more moves for black" << std::endl;
     } else if(playerTurn == 2){
         query.exec("UPDATE TempMoves SET WinOrLoss = 1 WHERE PlayerId = 1");
         query.exec("UPDATE TempMoves SET WinOrLoss = 0 WHERE PlayerId = 2");
-        std::cout << "Player 1 wins! No more moves for red" << std::endl;
+        //std::cout << "Player 1 wins! No more moves for red" << std::endl;
     }
 }

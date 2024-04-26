@@ -13,10 +13,10 @@ std::vector<std::vector<std::string>> startUp(){
     };
 
     //Print the initial board
-    std::cout << "Welcome to Checkers!" << std::endl;
-    std::cout << "Here is the board:" << std::endl;
-    checkerBoard(boards);
-    std::cout << std::endl;
+    //std::cout << "Welcome to Checkers!" << std::endl;
+    //std::cout << "Here is the board:" << std::endl;
+    //checkerBoard(boards);
+    //std::cout << std::endl;
     return boards;
 }
 

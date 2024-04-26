@@ -23,4 +23,6 @@ void printAIMove(bool& DatabaseMoveMade, std::vector<std::string>& moveSet, std:
 void printGameState(int ii, int DrawChecker, int redPieces, int blackPieces, int playerTurn, std::vector<std::vector<std::string>>& boards, int depth, alphaBeta alphab);
 void GameEnd(int redPieces, int blackPieces, int playerTurn);
 
+void SimMove(std::vector<std::string>& moveSet, bool& DatabaseMoveMade, validMoves& validm, int& PlayerTurn, std::vector<int>& PlayerSimChoise, int& DrawChecker, std::vector<std::string> &PossibleJumps);
+
 #endif // MAINFUNCTIONS_H

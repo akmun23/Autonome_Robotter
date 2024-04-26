@@ -488,9 +488,11 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
             }
 
             //If eval is higher than beta, it breaks the for-loop
+            /*
             if(eval > beta){
                 break;
             }
+            */
 
             //Resets the board, pieces, and moves
             setBoards(boards);
@@ -551,9 +553,10 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
                     bestPlayer = 1;
                 }
             }
+            /*
             if(eval < alpha){
                 break;
-            }
+            }*/
 
             //Resets the board, pieces, and moves
             setBoards(boards);
