@@ -204,7 +204,7 @@ void Draw(Mat img, bool& startUpMain){
     //COPY
         Rect moveRect(Point(redGraveyardRect.x - 30, redGraveyardRect.y + 100), Point(redGraveyardRect.x + 80, redGraveyardRect.y + 150));
         rectangle(img, moveRect, Scalar(0,0,0), -1);
-        putText(img, "AI Move", Point(moveRect.x + 8, moveRect.y + 30), FONT_HERSHEY_COMPLEX_SMALL, 1, Scalar(255,255,255));
+        putText(img, "Take Picture", Point(moveRect.x + 8, moveRect.y + 30), FONT_HERSHEY_COMPLEX_SMALL, 0.6, Scalar(255,255,255));
     //
 
     //Draws checkers on new positions.
