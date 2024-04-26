@@ -72,7 +72,7 @@ void InsertNewMoveToNewBoard(int& TempBoardID, int& BoardID){    // funktion til
     while (query.next()) {
         QString Move = query.value(0).toString();
         int PlayerID = query.value(1).toInt();
-        double WinOrLoss = query.value(2).toDouble();
+        float WinOrLoss = query.value(2).toDouble();
 
         if (PlayerID == 1){                                                         // Indsætter trækket i den rigtige spillers tabel
             InsertMove(BoardID, Move, PlayerID, WinOrLoss);
@@ -114,7 +114,7 @@ void InserNewMoveToOldBoard(int& BoardID, int& TempBoardID){
     query.exec();
 }
 
-void HandleNewMoves(QString Move, int PlayerID, double WinOrLoss, int BoardID){
+void HandleNewMoves(QString Move, int PlayerID, float WinOrLoss, int BoardID){
     QSqlDatabase db = QSqlDatabase::database("QMYSQL");
     QSqlQuery query = QSqlQuery(db);
 
@@ -145,7 +145,7 @@ void HandleNewMoves(QString Move, int PlayerID, double WinOrLoss, int BoardID){
     }
 }
 
-void InsertMove(int board_id, QString Move, int PlayerID, double WinOrLoss){
+void InsertMove(int board_id, QString Move, int PlayerID, float WinOrLoss){
     QSqlDatabase db = QSqlDatabase::database("QMYSQL");
     QSqlQuery query = QSqlQuery(db);
 
@@ -173,7 +173,7 @@ void InsertMove(int board_id, QString Move, int PlayerID, double WinOrLoss){
     }
 }
 
-void UpdateMoveWinRate(QString& Move, int& BoardID, double& WinOrLoss, int& PlayerId){  // funktion til at opdatere træk i MovesP1 eller MovesP2
+void UpdateMoveWinRate(QString& Move, int& BoardID, float& WinOrLoss, int& PlayerId){  // funktion til at opdatere træk i MovesP1 eller MovesP2
 
     QSqlDatabase db = QSqlDatabase::database("QMYSQL");
     QSqlQuery query = QSqlQuery(db);

@@ -33,10 +33,10 @@ class Robot : public Vision, public Matrix
     std::vector<cv::Point2f> _calibrate;
     double _factor;
     double _pixToMeters;
-    double _piece;
-    double _chess;
-    double _table;
-    double _hover;
+    double _piece = 0;
+    double _chess = 0;
+    double _table = 0;
+    double _hover = 0;
     Matrix _CamToChess = Matrix(4,4);
     Matrix _robot = Matrix(4,4);
     std::vector<std::string> _moveSet;
@@ -46,8 +46,6 @@ class Robot : public Vision, public Matrix
 
 public:
     Robot();
-
-    void setValues(std::vector<cv::Point2f> newCorners, std::vector<cv::Point2f> calibrate, double factor, double pixToMeters);
 
     // Function to set the values of a matrix from the Matrix class
     void setMatrixValues(Matrix& m, std::vector<double> v);

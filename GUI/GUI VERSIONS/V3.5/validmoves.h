@@ -33,7 +33,7 @@ public:
     std::vector<std::vector<std::string>> getBoards();
     std::vector<int> getPieceCount();
     std::vector<std::string> getMove();
-    void setBoards(std::vector<std::vector<std::string>> boards);
+    void setBoard(std::vector<std::vector<std::string>> board);
     void setMove(std::string playerStart, std::string playerMove);
     void setPlayerTurn(int playerTurn);
     void setPieceCount(int blackPieces, int redPieces);

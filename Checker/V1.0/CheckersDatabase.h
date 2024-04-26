@@ -11,7 +11,7 @@
 // Boards and Moves
 void UploadTempToDatabase(int& UniqueBoardIDCounter, bool Toggle);
 
-void UpdateMoveWinRate(QString& Move, int& BoardID, double& WinOrLoss, int& PlayerId);
+void UpdateMoveWinRate(QString& Move, int& BoardID, float& WinOrLoss, int& PlayerId);
 
 //Player Moves
 std::string MovePlayer(std::string& BoardState,int& PlayerTurn);

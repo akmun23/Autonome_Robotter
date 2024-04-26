@@ -376,7 +376,7 @@ bool validMoves::move(){
     std::vector<std::string> moves = movePossible();
 
     while(!valid){
-        playerInput();
+        // playerInput();
         for (int i = 0; i < moves.size(); i += 2) {
             if(_playerStart == moves[i] && _playerMove == moves[i+1]){
                 jumped = pieceJump();
@@ -471,8 +471,8 @@ std::vector<std::string> validMoves::getMove(){
     return {_playerStart, _playerMove};
 }
 
-void validMoves::setBoards(std::vector<std::vector<std::string>> boards){
-    _boards = boards;
+void validMoves::setBoard(std::vector<std::vector<std::string>> board){
+    _boards = board;
 }
 
 void validMoves::setMove(std::string playerStart, std::string playerMove){

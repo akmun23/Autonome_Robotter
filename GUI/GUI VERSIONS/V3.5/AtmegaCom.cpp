@@ -60,7 +60,7 @@
     char msg[] = {InputNumber};                                         // Her skriver vi vores besked til atmegaen
     write(serial_port, msg, sizeof(msg));
 
-    char read_buf [1];                                                  // Her laver vi en buffer til at læse data ind i
+    char read_buf[1];                                                  // Her laver vi en buffer til at læse data ind i
 
 
     int n = read(serial_port, &read_buf, sizeof(read_buf));             // Her læser vi data ind fra atmegaen i variablen n

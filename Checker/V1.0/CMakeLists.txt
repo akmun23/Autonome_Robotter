@@ -25,6 +25,7 @@ add_executable(main main.cpp
     validmoves.h validmoves.cpp
     vision.h vision.cpp
     robot.h robot.cpp
+
     )
     
 target_link_libraries(main PRIVATE ur_rtde::rtde Qt5::Core Qt5::Sql opencv_core opencv_highgui opencv_imgcodecs ${OpenCV_LIBS})
