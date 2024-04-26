@@ -86,7 +86,7 @@ void Robot::robotStartVision(){
     // Calculates the transformation matrix for the robot to the checker piece
     Matrix RobotToChesspieceTransformation = _robot*Translation;
 
-    atmegaCom('6');
+    sendmsg('6');
     // Finds the height of a piece on the chessboard
     rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, pieceLocation.at(2,2)}, 2, 0.5);
     std::vector<double> target = rtde_receive.getActualTCPPose();
@@ -130,7 +130,7 @@ void Robot::robotStartVision(){
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
 
     rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, pieceLocation.at(2,2)}, 2, 0.5);
-    atmegaCom('8');
+    sendmsg('8');
 
     _hover = (_piece - _chess) * 2;
 }
@@ -163,7 +163,7 @@ void Robot::checkerJump(int piecesLeft){
     std::vector<double> target = rtde_receive.getActualTCPPose();
     rtde_control.moveL({xcord,     ycord,     _piece + _hover,              target[3], target[4], target[5]}, 1,   0.2);
     rtde_control.moveL({xcord,     ycord,     _chess,                      target[3], target[4], target[5]}, 0.2, 0.05);
-    atmegaCom('6');
+    sendmsg('6');
     rtde_control.moveL({xcord,     ycord,     _piece + _hover + piecesLeft, target[3], target[4], target[5]}, 1,   0.2);
 
     int gravex;
@@ -192,7 +192,7 @@ void Robot::checkerJump(int piecesLeft){
     rtde_control.moveL({xcord2 + offset, ycord2 + offset, gravez + offset, target[3], target[4], target[5]}, 1,   0.2);
     rtde_control.moveL({xcord2,          ycord2,          gravez + offset, target[3], target[4], target[5]}, 1,   0.2);
     rtde_control.moveL({xcord2,          ycord2,          gravez + 0.001,  target[3], target[4], target[5]}, 0.2, 0.05);
-    atmegaCom('8');
+    sendmsg('8');
     rtde_control.moveL({xcord2,          ycord2,          target[2],       target[3], target[4], target[5]}, 1,   0.2);
 }
 
@@ -236,22 +236,22 @@ void Robot::promotePiece(std::vector<std::vector<std::string>> boards, int piece
 
     rtde_control.moveL({target[0],       target[1],       _piece + _hover + piecesLeft, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord2 + offset, ycord2 + offset, _piece + _hover + piecesLeft, target[3], target[4], target[5]}, 1, 0.2);
-    atmegaCom('6');
+    sendmsg('6');
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){}
     double gravez = rtde_receive.getActualTCPPose()[2]+0.0005;
     rtde_control.speedStop();
 
     rtde_control.moveL({xcord2 + offset, ycord2 + offset, gravez + _hover+ piecesLeft,      target[3], target[4], target[5]}, 1, 0.2);
-    atmegaCom('8');
+    sendmsg('8');
     rtde_control.moveL({xcord2,          ycord2,          gravez + _hover + piecesLeft,     target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord2,          ycord2,          gravez - (_hover/2) + piecesLeft, target[3], target[4], target[5]}, 0.2, 0.05);
-    atmegaCom('6');
+    sendmsg('6');
     rtde_control.moveL({xcord2,          ycord2,          gravez + _hover + piecesLeft,     target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord,           ycord,           gravez + _hover + piecesLeft,     target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord,           ycord,           _piece,                   target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord,           ycord,           _piece - 0.0015,       target[3], target[4], target[5]}, 0.2, 0.05);
-    atmegaCom('8');
+    sendmsg('8');
     rtde_control.moveL({xcord,           ycord,           _piece + _hover,           target[3], target[4], target[5]}, 1, 0.2);
 }
 
@@ -303,11 +303,11 @@ bool Robot::robotMove(std::vector<std::string> moveSet, std::vector<std::vector<
 
     rtde_control.moveL({xcord,  ycord,  _piece + _hover, target[3], target[4], target[5]}, speed,  acc);
     rtde_control.moveL({xcord,  ycord,  _chess,         target[3], target[4], target[5]}, speed2, acc2);
-    atmegaCom('6');
+    sendmsg('6');
     rtde_control.moveL({xcord,  ycord,  _piece + _hover, target[3], target[4], target[5]}, speed,  acc);
     rtde_control.moveL({xcord2, ycord2, _piece + _hover, target[3], target[4], target[5]}, speed,  acc);
     rtde_control.moveL({xcord2, ycord2, _chess,         target[3], target[4], target[5]}, speed2, acc2);
-    atmegaCom('8');
+    sendmsg('8');
     rtde_control.moveL({xcord2, ycord2, _piece + _hover, target[3], target[4], target[5]}, speed,  acc);
 
     // Remove the jumped piece

@@ -14,7 +14,7 @@
 
 using namespace ur_rtde;
 
-class Robot : public Vision, public Matrix
+class Robot : public Vision, public Matrix, public AtmegaCom
 {
     RTDEControlInterface rtde_control = RTDEControlInterface("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
     RTDEReceiveInterface rtde_receive = RTDEReceiveInterface("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
@@ -43,6 +43,8 @@ class Robot : public Vision, public Matrix
     int _playerTurn;
     std::vector<double> _unit1;
     std::vector<double> _unit2;
+
+
 
 public:
     Robot();
