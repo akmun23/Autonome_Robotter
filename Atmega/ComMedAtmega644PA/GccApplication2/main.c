@@ -1,10 +1,11 @@
-#define F_CPU 184320000UL
+#define F_CPU 18432000UL
 
 #include <stdint.h>
 #include <avr/io.h>
 #include <util/delay.h>
 #include <string.h>
 #include <avr/interrupt.h>
+#include <stdbool.h>
 
 
 // Definerer funktioner
@@ -22,7 +23,9 @@ double dutyCycle = 1023;
 char stopcommand[1];
 int main(void)
 {
-	UBRR1 = F_CPU/(16*96000)-1;
+	sei();	
+	
+	UBRR1 = F_CPU/(16*9600)-1;
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);	// Tænder for reading og writing
     InitPWM();
 	InitADC();
@@ -75,10 +78,11 @@ void InitPWM(){
 		DDRD = (1 << PORTD4);									// Åbner for at der kan komme strøm ud af porten til PWM
 		
 		
-		TCCR1A = (1 << COM1B1) | (1 << WGM11) | (1 << WGM10);	// Sætter mode til PWM, Phase Correct, 10-bit måske slet WGM11 så bliver det til 8bit
+		//TCCR1A = (1 << COM1B1) | (1 << WGM11) | (1 << WGM10);	// Sætter mode til PWM, Phase Correct, 10-bit	
+		TCCR1A = (1 << COM1B1) | (1 << WGM10);	// Sætter mode til PWM, Phase Correct, 8-bit
+
 		TIMSK1 = (1 << TOIE1);
 		
-		sei();													// Sætter interupten til PWM
 		
 		TCCR1B = (1 << CS10);									// starter timeren
 		
@@ -107,7 +111,7 @@ void InitADC(){
 	MUX1 = 0
 	MUX0 = 1	use PC1/ADC1 for input
 	*/
-	ADMUX = 0b01000001;
+	ADMUX = 0b01100001;
 	
 	/*
 	ADCSRA - ADC Control and Status Register A
@@ -145,46 +149,45 @@ void InitADC(){
 	ADTS0 = 0
 	*/
 	ADCSRB = 0b00000000;
-	
-	ADCSRA |= (1 << ADSC);		// start ADC
-	
+		
 	
 }
 
 void PWMStart(){
-	DDRD = 0b00010000;
-	PORTD = 0b00010000;
-	PORTC = 0b00000000;				// Vender retningen på strømmen til motoren så den kører baglæns
-	dutyCycle = 1023;				// Full speed 16 bit
-	_delay_ms(150);	
-	int i = 0;
-	while (!(ADC < 464)) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
-		
-		//swrite('0');
-		//swrite(ADCH); //Outputter spændingen den måler på porten
-		//swrite(ADCL); //Outputter spændingen den måler på porten
+	PORTC = 0b00000000;							// Makes sure the motor is going the correct way
+	DDRC = 0b00000000;
+	dutyCycle = 0;								// Enables the motor at max speed
+	_delay_ms(150);								// Short delay before first reading since starting the motor requires more power than running
+	bool ObjectHit = false;						// Bool for checking when object is hit
+	while (!(ObjectHit)) {						// Loop waiting for bool set true when object is hit
+		ADCSRA |= (1 << ADSC);					// start ADC
+		while ((ADCSRA & (1 << ADIF)) == 0){}	// Waits for a reading from the ADC to be done
+		if(ADCH <= 115){						// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
+			swrite(ADCH);
+			ObjectHit = true;
+		}
 
 	}
-	//swrite(ADCH); //Outputter spændingen den måler på porten
-	//swrite(ADCL); //Outputter spændingen den måler på porten
-	//dutyCycle = dutyCycle/2;			// half speed
-	dutyCycle = 0;
+	dutyCycle = 1023;
 	swrite('7');
 	stopcommand[0] = sread(); // Venter på at den får sendt signal af robot der siger den er hvor der skal slippes
 	
-	dutyCycle = 1023;
+	
 	PORTC = 0b00001000;				// Vender retningen på strømmen til motoren så den kører baglæns
 	DDRC = 0b00001000;
-	_delay_ms(150);					// Find værdi her der passer med at den er åben
-	while (!(ADC > 564)) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
-		
+	dutyCycle = 1023;
+	_delay_ms(150);	
+	ObjectHit = false;				
+	while (!(ObjectHit)) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
+		ADCSRA |= (1 << ADSC);		// start ADC
+		while ((ADCSRA & (1 << ADIF)) == 0){}
+		if(ADCH >= 144){
+			swrite(ADCH);
+			ObjectHit = true;
+		}
 
-		//swrite(ADCH); //Outputter spændingen den måler på porten
-		//swrite(ADCL); //Outputter spændingen den måler på porten
-
-	}				// half speed
-	//swrite(ADCH); //Outputter spændingen den måler på porten
-	//swrite(ADCL); //Outputter spændingen den måler på porten
+	}
+	ADCSRA = 0b10100101;
 	DDRD = 0b00000000;
 	PORTD = 0b00000000;
 	PORTC = 0b00000000;				// Vender retningen til den anden vej igen og slukker motoren
@@ -193,7 +196,6 @@ void PWMStart(){
 
 	
 }
-
 
 ISR(TIMER1_OVF_vect){
 	
