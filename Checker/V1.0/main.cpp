@@ -14,7 +14,7 @@
 //using namespace ur_rtde;
 int main(int argc, char** argv) {
 
-    std::string RunMode = "SimOnly"; // Options are "Evolutions", "RobotWithVision" or "DatabaseSimulation"
+    std::string RunMode = "DatabaseSimulation"; // Options are "Evolutions", "RobotWithVision" or "DatabaseSimulation"
 
     if (RunMode == "Evolutions"){
 
@@ -373,11 +373,13 @@ int main(int argc, char** argv) {
         bool UploadTempToDB = false; //If the temp table should be uploaded to the database after the game ends set this to true
 
         resetDB(ResetDB); // Resets the database
+        int UniqueBoardIDCounter;
+        DatabaseInit(UniqueBoardIDCounter,LoadTempBeforeStart); //Initializes the database
 
-        for (int ii = 1; ii <= 1; ++ii) {
+        for (int ii = 1; ii <= 100000; ++ii) {
 
             int CounterForTempTable = 1;
-            int depth = 6; //Depth of the alphaBeta algorithm
+            int depth = 2; //Depth of the alphaBeta algorithm
             int playerTurn = 1; //Which player's turn it is
             int blackPieces = 12; //Initial number of black pieces
             int redPieces = 12; //Initial number of red pieces
@@ -385,22 +387,19 @@ int main(int argc, char** argv) {
             int thisTurn; //Which player's turn it is
             int DrawChecker = 1; //When this equal 200 the game is called draw
 
-            std::string player = "Simu"; //If the player is human or AI
-            std::string player2 = "Simu"; //If the player is human or AI
+            std::string player = "Random"; //If the player is human or AI
+            std::string player2 = "AI"; //If the player is human or AI
             std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
             std::string MoveMade = {}; // Stores the move made to put it in the database
             bool DatabaseMoveMade = false;
             validMoves validMoves;
-            alphaBeta alphaBeta(0);
+            alphaBeta alphaBeta(&validMoves,0);
 
 
             int TestCounterForDatabase = 0;
 
             int i = 0;
 
-            int UniqueBoardIDCounter;
-            // Skriv true i nr 2 input hvis temp skal uploades til databasen inden man starter spillet
-            DatabaseInit(UniqueBoardIDCounter,LoadTempBeforeStart); //Initializes the database
 
             // Construct initial board
             std::vector<std::vector<std::string>> boards = startUp();
@@ -444,7 +443,8 @@ int main(int argc, char** argv) {
 
                         }
                         else if (playerTurn == 1 && player == "AI" || playerTurn == 2 && player2 == "AI"){
-                            //alphaBeta.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
+
+                            alphaBeta.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
                             moveSet = alphaBeta.getMove();
                         }
                     }

@@ -26,6 +26,7 @@ void DatabaseInit(int& UniqueBoardIDCounter, bool UploadTemp){
         std::cout << "Startet" << std::endl;
         UploadTempToDatabase(UniqueBoardIDCounter,true); // Uploads the temp table to the database
         std::cout << "Uploaded" << std::endl;
+
     }
     RefreshTempTable(); // Refreshes the Temp table
 
