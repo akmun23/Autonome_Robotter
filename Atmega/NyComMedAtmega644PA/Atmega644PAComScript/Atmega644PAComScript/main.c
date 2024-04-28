@@ -26,11 +26,12 @@ void OpenGripper();
 
 int main(void)
 {
-	UBRR1 = 119; // Sets the baudrate calculated by (F_CPU/(16*9600-1))
-	UCSR1A = (1 << RXC1);  // Skal måske bare slettes da det bliver gjort gennem RXCIE1
+	UBRR1 = 119;											// Sets the baudrate calculated by (F_CPU/(16*9600-1))
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE1);	// Enables reading and writing and allows for read interupt flags
 	UCSR1C = (1 << UCSZ11) | (1 << UCSZ10);					// Sets frame as 8 bits
 	
+	// 	UCSR1A = (1 << RXC1);									// Skal måske bare slettes da det bliver gjort gennem RXCIE1
+
 	sei();		// Enables global interupts
 	InitPWM();	// Setup for PWM
 	InitADC();	// Setup for ADC
@@ -47,11 +48,12 @@ void swrite(uint8_t byte) {
 
 void InitPWM(){
 	
-	DDRD = (1 << PORTD4);									// Enables power for the PWM port	
-	PORTD = (1 << PORTD4);									// Same
-	TCCR1A = (1 << COM1B1)| (1 << WGM12)| (1 << WGM11) | (1 << WGM10);	// Sets up the timer for fast PWM 10-bit and non inverting mode
-	TCCR1B = (1 << CS10);									// Sets prescaler to 1  ->  Måske ændre den her prescaler til en bedre en Måske 8
-	TIMSK1 = (1 << TOIE1);									// Starts the timer
+	DDRD = (1 << PORTD4);												// Enables power for the PWM port	
+	PORTD = (1 << PORTD4);												// Same
+	TCCR1A = (1 << COM1B1) | (1 << WGM11) | (1 << WGM10);				// Sets up the timer for fast PWM 10-bit and non inverting mode
+	TCCR1B = (1 << CS10) | (1 << WGM13) | (1 << WGM12);					// Sets prescaler to 1
+	OCR1A = 100;														// Sets the top of the counter to 100
+	TIMSK1 = (1 << TOIE1);												// Starts the timer
 								
 
 
@@ -69,7 +71,7 @@ void InitADC(){
 void CloseGripper(){
 	PORTC = (0 << PORTC3);						// Makes sure the motor is going the correct way
 	DDRC = (0 << PORTC3);
-	dutycycle = 1023/2;							// Enables the motor at approximately 60% duty cycle 
+	dutycycle = 60;							// Enables the motor at approximately 60% duty cycle 
 	_delay_ms(300);								// Short delay before first reading since starting the motor requires more power than running
 	int ObjectHit = 0;							// variable for checking when object is hit
 	while (ObjectHit == 0) {					// Loop waiting for bool set true when object is hit
@@ -87,7 +89,7 @@ void CloseGripper(){
 void OpenGripper(){
 	PORTC = (1 << PORTC3);						// Makes sure the motor is going the correct way
 	DDRC = (1 << PORTC3);
-	dutycycle = 1023/2;							// Enables the motor at max speed
+	dutycycle = 100;							// Enables the motor at max speed
 	_delay_ms(300);								// Short delay before first reading since starting the motor requires more power than running
 	int ObjectHit = 0;							// variable for checking when object is hit
 	while (ObjectHit == 0) {					// Loop waiting for bool set true when object is hit
@@ -110,16 +112,11 @@ ISR(TIMER1_OVF_vect){
 }
 
 ISR(USART1_RX_vect){
-	
-	rxdata = UDR1;			// The received message is put into a variable to fix issue with reading directly from UDR1 causing it to show old message 
+	rxdata = UDR1;				// The received message is put into a variable to fix issue with reading directly from UDR1 causing it to show old message 	
+	sei();
 	if (rxdata == '6'){
-		sei();
 		CloseGripper();
-	}
-	
-	else if (rxdata == '8'){
-		sei();
+	} else if (rxdata == '8'){
 		OpenGripper();
 	}
-	
 }

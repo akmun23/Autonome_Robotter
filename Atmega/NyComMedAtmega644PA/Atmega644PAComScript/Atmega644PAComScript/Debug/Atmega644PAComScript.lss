@@ -3,31 +3,31 @@ Atmega644PAComScript.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800100  00800100  000002e8  2**0
+  0 .data         00000000  00800100  00800100  0000036e  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         00000274  00000000  00000000  00000074  2**1
+  1 .text         000002fa  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000005  00800100  00800100  000002e8  2**0
+  2 .bss          00000005  00800100  00800100  0000036e  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  000002e8  2**0
+  3 .comment      00000030  00000000  00000000  0000036e  2**0
                   CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000318  2**2
+  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000003a0  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 00000058  00000000  00000000  00000358  2**0
+  5 .debug_aranges 00000058  00000000  00000000  000003e0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   000009c2  00000000  00000000  000003b0  2**0
+  6 .debug_info   000009c2  00000000  00000000  00000438  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000800  00000000  00000000  00000d72  2**0
+  7 .debug_abbrev 00000800  00000000  00000000  00000dfa  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00000416  00000000  00000000  00001572  2**0
+  8 .debug_line   00000458  00000000  00000000  000015fa  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000000f0  00000000  00000000  00001988  2**2
+  9 .debug_frame  000000f0  00000000  00000000  00001a54  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    000004a3  00000000  00000000  00001a78  2**0
+ 10 .debug_str    000004a3  00000000  00000000  00001b44  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    000001ec  00000000  00000000  00001f1b  2**0
+ 11 .debug_loc    000001ec  00000000  00000000  00001fe7  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000048  00000000  00000000  00002107  2**0
+ 12 .debug_ranges 00000048  00000000  00000000  000021d3  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -48,7 +48,7 @@ Disassembly of section .text:
   30:	0c 94 5b 00 	jmp	0xb6	; 0xb6 <__bad_interrupt>
   34:	0c 94 5b 00 	jmp	0xb6	; 0xb6 <__bad_interrupt>
   38:	0c 94 5b 00 	jmp	0xb6	; 0xb6 <__bad_interrupt>
-  3c:	0c 94 ed 00 	jmp	0x1da	; 0x1da <__vector_15>
+  3c:	0c 94 f1 00 	jmp	0x1e2	; 0x1e2 <__vector_15>
   40:	0c 94 5b 00 	jmp	0xb6	; 0xb6 <__bad_interrupt>
   44:	0c 94 5b 00 	jmp	0xb6	; 0xb6 <__bad_interrupt>
   48:	0c 94 5b 00 	jmp	0xb6	; 0xb6 <__bad_interrupt>
@@ -61,7 +61,7 @@ Disassembly of section .text:
   64:	0c 94 5b 00 	jmp	0xb6	; 0xb6 <__bad_interrupt>
   68:	0c 94 5b 00 	jmp	0xb6	; 0xb6 <__bad_interrupt>
   6c:	0c 94 5b 00 	jmp	0xb6	; 0xb6 <__bad_interrupt>
-  70:	0c 94 03 01 	jmp	0x206	; 0x206 <__vector_28>
+  70:	0c 94 07 01 	jmp	0x20e	; 0x20e <__vector_28>
   74:	0c 94 5b 00 	jmp	0xb6	; 0xb6 <__bad_interrupt>
   78:	0c 94 5b 00 	jmp	0xb6	; 0xb6 <__bad_interrupt>
 
@@ -77,7 +77,7 @@ Disassembly of section .text:
   88:	11 e0       	ldi	r17, 0x01	; 1
   8a:	a0 e0       	ldi	r26, 0x00	; 0
   8c:	b1 e0       	ldi	r27, 0x01	; 1
-  8e:	e4 e7       	ldi	r30, 0x74	; 116
+  8e:	ea ef       	ldi	r30, 0xFA	; 250
   90:	f2 e0       	ldi	r31, 0x02	; 2
   92:	02 c0       	rjmp	.+4      	; 0x98 <__do_copy_data+0x10>
   94:	05 90       	lpm	r0, Z+
@@ -99,8 +99,8 @@ Disassembly of section .text:
   a8:	a5 30       	cpi	r26, 0x05	; 5
   aa:	b2 07       	cpc	r27, r18
   ac:	e1 f7       	brne	.-8      	; 0xa6 <.do_clear_bss_loop>
-  ae:	0e 94 77 00 	call	0xee	; 0xee <main>
-  b2:	0c 94 38 01 	jmp	0x270	; 0x270 <_exit>
+  ae:	0e 94 7e 00 	call	0xfc	; 0xfc <main>
+  b2:	0c 94 7b 01 	jmp	0x2f6	; 0x2f6 <_exit>
 
 000000b6 <__bad_interrupt>:
   b6:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
@@ -125,304 +125,374 @@ void swrite(uint8_t byte) {
 
 void InitPWM(){
 	
-	DDRD = (1 << PORTD4);									// Enables power for the PWM port	
+	DDRD = (1 << PORTD4);												// Enables power for the PWM port	
   c8:	80 e1       	ldi	r24, 0x10	; 16
   ca:	8a b9       	out	0x0a, r24	; 10
-	PORTD = (1 << PORTD4);									// Same
+	PORTD = (1 << PORTD4);												// Same
   cc:	8b b9       	out	0x0b, r24	; 11
-	TCCR1A = (1 << COM1B1)| (1 << WGM12)| (1 << WGM11) | (1 << WGM10);	// Sets up the timer for fast PWM 10-bit and non inverting mode
-  ce:	8b e2       	ldi	r24, 0x2B	; 43
+	TCCR1A = (1 << COM1B1) | (1 << WGM11) | (1 << WGM10);	// Sets up the timer for fast PWM 10-bit and non inverting mode
+  ce:	83 e2       	ldi	r24, 0x23	; 35
   d0:	80 93 80 00 	sts	0x0080, r24	; 0x800080 <__TEXT_REGION_LENGTH__+0x7f0080>
-	TCCR1B = (1 << CS10);									// Sets prescaler to 1  ->  Måske ændre den her prescaler til en bedre en Måske 8
-  d4:	81 e0       	ldi	r24, 0x01	; 1
+	TCCR1B = (1 << CS10) | (1 << WGM13) | (1 << WGM12);												// Sets prescaler to 1
+  d4:	89 e1       	ldi	r24, 0x19	; 25
   d6:	80 93 81 00 	sts	0x0081, r24	; 0x800081 <__TEXT_REGION_LENGTH__+0x7f0081>
-	TIMSK1 = (1 << TOIE1);									// Starts the timer
-  da:	80 93 6f 00 	sts	0x006F, r24	; 0x80006f <__TEXT_REGION_LENGTH__+0x7f006f>
-  de:	08 95       	ret
+	OCR1A = 100;
+  da:	84 e6       	ldi	r24, 0x64	; 100
+  dc:	90 e0       	ldi	r25, 0x00	; 0
+  de:	90 93 89 00 	sts	0x0089, r25	; 0x800089 <__TEXT_REGION_LENGTH__+0x7f0089>
+  e2:	80 93 88 00 	sts	0x0088, r24	; 0x800088 <__TEXT_REGION_LENGTH__+0x7f0088>
+	TIMSK1 = (1 << TOIE1);												// Starts the timer
+  e6:	81 e0       	ldi	r24, 0x01	; 1
+  e8:	80 93 6f 00 	sts	0x006F, r24	; 0x80006f <__TEXT_REGION_LENGTH__+0x7f006f>
+  ec:	08 95       	ret
 
-000000e0 <InitADC>:
+000000ee <InitADC>:
 
 
 
 void InitADC(){
 	
 	ADMUX = (1 << REFS0) | (1 << MUX0);					// AVCC at AREF pin and ADC1 Chosen
-  e0:	81 e4       	ldi	r24, 0x41	; 65
-  e2:	80 93 7c 00 	sts	0x007C, r24	; 0x80007c <__TEXT_REGION_LENGTH__+0x7f007c>
+  ee:	81 e4       	ldi	r24, 0x41	; 65
+  f0:	80 93 7c 00 	sts	0x007C, r24	; 0x80007c <__TEXT_REGION_LENGTH__+0x7f007c>
 	ADCSRA = (1 << ADEN) | (ADPS2);						// Aden enables ADC and then 32 division factor is set to reach between 200khz and 50khz
-  e6:	82 e8       	ldi	r24, 0x82	; 130
-  e8:	80 93 7a 00 	sts	0x007A, r24	; 0x80007a <__TEXT_REGION_LENGTH__+0x7f007a>
-  ec:	08 95       	ret
+  f4:	82 e8       	ldi	r24, 0x82	; 130
+  f6:	80 93 7a 00 	sts	0x007A, r24	; 0x80007a <__TEXT_REGION_LENGTH__+0x7f007a>
+  fa:	08 95       	ret
 
-000000ee <main>:
+000000fc <main>:
 void CloseGripper();
 void OpenGripper();
 
 int main(void)
 {
-	UBRR1 = 119; // Sets the baudrate calculated by (F_CPU/(16*9600-1))
-  ee:	87 e7       	ldi	r24, 0x77	; 119
-  f0:	90 e0       	ldi	r25, 0x00	; 0
-  f2:	90 93 cd 00 	sts	0x00CD, r25	; 0x8000cd <__TEXT_REGION_LENGTH__+0x7f00cd>
-  f6:	80 93 cc 00 	sts	0x00CC, r24	; 0x8000cc <__TEXT_REGION_LENGTH__+0x7f00cc>
-	UCSR1A = (1 << RXC1);  // Skal måske bare slettes da det bliver gjort gennem RXCIE1
-  fa:	80 e8       	ldi	r24, 0x80	; 128
-  fc:	80 93 c8 00 	sts	0x00C8, r24	; 0x8000c8 <__TEXT_REGION_LENGTH__+0x7f00c8>
+	UBRR1 = 119;											// Sets the baudrate calculated by (F_CPU/(16*9600-1))
+  fc:	87 e7       	ldi	r24, 0x77	; 119
+  fe:	90 e0       	ldi	r25, 0x00	; 0
+ 100:	90 93 cd 00 	sts	0x00CD, r25	; 0x8000cd <__TEXT_REGION_LENGTH__+0x7f00cd>
+ 104:	80 93 cc 00 	sts	0x00CC, r24	; 0x8000cc <__TEXT_REGION_LENGTH__+0x7f00cc>
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE1);	// Enables reading and writing and allows for read interupt flags
- 100:	88 e9       	ldi	r24, 0x98	; 152
- 102:	80 93 c9 00 	sts	0x00C9, r24	; 0x8000c9 <__TEXT_REGION_LENGTH__+0x7f00c9>
+ 108:	88 e9       	ldi	r24, 0x98	; 152
+ 10a:	80 93 c9 00 	sts	0x00C9, r24	; 0x8000c9 <__TEXT_REGION_LENGTH__+0x7f00c9>
 	UCSR1C = (1 << UCSZ11) | (1 << UCSZ10);					// Sets frame as 8 bits
- 106:	86 e0       	ldi	r24, 0x06	; 6
- 108:	80 93 ca 00 	sts	0x00CA, r24	; 0x8000ca <__TEXT_REGION_LENGTH__+0x7f00ca>
+ 10e:	86 e0       	ldi	r24, 0x06	; 6
+ 110:	80 93 ca 00 	sts	0x00CA, r24	; 0x8000ca <__TEXT_REGION_LENGTH__+0x7f00ca>
 	
-	sei();		// Enables global interupts
- 10c:	78 94       	sei
-	InitPWM();	// Setup for PWM
- 10e:	0e 94 64 00 	call	0xc8	; 0xc8 <InitPWM>
-	InitADC();	// Setup for ADC
- 112:	0e 94 70 00 	call	0xe0	; 0xe0 <InitADC>
- 116:	ff cf       	rjmp	.-2      	; 0x116 <main+0x28>
+	// 	UCSR1A = (1 << RXC1);									// Skal måske bare slettes da det bliver gjort gennem RXCIE1
 
-00000118 <CloseGripper>:
+	sei();		// Enables global interupts
+ 114:	78 94       	sei
+	InitPWM();	// Setup for PWM
+ 116:	0e 94 64 00 	call	0xc8	; 0xc8 <InitPWM>
+	InitADC();	// Setup for ADC
+ 11a:	0e 94 77 00 	call	0xee	; 0xee <InitADC>
+ 11e:	ff cf       	rjmp	.-2      	; 0x11e <main+0x22>
+
+00000120 <CloseGripper>:
 	ADCSRA = (1 << ADEN) | (ADPS2);						// Aden enables ADC and then 32 division factor is set to reach between 200khz and 50khz
 }
 
 
 void CloseGripper(){
 	PORTC = (0 << PORTC3);						// Makes sure the motor is going the correct way
- 118:	18 b8       	out	0x08, r1	; 8
+ 120:	18 b8       	out	0x08, r1	; 8
 	DDRC = (0 << PORTC3);
- 11a:	17 b8       	out	0x07, r1	; 7
-	dutycycle = 1023/2;							// Enables the motor at approximately 60% duty cycle 
- 11c:	8f ef       	ldi	r24, 0xFF	; 255
- 11e:	91 e0       	ldi	r25, 0x01	; 1
- 120:	90 93 01 01 	sts	0x0101, r25	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
- 124:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 122:	17 b8       	out	0x07, r1	; 7
+	dutycycle = 60;							// Enables the motor at approximately 60% duty cycle 
+ 124:	8c e3       	ldi	r24, 0x3C	; 60
+ 126:	90 e0       	ldi	r25, 0x00	; 0
+ 128:	90 93 01 01 	sts	0x0101, r25	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
+ 12c:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
 	#endif
 
 	__builtin_avr_delay_cycles(__ticks_dc);
- 128:	28 ef       	ldi	r18, 0xF8	; 248
- 12a:	4b eb       	ldi	r20, 0xBB	; 187
- 12c:	80 e1       	ldi	r24, 0x10	; 16
- 12e:	21 50       	subi	r18, 0x01	; 1
- 130:	40 40       	sbci	r20, 0x00	; 0
- 132:	80 40       	sbci	r24, 0x00	; 0
- 134:	e1 f7       	brne	.-8      	; 0x12e <CloseGripper+0x16>
- 136:	00 c0       	rjmp	.+0      	; 0x138 <CloseGripper+0x20>
+ 130:	28 ef       	ldi	r18, 0xF8	; 248
+ 132:	4b eb       	ldi	r20, 0xBB	; 187
+ 134:	80 e1       	ldi	r24, 0x10	; 16
+ 136:	21 50       	subi	r18, 0x01	; 1
+ 138:	40 40       	sbci	r20, 0x00	; 0
+ 13a:	80 40       	sbci	r24, 0x00	; 0
+ 13c:	e1 f7       	brne	.-8      	; 0x136 <CloseGripper+0x16>
+ 13e:	00 c0       	rjmp	.+0      	; 0x140 <CloseGripper+0x20>
 	_delay_ms(300);								// Short delay before first reading since starting the motor requires more power than running
 	int ObjectHit = 0;							// variable for checking when object is hit
- 138:	20 e0       	ldi	r18, 0x00	; 0
- 13a:	30 e0       	ldi	r19, 0x00	; 0
+ 140:	20 e0       	ldi	r18, 0x00	; 0
+ 142:	30 e0       	ldi	r19, 0x00	; 0
 	while (ObjectHit == 0) {					// Loop waiting for bool set true when object is hit
- 13c:	12 c0       	rjmp	.+36     	; 0x162 <CloseGripper+0x4a>
+ 144:	12 c0       	rjmp	.+36     	; 0x16a <CloseGripper+0x4a>
 		ADCSRA |= (1 << ADSC);					// start ADC
- 13e:	ea e7       	ldi	r30, 0x7A	; 122
- 140:	f0 e0       	ldi	r31, 0x00	; 0
- 142:	80 81       	ld	r24, Z
- 144:	80 64       	ori	r24, 0x40	; 64
- 146:	80 83       	st	Z, r24
+ 146:	ea e7       	ldi	r30, 0x7A	; 122
+ 148:	f0 e0       	ldi	r31, 0x00	; 0
+ 14a:	80 81       	ld	r24, Z
+ 14c:	80 64       	ori	r24, 0x40	; 64
+ 14e:	80 83       	st	Z, r24
 		while ((ADCSRA & (1 << ADIF)) == 0){}	// Waits for a reading from the ADC to be done
- 148:	80 91 7a 00 	lds	r24, 0x007A	; 0x80007a <__TEXT_REGION_LENGTH__+0x7f007a>
- 14c:	84 ff       	sbrs	r24, 4
- 14e:	fc cf       	rjmp	.-8      	; 0x148 <CloseGripper+0x30>
+ 150:	80 91 7a 00 	lds	r24, 0x007A	; 0x80007a <__TEXT_REGION_LENGTH__+0x7f007a>
+ 154:	84 ff       	sbrs	r24, 4
+ 156:	fc cf       	rjmp	.-8      	; 0x150 <CloseGripper+0x30>
 		if(ADC <= 461){							// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
- 150:	80 91 78 00 	lds	r24, 0x0078	; 0x800078 <__TEXT_REGION_LENGTH__+0x7f0078>
- 154:	90 91 79 00 	lds	r25, 0x0079	; 0x800079 <__TEXT_REGION_LENGTH__+0x7f0079>
- 158:	8e 3c       	cpi	r24, 0xCE	; 206
- 15a:	91 40       	sbci	r25, 0x01	; 1
- 15c:	10 f4       	brcc	.+4      	; 0x162 <CloseGripper+0x4a>
+ 158:	80 91 78 00 	lds	r24, 0x0078	; 0x800078 <__TEXT_REGION_LENGTH__+0x7f0078>
+ 15c:	90 91 79 00 	lds	r25, 0x0079	; 0x800079 <__TEXT_REGION_LENGTH__+0x7f0079>
+ 160:	8e 3c       	cpi	r24, 0xCE	; 206
+ 162:	91 40       	sbci	r25, 0x01	; 1
+ 164:	10 f4       	brcc	.+4      	; 0x16a <CloseGripper+0x4a>
 			ObjectHit = 1;						// Makes variable true telling the loop that a object has been grasped
- 15e:	21 e0       	ldi	r18, 0x01	; 1
- 160:	30 e0       	ldi	r19, 0x00	; 0
+ 166:	21 e0       	ldi	r18, 0x01	; 1
+ 168:	30 e0       	ldi	r19, 0x00	; 0
 	PORTC = (0 << PORTC3);						// Makes sure the motor is going the correct way
 	DDRC = (0 << PORTC3);
-	dutycycle = 1023/2;							// Enables the motor at approximately 60% duty cycle 
+	dutycycle = 60;							// Enables the motor at approximately 60% duty cycle 
 	_delay_ms(300);								// Short delay before first reading since starting the motor requires more power than running
 	int ObjectHit = 0;							// variable for checking when object is hit
 	while (ObjectHit == 0) {					// Loop waiting for bool set true when object is hit
- 162:	21 15       	cp	r18, r1
- 164:	31 05       	cpc	r19, r1
- 166:	59 f3       	breq	.-42     	; 0x13e <CloseGripper+0x26>
+ 16a:	21 15       	cp	r18, r1
+ 16c:	31 05       	cpc	r19, r1
+ 16e:	59 f3       	breq	.-42     	; 0x146 <CloseGripper+0x26>
 		while ((ADCSRA & (1 << ADIF)) == 0){}	// Waits for a reading from the ADC to be done
 		if(ADC <= 461){							// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
 			ObjectHit = 1;						// Makes variable true telling the loop that a object has been grasped
 		}
 	}
 	dutycycle = 0;								// Turn off motor
- 168:	10 92 01 01 	sts	0x0101, r1	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
- 16c:	10 92 00 01 	sts	0x0100, r1	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 170:	10 92 01 01 	sts	0x0101, r1	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
+ 174:	10 92 00 01 	sts	0x0100, r1	; 0x800100 <__DATA_REGION_ORIGIN__>
 	swrite('7');								// Send signal to pc telling script that is has picked up a piece
- 170:	87 e3       	ldi	r24, 0x37	; 55
- 172:	0e 94 5d 00 	call	0xba	; 0xba <swrite>
- 176:	08 95       	ret
+ 178:	87 e3       	ldi	r24, 0x37	; 55
+ 17a:	0e 94 5d 00 	call	0xba	; 0xba <swrite>
+ 17e:	08 95       	ret
 
-00000178 <OpenGripper>:
+00000180 <OpenGripper>:
 	
 }
 
 void OpenGripper(){
 	PORTC = (1 << PORTC3);						// Makes sure the motor is going the correct way
- 178:	88 e0       	ldi	r24, 0x08	; 8
- 17a:	88 b9       	out	0x08, r24	; 8
+ 180:	88 e0       	ldi	r24, 0x08	; 8
+ 182:	88 b9       	out	0x08, r24	; 8
 	DDRC = (1 << PORTC3);
- 17c:	87 b9       	out	0x07, r24	; 7
-	dutycycle = 1023/2;							// Enables the motor at max speed
- 17e:	8f ef       	ldi	r24, 0xFF	; 255
- 180:	91 e0       	ldi	r25, 0x01	; 1
- 182:	90 93 01 01 	sts	0x0101, r25	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
- 186:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
- 18a:	28 ef       	ldi	r18, 0xF8	; 248
- 18c:	4b eb       	ldi	r20, 0xBB	; 187
- 18e:	80 e1       	ldi	r24, 0x10	; 16
- 190:	21 50       	subi	r18, 0x01	; 1
- 192:	40 40       	sbci	r20, 0x00	; 0
- 194:	80 40       	sbci	r24, 0x00	; 0
- 196:	e1 f7       	brne	.-8      	; 0x190 <OpenGripper+0x18>
- 198:	00 c0       	rjmp	.+0      	; 0x19a <OpenGripper+0x22>
+ 184:	87 b9       	out	0x07, r24	; 7
+	dutycycle = 100;							// Enables the motor at max speed
+ 186:	84 e6       	ldi	r24, 0x64	; 100
+ 188:	90 e0       	ldi	r25, 0x00	; 0
+ 18a:	90 93 01 01 	sts	0x0101, r25	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
+ 18e:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 192:	28 ef       	ldi	r18, 0xF8	; 248
+ 194:	4b eb       	ldi	r20, 0xBB	; 187
+ 196:	80 e1       	ldi	r24, 0x10	; 16
+ 198:	21 50       	subi	r18, 0x01	; 1
+ 19a:	40 40       	sbci	r20, 0x00	; 0
+ 19c:	80 40       	sbci	r24, 0x00	; 0
+ 19e:	e1 f7       	brne	.-8      	; 0x198 <OpenGripper+0x18>
+ 1a0:	00 c0       	rjmp	.+0      	; 0x1a2 <OpenGripper+0x22>
 	_delay_ms(300);								// Short delay before first reading since starting the motor requires more power than running
 	int ObjectHit = 0;							// variable for checking when object is hit
- 19a:	20 e0       	ldi	r18, 0x00	; 0
- 19c:	30 e0       	ldi	r19, 0x00	; 0
+ 1a2:	20 e0       	ldi	r18, 0x00	; 0
+ 1a4:	30 e0       	ldi	r19, 0x00	; 0
 	while (ObjectHit == 0) {					// Loop waiting for bool set true when object is hit
- 19e:	12 c0       	rjmp	.+36     	; 0x1c4 <OpenGripper+0x4c>
+ 1a6:	12 c0       	rjmp	.+36     	; 0x1cc <OpenGripper+0x4c>
 		ADCSRA |= (1 << ADSC);					// start ADC
- 1a0:	ea e7       	ldi	r30, 0x7A	; 122
- 1a2:	f0 e0       	ldi	r31, 0x00	; 0
- 1a4:	80 81       	ld	r24, Z
- 1a6:	80 64       	ori	r24, 0x40	; 64
- 1a8:	80 83       	st	Z, r24
+ 1a8:	ea e7       	ldi	r30, 0x7A	; 122
+ 1aa:	f0 e0       	ldi	r31, 0x00	; 0
+ 1ac:	80 81       	ld	r24, Z
+ 1ae:	80 64       	ori	r24, 0x40	; 64
+ 1b0:	80 83       	st	Z, r24
 		while ((ADCSRA & (1 << ADIF)) == 0){}	// Waits for a reading from the ADC to be done
- 1aa:	80 91 7a 00 	lds	r24, 0x007A	; 0x80007a <__TEXT_REGION_LENGTH__+0x7f007a>
- 1ae:	84 ff       	sbrs	r24, 4
- 1b0:	fc cf       	rjmp	.-8      	; 0x1aa <OpenGripper+0x32>
+ 1b2:	80 91 7a 00 	lds	r24, 0x007A	; 0x80007a <__TEXT_REGION_LENGTH__+0x7f007a>
+ 1b6:	84 ff       	sbrs	r24, 4
+ 1b8:	fc cf       	rjmp	.-8      	; 0x1b2 <OpenGripper+0x32>
 		if(ADC >= 570){							// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
- 1b2:	80 91 78 00 	lds	r24, 0x0078	; 0x800078 <__TEXT_REGION_LENGTH__+0x7f0078>
- 1b6:	90 91 79 00 	lds	r25, 0x0079	; 0x800079 <__TEXT_REGION_LENGTH__+0x7f0079>
- 1ba:	8a 33       	cpi	r24, 0x3A	; 58
- 1bc:	92 40       	sbci	r25, 0x02	; 2
- 1be:	10 f0       	brcs	.+4      	; 0x1c4 <OpenGripper+0x4c>
+ 1ba:	80 91 78 00 	lds	r24, 0x0078	; 0x800078 <__TEXT_REGION_LENGTH__+0x7f0078>
+ 1be:	90 91 79 00 	lds	r25, 0x0079	; 0x800079 <__TEXT_REGION_LENGTH__+0x7f0079>
+ 1c2:	8a 33       	cpi	r24, 0x3A	; 58
+ 1c4:	92 40       	sbci	r25, 0x02	; 2
+ 1c6:	10 f0       	brcs	.+4      	; 0x1cc <OpenGripper+0x4c>
 			ObjectHit = 1;						// Setting the variable to 1 telling the loop that the gripper is fully open
- 1c0:	21 e0       	ldi	r18, 0x01	; 1
- 1c2:	30 e0       	ldi	r19, 0x00	; 0
+ 1c8:	21 e0       	ldi	r18, 0x01	; 1
+ 1ca:	30 e0       	ldi	r19, 0x00	; 0
 	PORTC = (1 << PORTC3);						// Makes sure the motor is going the correct way
 	DDRC = (1 << PORTC3);
-	dutycycle = 1023/2;							// Enables the motor at max speed
+	dutycycle = 100;							// Enables the motor at max speed
 	_delay_ms(300);								// Short delay before first reading since starting the motor requires more power than running
 	int ObjectHit = 0;							// variable for checking when object is hit
 	while (ObjectHit == 0) {					// Loop waiting for bool set true when object is hit
- 1c4:	21 15       	cp	r18, r1
- 1c6:	31 05       	cpc	r19, r1
- 1c8:	59 f3       	breq	.-42     	; 0x1a0 <OpenGripper+0x28>
+ 1cc:	21 15       	cp	r18, r1
+ 1ce:	31 05       	cpc	r19, r1
+ 1d0:	59 f3       	breq	.-42     	; 0x1a8 <OpenGripper+0x28>
 		while ((ADCSRA & (1 << ADIF)) == 0){}	// Waits for a reading from the ADC to be done
 		if(ADC >= 570){							// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
 			ObjectHit = 1;						// Setting the variable to 1 telling the loop that the gripper is fully open
 		}
 	}
 	dutycycle = 0;								// Turn off motor
- 1ca:	10 92 01 01 	sts	0x0101, r1	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
- 1ce:	10 92 00 01 	sts	0x0100, r1	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 1d2:	10 92 01 01 	sts	0x0101, r1	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
+ 1d6:	10 92 00 01 	sts	0x0100, r1	; 0x800100 <__DATA_REGION_ORIGIN__>
 	swrite('7');								// Send signal to pc telling script that is has picked up a piece
- 1d2:	87 e3       	ldi	r24, 0x37	; 55
- 1d4:	0e 94 5d 00 	call	0xba	; 0xba <swrite>
- 1d8:	08 95       	ret
+ 1da:	87 e3       	ldi	r24, 0x37	; 55
+ 1dc:	0e 94 5d 00 	call	0xba	; 0xba <swrite>
+ 1e0:	08 95       	ret
 
-000001da <__vector_15>:
+000001e2 <__vector_15>:
 	
 	
 }
 
 
 ISR(TIMER1_OVF_vect){
- 1da:	1f 92       	push	r1
- 1dc:	0f 92       	push	r0
- 1de:	0f b6       	in	r0, 0x3f	; 63
- 1e0:	0f 92       	push	r0
- 1e2:	11 24       	eor	r1, r1
- 1e4:	8f 93       	push	r24
- 1e6:	9f 93       	push	r25
+ 1e2:	1f 92       	push	r1
+ 1e4:	0f 92       	push	r0
+ 1e6:	0f b6       	in	r0, 0x3f	; 63
+ 1e8:	0f 92       	push	r0
+ 1ea:	11 24       	eor	r1, r1
+ 1ec:	8f 93       	push	r24
+ 1ee:	9f 93       	push	r25
 	
 	OCR1B = dutycycle;		// Value for compare value for timer is set to dutycycle 
- 1e8:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <__DATA_REGION_ORIGIN__>
- 1ec:	90 91 01 01 	lds	r25, 0x0101	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
- 1f0:	90 93 8b 00 	sts	0x008B, r25	; 0x80008b <__TEXT_REGION_LENGTH__+0x7f008b>
- 1f4:	80 93 8a 00 	sts	0x008A, r24	; 0x80008a <__TEXT_REGION_LENGTH__+0x7f008a>
+ 1f0:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 1f4:	90 91 01 01 	lds	r25, 0x0101	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
+ 1f8:	90 93 8b 00 	sts	0x008B, r25	; 0x80008b <__TEXT_REGION_LENGTH__+0x7f008b>
+ 1fc:	80 93 8a 00 	sts	0x008A, r24	; 0x80008a <__TEXT_REGION_LENGTH__+0x7f008a>
 }
- 1f8:	9f 91       	pop	r25
- 1fa:	8f 91       	pop	r24
- 1fc:	0f 90       	pop	r0
- 1fe:	0f be       	out	0x3f, r0	; 63
- 200:	0f 90       	pop	r0
- 202:	1f 90       	pop	r1
- 204:	18 95       	reti
+ 200:	9f 91       	pop	r25
+ 202:	8f 91       	pop	r24
+ 204:	0f 90       	pop	r0
+ 206:	0f be       	out	0x3f, r0	; 63
+ 208:	0f 90       	pop	r0
+ 20a:	1f 90       	pop	r1
+ 20c:	18 95       	reti
 
-00000206 <__vector_28>:
+0000020e <__vector_28>:
 
 ISR(USART1_RX_vect){
- 206:	1f 92       	push	r1
- 208:	0f 92       	push	r0
- 20a:	0f b6       	in	r0, 0x3f	; 63
- 20c:	0f 92       	push	r0
- 20e:	11 24       	eor	r1, r1
- 210:	2f 93       	push	r18
- 212:	3f 93       	push	r19
- 214:	4f 93       	push	r20
- 216:	5f 93       	push	r21
- 218:	6f 93       	push	r22
- 21a:	7f 93       	push	r23
- 21c:	8f 93       	push	r24
- 21e:	9f 93       	push	r25
- 220:	af 93       	push	r26
- 222:	bf 93       	push	r27
- 224:	ef 93       	push	r30
- 226:	ff 93       	push	r31
-	
-	rxdata = UDR1;			// The received message is put into a variable to fix issue with reading directly from UDR1 causing it to show old message 
- 228:	80 91 ce 00 	lds	r24, 0x00CE	; 0x8000ce <__TEXT_REGION_LENGTH__+0x7f00ce>
- 22c:	80 93 02 01 	sts	0x0102, r24	; 0x800102 <rxdata>
-	if (rxdata == '6'){
- 230:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <rxdata>
- 234:	86 33       	cpi	r24, 0x36	; 54
- 236:	21 f4       	brne	.+8      	; 0x240 <__vector_28+0x3a>
-		sei();
+ 20e:	1f 92       	push	r1
+ 210:	0f 92       	push	r0
+ 212:	0f b6       	in	r0, 0x3f	; 63
+ 214:	0f 92       	push	r0
+ 216:	11 24       	eor	r1, r1
+ 218:	2f 93       	push	r18
+ 21a:	3f 93       	push	r19
+ 21c:	4f 93       	push	r20
+ 21e:	5f 93       	push	r21
+ 220:	6f 93       	push	r22
+ 222:	7f 93       	push	r23
+ 224:	8f 93       	push	r24
+ 226:	9f 93       	push	r25
+ 228:	af 93       	push	r26
+ 22a:	bf 93       	push	r27
+ 22c:	ef 93       	push	r30
+ 22e:	ff 93       	push	r31
+	rxdata = UDR1;				// The received message is put into a variable to fix issue with reading directly from UDR1 causing it to show old message 	
+ 230:	80 91 ce 00 	lds	r24, 0x00CE	; 0x8000ce <__TEXT_REGION_LENGTH__+0x7f00ce>
+ 234:	80 93 02 01 	sts	0x0102, r24	; 0x800102 <rxdata>
+	sei();
  238:	78 94       	sei
+	if (rxdata == '6'){
+ 23a:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <rxdata>
+ 23e:	86 33       	cpi	r24, 0x36	; 54
+ 240:	19 f4       	brne	.+6      	; 0x248 <__vector_28+0x3a>
 		CloseGripper();
- 23a:	0e 94 8c 00 	call	0x118	; 0x118 <CloseGripper>
- 23e:	07 c0       	rjmp	.+14     	; 0x24e <__vector_28+0x48>
-	}
-	
-	else if (rxdata == '8'){
- 240:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <rxdata>
- 244:	88 33       	cpi	r24, 0x38	; 56
- 246:	19 f4       	brne	.+6      	; 0x24e <__vector_28+0x48>
-		sei();
- 248:	78 94       	sei
+ 242:	0e 94 90 00 	call	0x120	; 0x120 <CloseGripper>
+ 246:	46 c0       	rjmp	.+140    	; 0x2d4 <__vector_28+0xc6>
+	} else if (rxdata == '8'){
+ 248:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <rxdata>
+ 24c:	88 33       	cpi	r24, 0x38	; 56
+ 24e:	19 f4       	brne	.+6      	; 0x256 <__vector_28+0x48>
 		OpenGripper();
- 24a:	0e 94 bc 00 	call	0x178	; 0x178 <OpenGripper>
+ 250:	0e 94 c0 00 	call	0x180	; 0x180 <OpenGripper>
+ 254:	3f c0       	rjmp	.+126    	; 0x2d4 <__vector_28+0xc6>
 	}
 	
- 24e:	ff 91       	pop	r31
- 250:	ef 91       	pop	r30
- 252:	bf 91       	pop	r27
- 254:	af 91       	pop	r26
- 256:	9f 91       	pop	r25
- 258:	8f 91       	pop	r24
- 25a:	7f 91       	pop	r23
- 25c:	6f 91       	pop	r22
- 25e:	5f 91       	pop	r21
- 260:	4f 91       	pop	r20
- 262:	3f 91       	pop	r19
- 264:	2f 91       	pop	r18
- 266:	0f 90       	pop	r0
- 268:	0f be       	out	0x3f, r0	; 63
- 26a:	0f 90       	pop	r0
- 26c:	1f 90       	pop	r1
- 26e:	18 95       	reti
+	else if (rxdata == '1')
+ 256:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <rxdata>
+ 25a:	81 33       	cpi	r24, 0x31	; 49
+ 25c:	29 f4       	brne	.+10     	; 0x268 <__vector_28+0x5a>
+	{
+		dutycycle = 0;
+ 25e:	10 92 01 01 	sts	0x0101, r1	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
+ 262:	10 92 00 01 	sts	0x0100, r1	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 266:	36 c0       	rjmp	.+108    	; 0x2d4 <__vector_28+0xc6>
+	}
+	else if (rxdata == '2')
+ 268:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <rxdata>
+ 26c:	82 33       	cpi	r24, 0x32	; 50
+ 26e:	39 f4       	brne	.+14     	; 0x27e <__vector_28+0x70>
+	{
+		dutycycle = 20;
+ 270:	84 e1       	ldi	r24, 0x14	; 20
+ 272:	90 e0       	ldi	r25, 0x00	; 0
+ 274:	90 93 01 01 	sts	0x0101, r25	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
+ 278:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 27c:	2b c0       	rjmp	.+86     	; 0x2d4 <__vector_28+0xc6>
+	}
+	else if (rxdata == '3')
+ 27e:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <rxdata>
+ 282:	83 33       	cpi	r24, 0x33	; 51
+ 284:	39 f4       	brne	.+14     	; 0x294 <__vector_28+0x86>
+	{
+		dutycycle = 40;
+ 286:	88 e2       	ldi	r24, 0x28	; 40
+ 288:	90 e0       	ldi	r25, 0x00	; 0
+ 28a:	90 93 01 01 	sts	0x0101, r25	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
+ 28e:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 292:	20 c0       	rjmp	.+64     	; 0x2d4 <__vector_28+0xc6>
+	}
+	else if (rxdata == '4')
+ 294:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <rxdata>
+ 298:	84 33       	cpi	r24, 0x34	; 52
+ 29a:	39 f4       	brne	.+14     	; 0x2aa <__vector_28+0x9c>
+	{
+		dutycycle = 60;
+ 29c:	8c e3       	ldi	r24, 0x3C	; 60
+ 29e:	90 e0       	ldi	r25, 0x00	; 0
+ 2a0:	90 93 01 01 	sts	0x0101, r25	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
+ 2a4:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 2a8:	15 c0       	rjmp	.+42     	; 0x2d4 <__vector_28+0xc6>
+	}
+	else if (rxdata == '5')
+ 2aa:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <rxdata>
+ 2ae:	85 33       	cpi	r24, 0x35	; 53
+ 2b0:	39 f4       	brne	.+14     	; 0x2c0 <__vector_28+0xb2>
+	{
+		dutycycle =  80;
+ 2b2:	80 e5       	ldi	r24, 0x50	; 80
+ 2b4:	90 e0       	ldi	r25, 0x00	; 0
+ 2b6:	90 93 01 01 	sts	0x0101, r25	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
+ 2ba:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 2be:	0a c0       	rjmp	.+20     	; 0x2d4 <__vector_28+0xc6>
+	}
+else if (rxdata == '7')
+ 2c0:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <rxdata>
+ 2c4:	87 33       	cpi	r24, 0x37	; 55
+ 2c6:	31 f4       	brne	.+12     	; 0x2d4 <__vector_28+0xc6>
+{
+	dutycycle =  1023;
+ 2c8:	8f ef       	ldi	r24, 0xFF	; 255
+ 2ca:	93 e0       	ldi	r25, 0x03	; 3
+ 2cc:	90 93 01 01 	sts	0x0101, r25	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
+ 2d0:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
+}
+ 2d4:	ff 91       	pop	r31
+ 2d6:	ef 91       	pop	r30
+ 2d8:	bf 91       	pop	r27
+ 2da:	af 91       	pop	r26
+ 2dc:	9f 91       	pop	r25
+ 2de:	8f 91       	pop	r24
+ 2e0:	7f 91       	pop	r23
+ 2e2:	6f 91       	pop	r22
+ 2e4:	5f 91       	pop	r21
+ 2e6:	4f 91       	pop	r20
+ 2e8:	3f 91       	pop	r19
+ 2ea:	2f 91       	pop	r18
+ 2ec:	0f 90       	pop	r0
+ 2ee:	0f be       	out	0x3f, r0	; 63
+ 2f0:	0f 90       	pop	r0
+ 2f2:	1f 90       	pop	r1
+ 2f4:	18 95       	reti
 
-00000270 <_exit>:
- 270:	f8 94       	cli
+000002f6 <_exit>:
+ 2f6:	f8 94       	cli
 
-00000272 <__stop_program>:
- 272:	ff cf       	rjmp	.-2      	; 0x272 <__stop_program>
+000002f8 <__stop_program>:
+ 2f8:	ff cf       	rjmp	.-2      	; 0x2f8 <__stop_program>
