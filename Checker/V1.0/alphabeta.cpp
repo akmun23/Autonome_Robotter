@@ -449,7 +449,7 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
             //Adds the start and end position to the vector moves
             setMove(playerStart, playerMove);
 
-            if (depth == 1 || depth == 2){
+            if (depth == 1){
                 insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
             }
 
@@ -521,7 +521,7 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
             std::string MoveMade = playerStart + playerMove;
             setMove(playerStart, playerMove);
 
-            if (depth == 1 || depth == 2){
+            if (depth == 1){
                 insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
             }
 
