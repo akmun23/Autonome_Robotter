@@ -34,6 +34,7 @@ void LoadSimVectors(std::vector<int>& Player1SimChoise,std::vector<int>& Player2
 void IncreaseSimu(const int& drawChecker, bool& AlreadyIncreased, std::vector<int>& Player1SimChoise);
 void IncreaseOponentSimu(const int& drawChecker, std::vector<int>& Player2SimChoise);
 
+void DeleteWrongMove(std::vector<std::vector<std::string>>& tempBoard, std::string& MoveMade, int& tempPlayer);
 //qDebug() << "SqLite error:" << query.lastError().text() << ", SqLite error code:" << query.lastError().number(); // debug komando
 
 

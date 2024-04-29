@@ -1,4 +1,5 @@
 #include "validmoves.h"
+#include "CheckersDatabase.h"
 
 //Constructor for validMoves
 validMoves::validMoves(){}
@@ -434,6 +435,8 @@ bool validMoves::DB_move(std::string playerStart, std::string playerMove){ // Mo
         }
 
         if(!valid){
+            std::string move = _playerStart+_playerMove;
+            DeleteWrongMove(_boards, move , _playerTurn);
             std::cout << "Move not valid. Please enter a new move." << std::endl;
             return false;
         }
