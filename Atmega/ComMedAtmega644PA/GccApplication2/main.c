@@ -1,26 +1,21 @@
-#define F_CPU 184320000UL
+#define F_CPU 18432000UL
 
 #include <stdint.h>
 #include <avr/io.h>
 #include <util/delay.h>
 #include <string.h>
 #include <avr/interrupt.h>
+#include <stdbool.h>
 
 
 // Definerer funktioner
-void WriteMessage();
 void swrite(uint8_t byte);
 uint8_t sread();
-void InitPWMandADC();
+void InitPWM();
+void InitADC();
 void PWMStart();
 
 
-/*
-Test PWM signaler der kører på konstant værdi
-void PWM100();
-void PWM75();
-void PWM50();
-void PWM25();*/
 
 
 //Sætter variabler
@@ -28,12 +23,14 @@ double dutyCycle = 1023;
 char stopcommand[1];
 int main(void)
 {
-
-	UBRR1L = 119;							// UBBR = Freq / (16 * (BaudRate)) – 1
+	sei();	
+	
+	UBRR1 = F_CPU/(16*9600)-1;
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1);	// Tænder for reading og writing
-    InitPWMandADC();
-	DDRD = 0b00000000;
-	PORTD = 0b00000000;
+    InitPWM();
+	InitADC();
+	DDRD = 0x00;
+	PORTD = 0x00;
 
 	while (1) {
 		
@@ -41,71 +38,26 @@ int main(void)
 		char ReceivedMessage[1];
 		ReceivedMessage[0] = sread();		// Venter hele tiden på signal fra pc medmindre anden operation i koden er igang
 		
-		if (ReceivedMessage[0] == 's')
-		{
-			swrite(ReceivedMessage[0]);
-
-		}
-		
-		if (ReceivedMessage[0] == '0')
-		{
-			//Timer250us();
-			swrite(ReceivedMessage[0]);
-		}
-		if (ReceivedMessage[0] == '1')
-		{
-			
-			DDRD = 0b00100000; 
-			PORTD = 0b00100000;
-			swrite(ReceivedMessage[0]);
-
-		}
 		if (ReceivedMessage[0] == '2')
 		{
-			DDRD = 0b00000000;
-			PORTD = 0b00000000;
-			swrite(ReceivedMessage[0]);
-			
+			dutyCycle = 1023;
+			DDRD = (1 << PORTD4);
 		}
+		
 		if (ReceivedMessage[0] == '3')
 		{
-			//PWM100();
-			DDRD = 0b00010000;
-			PORTD = 0b00010000;
-			swrite(ReceivedMessage[0]);
-
+			DDRD = (0 << PORTD4);
 		}
-		if (ReceivedMessage[0] == '4')
-		{
-			//PWM75();
-			DDRD = 0b00000000;
-			PORTD = 0b00000000;
-			swrite(ReceivedMessage[0]);
-		}
-		if (ReceivedMessage[0] == '5')
-		{
-			swrite(ReceivedMessage[0]);
-		}
+		
 		if (ReceivedMessage[0] == '6')
 		{
 			PWMStart();
 		}
-		if (ReceivedMessage[0] == '7')
-		{
-			swrite(2 + '0');
-			//PWM(50,100)
-			swrite(ReceivedMessage[0]);
-		}
 		if (ReceivedMessage[0] == '8')
 		{
-			//PWM(100,50);
 			swrite(ReceivedMessage[0]);
 		}
-		if (ReceivedMessage[0] == '9')
-		{
-			_delay_ms(1000);
-			swrite(ReceivedMessage[0]);
-		}
+		
 		
 		
 	}
@@ -122,46 +74,42 @@ uint8_t sread(){
 }
 
 
-void WriteMessage(char* sendthis){
+void InitPWM(){
+		DDRD = (1 << PORTD4);									// Åbner for at der kan komme strøm ud af porten til PWM
+		
+		
+		//TCCR1A = (1 << COM1B1) | (1 << WGM11) | (1 << WGM10);	// Sætter mode til PWM, Phase Correct, 10-bit	
+		TCCR1A = (1 << COM1B1) | (1 << WGM10);	// Sætter mode til PWM, Phase Correct, 8-bit
+
+		TIMSK1 = (1 << TOIE1);
+		
+		
+		TCCR1B = (1 << CS10);									// starter timeren
+		
 	
-	for (int i = 0; i < strlen(sendthis); i++){		// Tager en større mængde tal/bogstaver og sender dem 1 af gangen 
-		swrite(sendthis[i]);						// Benytter write komandoen
-	}
 }
 
 
+void InitADC(){
 
-
-
-void InitPWMandADC(){
-	DDRD = (1 << PORTD4);									// Åbner for at der kan komme strøm ud af porten til PWM 
-	
-	
-	TCCR1A = (1 << COM1B1) | (1 << WGM11) | (1 << WGM10);	// Sætter mode til PWM, Phase Correct, 10-bit måske slet WGM11 så bliver det til 8bit
-	TIMSK1 = (1 << TOIE1);
-			
-	sei();													// Sætter interupten til PWM
-	
-	TCCR1B = (1 << CS10);									// starter timeren
-	
     /*
 	ADMUX - ADC Multiplexer Selection Register
 	
 	bit          7           6          5         4        3         2          1          0
-	name       REFS1       REFS0      ADLAR       -       MUX3      MUX2       MUX1       MUX0
-	set to       0           1          1         0        0         0          0          1
+	name       REFS1       REFS0      ADLAR      MUX4     MUX3      MUX2       MUX1       MUX0
+	set to       0           1          0         0        0         0          0          1
 	
-	REFS1 = 0    use AVCC for reference voltage
-	REFS0 = 1
+	REFS1 = 0    
+	REFS0 = 1	use AVCC with external capacitor at AREF pin
 	
 	ADLAR = 1    left justify ADC result in ADCH/ADCL
 	
 	bit 4 = 0
 	
-	MUX3 = 0     use PC1/ADC1 for input
+	MUX3 = 0     
 	MUX2 = 0
 	MUX1 = 0
-	MUX0 = 1
+	MUX0 = 1	use PC1/ADC1 for input
 	*/
 	ADMUX = 0b01100001;
 	
@@ -178,11 +126,11 @@ void InitPWMandADC(){
 	ADIF = 0     don't set ADC interrupt flag
 	ADIE = 0     don't set ADC interrupt enable
 	
-	ADPS2 = 0
-	ADPS1 = 1    MHz clock / 8 
+	ADPS2 = 1
+	ADPS1 = 0    MHz clock / 8 
 	ADPS0 = 1
 	*/
-	ADCSRA = 0b10100011;
+	ADCSRA = 0b10100101;
 	
 	/*
 	ADCSRB - ADC Control and Status Register B
@@ -201,35 +149,45 @@ void InitPWMandADC(){
 	ADTS0 = 0
 	*/
 	ADCSRB = 0b00000000;
-	
-	ADCSRA |= (1 << ADSC);		// start ADC
-	
+		
 	
 }
 
 void PWMStart(){
-	DDRD = 0b00010000;
-	PORTD = 0b00010000;
-	dutyCycle = 1023;				// Full speed 16 bit
-	_delay_ms(100);	
-	while (!(ADCH < 114)) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
-		
-		//swrite(ADCH); //Outputter spændingen den måler på porten
+	PORTC = 0b00000000;							// Makes sure the motor is going the correct way
+	DDRC = 0b00000000;
+	dutyCycle = 0;								// Enables the motor at max speed
+	_delay_ms(150);								// Short delay before first reading since starting the motor requires more power than running
+	bool ObjectHit = false;						// Bool for checking when object is hit
+	while (!(ObjectHit)) {						// Loop waiting for bool set true when object is hit
+		ADCSRA |= (1 << ADSC);					// start ADC
+		while ((ADCSRA & (1 << ADIF)) == 0){}	// Waits for a reading from the ADC to be done
+		if(ADCH <= 115){						// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
+			swrite(ADCH);
+			ObjectHit = true;
+		}
+
 	}
-	//swrite(ADCH);
-	//dutyCycle = dutyCycle/2;			// half speed
-	dutyCycle = 0;
+	dutyCycle = 1023;
 	swrite('7');
 	stopcommand[0] = sread(); // Venter på at den får sendt signal af robot der siger den er hvor der skal slippes
 	
-	dutyCycle = 1023;
+	
 	PORTC = 0b00001000;				// Vender retningen på strømmen til motoren så den kører baglæns
 	DDRC = 0b00001000;
-	_delay_ms(100);					// Find værdi her der passer med at den er åben
-	while (!(ADCH > 140)) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
-		
-		//swrite(ADCH); //Outputter spændingen den måler på porten
-	}				// half speed
+	dutyCycle = 1023;
+	_delay_ms(150);	
+	ObjectHit = false;				
+	while (!(ObjectHit)) {			// Laver en evigt loop der venter på at strømmen bliver for stor også slutter den
+		ADCSRA |= (1 << ADSC);		// start ADC
+		while ((ADCSRA & (1 << ADIF)) == 0){}
+		if(ADCH >= 144){
+			swrite(ADCH);
+			ObjectHit = true;
+		}
+
+	}
+	ADCSRA = 0b10100101;
 	DDRD = 0b00000000;
 	PORTD = 0b00000000;
 	PORTC = 0b00000000;				// Vender retningen til den anden vej igen og slukker motoren
@@ -239,185 +197,8 @@ void PWMStart(){
 	
 }
 
-
 ISR(TIMER1_OVF_vect){
 	
 	OCR1B = dutyCycle;				// Styrer hvor hurtigt den skal interupt alt efter hvor høj dutycyle er
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-
-void setupADC(){
-	
-	ADMUX = (1 << REFS0) ;
-	ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADPS0) | (1 << ADPS1) | (1 << ADPS2);
-	DIDR0 = (1 << ADC5D);
-	void startConversion(){
-
-}
-
-void startConversion(){
-	
-	ADCSRA |= (1 << ADSC);
-	
-}
-
-
-
-*/
-
-/*void PWM100(){
-	DDRD |= (1 << DDD5);
-	// PD5 is now an output
-	
-	ICR1 = 0xFFFF;
-	// set TOP to 16bit
-	
-	OCR1A = 0xBFFF;
-	// set PWM for 25% duty cycle @ 16bit
-	
-	
-	TCCR1A |= (1 << COM1A1);
-	// set none-inverting mode
-	
-	TCCR1A |= (1 << WGM11);
-	TCCR1B |= (1 << WGM12)|(1 << WGM13);
-	// set Fast PWM mode using ICR1 as TOP
-	
-	TCCR1B |= (1 << CS10);
-	// START the timer with no prescaler
-
-
-}
-
-
-
-
- void PWM75(){
-	    DDRD |= (1 << DDD5);
-	    // PD5 is now an output
-	    
-	    ICR1 = 0xFFFF;
-	    // set TOP to 16bit
-	    
-	    OCR1A = 0xBFFF;
-	    // set PWM for 25% duty cycle @ 16bit
-	    
-	    
-	    TCCR1A |= (1 << COM1A1);
-	    // set none-inverting mode
-	    
-	    TCCR1A |= (1 << WGM11);
-	    TCCR1B |= (1 << WGM12)|(1 << WGM13);
-	    // set Fast PWM mode using ICR1 as TOP
-	    
-	    TCCR1B |= (1 << CS10);
-	    // START the timer with no prescaler
-
-
-}
-
-void PWM50(){
-	DDRD |= (1 << DDD5);
-	// PD5 is now an output
-	
-	ICR1 = 0xFFFF;
-	// set TOP to 16bit
-	
-	OCR1A = 0x7FFF;
-	// set PWM for 25% duty cycle @ 16bit
-	
-	
-	TCCR1A |= (1 << COM1A1);
-	// set none-inverting mode
-	
-	TCCR1A |= (1 << WGM11);
-	TCCR1B |= (1 << WGM12)|(1 << WGM13);
-	// set Fast PWM mode using ICR1 as TOP
-	
-	TCCR1B |= (1 << CS10);
-	// START the timer with no prescaler
-
-
-}
-
-void PWM25(){
-	DDRD |= (1 << DDD5);
-	// PD5 is now an output
-	
-	ICR1 = 0xFFFF;
-	// set TOP to 16bit
-	
-	OCR1A = 0x3FFF;
-	// set PWM for 25% duty cycle @ 16bit
-	
-	
-	TCCR1A |= (1 << COM1A1);
-	// set none-inverting mode
-	
-	TCCR1A |= (1 << WGM11);
-	TCCR1B |= (1 << WGM12)|(1 << WGM13);
-	// set Fast PWM mode using ICR1 as TOP
-	
-	TCCR1B |= (1 << CS10);
-	// START the timer with no prescaler
-
-
-}*/ 

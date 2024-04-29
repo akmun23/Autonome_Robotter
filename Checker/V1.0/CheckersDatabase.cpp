@@ -142,14 +142,6 @@ void InsertNewMoveToNewBoard(int& TempBoardID, int& BoardID){    // funktion til
 
         }
     }
-    query.prepare("DELETE FROM TempMoves WHERE tempBoard_id = :tempBoard_id");
-    query.bindValue(":tempBoard_id", TempBoardID);
-    query.exec();
-
-    query.prepare("DELETE FROM Temp WHERE tempBoard_id = :tempBoard_id");
-    query.bindValue(":tempBoard_id", TempBoardID);
-    query.exec();
-
 }
 
 void InserNewMoveToOldBoard(int& BoardID, int& TempBoardID){
@@ -164,13 +156,6 @@ void InserNewMoveToOldBoard(int& BoardID, int& TempBoardID){
     while (query.next()) {
         HandleNewMoves(query.value(0).toString(), query.value(1).toInt(), query.value(2).toFloat(),BoardID);
     }
-    query.prepare("DELETE FROM TempMoves WHERE tempBoard_id = :tempBoard_id");
-    query.bindValue(":tempBoard_id", TempBoardID);
-    query.exec();
-
-    query.prepare("DELETE FROM Temp WHERE tempBoard_id = :tempBoard_id");
-    query.bindValue(":tempBoard_id", TempBoardID);
-    query.exec();
 }
 
 
@@ -455,6 +440,52 @@ void IncreaseOponentSimu(const int& drawChecker, std::vector<int> &Player2SimCho
     query.exec("select MoveChoise from SimMovesP2");
     while (query.next()) {
         Player2SimChoise.push_back(query.value(0).toInt());
+    }
+
+}
+
+
+
+void DeleteWrongMove(std::vector<std::vector<std::string>>& tempBoard, std::string& MoveMade, int& tempPlayer){
+
+    QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
+    QSqlQuery query = QSqlQuery(db);
+
+    std::string output;
+
+    for (int i = 0; i < 8; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            if(tempBoard[i][j] == "1 "){
+                output += "1";
+            } else if(tempBoard[i][j] == "B "){
+                output += "2";
+            } else if(tempBoard[i][j] == "BK"){
+                output += "3";
+            } else if(tempBoard[i][j] == "R "){
+                output += "4";
+            } else if(tempBoard[i][j] == "RK"){
+                output += "5";
+            }
+        }
+    }
+
+    query.prepare("Select board_id from UniqueBoard where BoardState = :BoardState");
+    query.bindValue(":BoardState",QString::fromStdString(output));
+    query.exec();
+    query.first();
+    int board_id = query.value(0).toInt();
+
+    if (tempPlayer == 1){
+        query.prepare("DELETE FROM MovesP1 WHERE board_id = :board_id AND Move = :Move");
+        query.bindValue(":board_id", board_id);
+        query.bindValue(":Move", QString::fromStdString(MoveMade));
+        query.exec();
+    }
+    else if (tempPlayer == 2){
+        query.prepare("DELETE FROM MovesP2 WHERE board_id = :board_id AND Move = :Move");
+        query.bindValue(":board_id", board_id);
+        query.bindValue(":Move", QString::fromStdString(MoveMade));
+        query.exec();
     }
 
 }
