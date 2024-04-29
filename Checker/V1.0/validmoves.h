@@ -10,8 +10,8 @@
 
 class validMoves
 {
-    std::string _playerStart = {};
-    std::string _playerMove = {};
+    std::string _playerStart = "a1";
+    std::string _playerMove = "a1";
     int _playerTurn = 1;
     int _blackPieces = 12;
     int _redPieces = 12;

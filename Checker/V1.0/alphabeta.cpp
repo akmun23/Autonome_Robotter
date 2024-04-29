@@ -1,4 +1,5 @@
 #include "alphabeta.h"
+#include "opencv2/core/cvdef.h"
 
 // The constructor for the alphaBeta class with no defined values
 alphaBeta::alphaBeta(validMoves* vm):_vm(vm){
@@ -441,7 +442,6 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
 
         //Iterates through all possible moves
         for (int i = 0; i < (posMove.size()-1); i += 2) {
-
             //Sets the start and end position for the move
             playerStart = posMove[i];
             playerMove = posMove[i+1];
@@ -450,7 +450,7 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
             setMove(playerStart, playerMove);
 
             if (depth == 1 || depth == 2){
-                insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
+                // insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
             }
 
             //Checks if the piece has jumped
@@ -479,7 +479,7 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
                 bestMoves = {playerStart, playerMove};
                 bestBlack = getPieceCount()[0];
                 bestRed = getPieceCount()[1];
-                alpha = eval;
+
                 if(moreJump && jumped && !promotion){
                     bestPlayer = 1;
                 } else {
@@ -487,12 +487,13 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
                 }
             }
 
-            //If eval is higher than beta, it breaks the for-loop
-            /*
-            if(eval > beta){
+            alpha = MAX(maxEval, alpha);
+
+            //If alpha is higher than beta, it breaks the for-loop
+            if(alpha >= beta){
                 break;
             }
-            */
+
 
             //Resets the board, pieces, and moves
             setBoards(boards);
@@ -522,7 +523,7 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
             setMove(playerStart, playerMove);
 
             if (depth == 1 || depth == 2){
-                insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
+                // insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
             }
 
             jumped = pieceJump();
@@ -539,13 +540,14 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
             } else {
                 eval = findMove(getBoards(), depth-1, 1, blackPieces, redPieces, alpha, beta, {},CounterForTempTable);
             }
+
             if(maxEval > eval){
                 maxEval = eval;
                 bestBoard = getBoards();
                 bestMoves = {playerStart, playerMove};
                 bestBlack = getPieceCount()[0];
                 bestRed = getPieceCount()[1];
-                beta = eval;
+                beta = eval;               
 
                 if(moreJump && jumped && !promotion){
                     bestPlayer = 2;
@@ -553,10 +555,12 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
                     bestPlayer = 1;
                 }
             }
-            /*
-            if(eval < alpha){
+
+            beta = MIN(maxEval, beta);
+
+            if(alpha >= beta){
                 break;
-            }*/
+            }
 
             //Resets the board, pieces, and moves
             setBoards(boards);

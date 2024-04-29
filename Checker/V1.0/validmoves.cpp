@@ -421,6 +421,7 @@ bool validMoves::DB_move(std::string playerStart, std::string playerMove){ // Mo
 
     //Checks all possible moves
     std::vector<std::string> moves = movePossible();
+
     while(!valid){
         for (int i = 0; i < moves.size(); i += 2) {
             if(_playerStart == moves[i] && _playerMove == moves[i+1]){

@@ -3,6 +3,7 @@
 #include<string>
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
+#include <chrono>
 
 #include "validmoves.h"
 #include "mainfunctions.h"
@@ -14,7 +15,7 @@
 //using namespace ur_rtde;
 int main(int argc, char** argv) {
 
-    std::string RunMode = "SimOnly"; // Options are "Evolutions", "RobotWithVision" or "DatabaseSimulation"
+    std::string RunMode = "DatabaseSimulation"; // Options are "Evolutions", "RobotWithVision" or "DatabaseSimulation"
 
     if (RunMode == "Evolutions"){
 
@@ -356,7 +357,7 @@ int main(int argc, char** argv) {
 
 
     else if (RunMode == "DatabaseSimulation"){
-
+/*
         QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
         db.setHostName("localhost");
         db.setDatabaseName("CheckersDatabase");
@@ -365,7 +366,7 @@ int main(int argc, char** argv) {
         db.open();
 
         QSqlQuery query;
-
+*/
 
         //Database settings
         bool ResetDB = false; //If the database should be reset set this to true
@@ -376,8 +377,8 @@ int main(int argc, char** argv) {
 
         for (int ii = 1; ii <= 1; ++ii) {
 
-            int CounterForTempTable = 1;
-            int depth = 6; //Depth of the alphaBeta algorithm
+            int CounterForTempTable = 0;
+            int depth = 3; //Depth of the alphaBeta algorithm
             int playerTurn = 1; //Which player's turn it is
             int blackPieces = 12; //Initial number of black pieces
             int redPieces = 12; //Initial number of red pieces
@@ -385,13 +386,13 @@ int main(int argc, char** argv) {
             int thisTurn; //Which player's turn it is
             int DrawChecker = 1; //When this equal 200 the game is called draw
 
-            std::string player = "Simu"; //If the player is human or AI
-            std::string player2 = "Simu"; //If the player is human or AI
+            std::string player = "AI"; //If the player is human or AI
+            std::string player2 = "AI"; //If the player is human or AI
             std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
             std::string MoveMade = {}; // Stores the move made to put it in the database
             bool DatabaseMoveMade = false;
             validMoves validMoves;
-            alphaBeta alphaBeta(0);
+            alphaBeta alphaBeta(&validMoves, 0);
 
 
             int TestCounterForDatabase = 0;
@@ -400,14 +401,13 @@ int main(int argc, char** argv) {
 
             int UniqueBoardIDCounter;
             // Skriv true i nr 2 input hvis temp skal uploades til databasen inden man starter spillet
-            DatabaseInit(UniqueBoardIDCounter,LoadTempBeforeStart); //Initializes the database
+            // DatabaseInit(UniqueBoardIDCounter,LoadTempBeforeStart); //Initializes the database
 
             // Construct initial board
             std::vector<std::vector<std::string>> boards = startUp();
             validMoves.setBoards(boards);
-
+            auto start = std::chrono::high_resolution_clock::now();
             while(true){ //Game loop
-
                 std::string BoardState = "";
                 loadBoardToString(boards,BoardState);
 
@@ -417,7 +417,7 @@ int main(int argc, char** argv) {
                 thisTurn = playerTurn; //Which player's turn it is
 
                 if (DrawChecker == 201){ // Tjekker om der er gået 175 træk uden en vinder
-                    query.exec("UPDATE TempMoves SET WinOrLoss = 0.5"); // Sætter en halv ind i wincase for uafgjort
+                    // query.exec("UPDATE TempMoves SET WinOrLoss = 0.5"); // Sætter en halv ind i wincase for uafgjort
                     std::cout << "The game is a draw!" << std::endl;
                     break;
                 }
@@ -430,7 +430,8 @@ int main(int argc, char** argv) {
 
                     if((playerTurn == 1 && player == "p") || (playerTurn == 2 && player2 == "p")){
 
-                        //move(playerTurn, boards, redPieces, blackPieces); //Player's move
+                        checkerBoard(boards);
+                        while(!validMoves.move()){} //Player's move
 
                     } else {
                         if (playerTurn == 1 && player == "DB" || playerTurn == 2 && player2 == "DB"){
@@ -440,15 +441,19 @@ int main(int argc, char** argv) {
                         }
                         else if (playerTurn == 1 && player == "Random" || playerTurn == 2 && player2 == "Random"){
 
+                            checkerBoard(boards);
                             MoveRandom(moveSet, DatabaseMoveMade, validMoves); // Random move
 
                         }
                         else if (playerTurn == 1 && player == "AI" || playerTurn == 2 && player2 == "AI"){
-                            //alphaBeta.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {},CounterForTempTable); //AI's move
+                            CounterForTempTable = 0;
+                            checkerBoard(boards);
+                            alphaBeta.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
                             moveSet = alphaBeta.getMove();
                         }
                     }
 
+                    moveSet = validMoves.getMove();
                     playerTurn = validMoves.getPlayerTurn();
                     boards = validMoves.getBoards();
                     blackPieces = validMoves.getPieceCount()[0];
@@ -457,21 +462,22 @@ int main(int argc, char** argv) {
                     // Skriv true i første input for at køre robotten
                     //MoveRobot(false,fut,tempBoard,thisTurn,moveSet,startUpRobot,i); //Robot movement
 
-                    printAIMove(DatabaseMoveMade,moveSet,MoveMade,thisTurn); //Prints the move made by the AI
+                    // printAIMove(DatabaseMoveMade,moveSet,MoveMade,thisTurn); //Prints the move made by the AI
 
                     MoveMade = moveSet[0]+moveSet[1];
                     std::string *MoveMadePtr = &MoveMade;
 
-                    InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
+                    // InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
 
 
 
-                    printGameState(ii,DrawChecker,redPieces,blackPieces,playerTurn,boards,depth,alphaBeta); //Prints the game state
+                    // printGameState(ii,DrawChecker,redPieces,blackPieces,playerTurn,boards,depth,alphaBeta); //Prints the game state
 
                     DrawChecker++;
                     i++;
 
                 } else { //If no valid moves, or no more pieces on the board
+                    checkerBoard(boards);
                     gameEnd = true; //Game has ended
                     break;
                 }
@@ -479,10 +485,14 @@ int main(int argc, char** argv) {
 
             //Prints the winner of the game
             if(gameEnd){
-                GameEnd(redPieces,blackPieces,playerTurn);
+                std::cout << "Game played at depth: " << depth << std::endl;
+                auto stop = std::chrono::high_resolution_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+                std::cout << "Game took: " << duration.count() << " milliseconds" << std::endl;
+                // GameEnd(redPieces,blackPieces,playerTurn);
             }
 
-            UploadTempToDatabase(UniqueBoardIDCounter, UploadTempToDB); // Uploads the temp table to the database
+            //UploadTempToDatabase(UniqueBoardIDCounter, UploadTempToDB); // Uploads the temp table to the database
             //std::cout << "Moves made by database: " << TestCounterForDatabase << std::endl;
         }
     }

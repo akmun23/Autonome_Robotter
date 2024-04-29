@@ -35,7 +35,7 @@ class alphaBeta : public validMoves
     int _playerTurn;
     int _CounterForTempTable;
 
-    validMoves * _vm;
+    validMoves* _vm;
 
 public:
     QSqlQuery query;
