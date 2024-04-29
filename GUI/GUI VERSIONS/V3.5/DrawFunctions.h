@@ -1,11 +1,8 @@
-<<<<<<< HEAD
-=======
 #include "alphabeta.h"
 #include "boardUpdate.h"
 #include "robot.h"
 #include "validmoves.h"
 
->>>>>>> evolutionAI
 #include <iostream>
 #include <opencv4/opencv2/opencv.hpp>
 #include <opencv4/opencv2/core.hpp>
@@ -32,12 +29,8 @@ string moveStart = "", moveEnd = "";
 int thisTurn; //Which player's turn it is
 int blackPieces = 12; //Initial number of black pieces
 int redPieces = 12; //Initial number of red pieces
-<<<<<<< HEAD
-int depth = 5;
-=======
 int depth = 7; //Depth of the minimax algorithm
 std::vector<std::vector<std::string>> boards; //2D vec of strings, that represent the board state.
->>>>>>> evolutionAI
 
 bool startUpMain = true; //Bool, true if code is being run for the first time.
 
@@ -53,7 +46,7 @@ void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves
     string spiller2 = "Det er spiller 2's tur.";
     string playerTurnString, outputString;
 
-    ((turnVal%2 == 0) ? playerTurnString = spiller1 : playerTurnString = spiller2);
+    ((thisTurn%2 == 0) ? playerTurnString = spiller1 : playerTurnString = spiller2);
 
     rectangle(img, Point(115,0), Point(500,35), Scalar(255,255,255), -1); //Creates a white rectangle, that covers the old text.
     putText(img, playerTurnString, Point(115, 25), FONT_HERSHEY_COMPLEX, 1, Scalar(0,0,0), 1); //Prints new text.
@@ -61,11 +54,7 @@ void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves
     if(turnVal > 0){
         outputString = moveStart + " To " + moveEnd + ": ";
         moves.push_back(outputString);
-<<<<<<< HEAD
-        scores.push_back(giveBoardScore(boards, thisTurn, blackPieces, redPieces, depth));
-=======
         scores.push_back(alphaBeta.giveScoreAI(boards, thisTurn, blackPieces, redPieces, depth)/1000);
->>>>>>> evolutionAI
 
         rectangle(img, Point(700,75), Point(1000,200), Scalar(255,255,255), -1);
 
@@ -144,7 +133,7 @@ void Draw(Mat& img, bool& startUpMain){
         }
 
         //Loads graveyard segment image, and resizes it to fit inside rect.
-        resize(imread("/home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt/graveyard.jpg"), graveyardDownSized, Size(50, 50), INTER_LINEAR);
+        resize(imread("/home/aksel/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/graveyard.jpg"), graveyardDownSized, Size(50, 50), INTER_LINEAR);
         graveyardDownSized.copyTo(img(blackGraveyardRect)); //Draws graveyard onto img.
         graveyardDownSized.copyTo(img(redGraveyardRect));
 
@@ -225,14 +214,8 @@ void Draw(Mat& img, bool& startUpMain){
     }
 
     //COPY
-<<<<<<< HEAD
-        Rect moveRect(Point(redGraveyardRect.x - 30, redGraveyardRect.y + 100), Point(redGraveyardRect.x + 80, redGraveyardRect.y + 150));
-        rectangle(img, moveRect, Scalar(0,0,0), -1);
-        putText(img, "Take Picture", Point(moveRect.x + 8, moveRect.y + 30), FONT_HERSHEY_COMPLEX_SMALL, 0.6, Scalar(255,255,255));
-=======
     rectangle(img, takePicture, Scalar(0,0,0), -1);
     putText(img, "Take Picture", Point(takePicture.x + 8, takePicture.y + 30), FONT_HERSHEY_COMPLEX_SMALL, 0.6, Scalar(255,255,255));
->>>>>>> evolutionAI
     //
 
     //Draws checkers on new positions.
@@ -542,19 +525,11 @@ void promotionGUI(vector<Circle> checkerVector){
 }
 
 bool isGameWon(vector<Circle> checkerVec, vector<Circle> enemyCheckerVec, int turn){
-<<<<<<< HEAD
-
-=======
->>>>>>> evolutionAI
     if(checkerVec == rCheckers){
         if(piecesLeft(rectangles, enemyCheckerVec) < 1){
             return true;
         }
-<<<<<<< HEAD
-        else if(movePossible(turn, boards, jumpPossible(turn, boards), false, "").size() < 1){
-=======
         else if(validM.movePossible().size() < 1){
->>>>>>> evolutionAI
             return true;
         }
         else{
@@ -565,11 +540,7 @@ bool isGameWon(vector<Circle> checkerVec, vector<Circle> enemyCheckerVec, int tu
         if(piecesLeft(rectangles, enemyCheckerVec) < 1){
             return true;
         }
-<<<<<<< HEAD
-        else if(movePossible(turn, boards, jumpPossible(turn, boards), false, "").size() < 1){
-=======
         else if(validM.movePossible().size() < 1){
->>>>>>> evolutionAI
             return true;
         }
         else{

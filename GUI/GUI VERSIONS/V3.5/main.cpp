@@ -332,15 +332,15 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
             circle(img, {rectangles[selected[selected.size()-2]].x + 25, rectangles[selected[selected.size()-2]].y + 25}, 20, Vec3b(14,17,175), -1);
             imshow(winName, img);
 
-            blackPieces = validM.getPieceCount()[0];
-            redPieces = validM.getPieceCount()[1];
-            thisTurn = validM.getPlayerTurn();
-            boards = validM.getBoards();
-            checkerBoard(boards);
-
             bCheckers[selected[selected.size()-1]].x = intPos[intPos.size()-2];
             bCheckers[selected[selected.size()-1]].y = intPos[intPos.size()-1];
         }
+
+        blackPieces = validM.getPieceCount()[0];
+        redPieces = validM.getPieceCount()[1];
+        thisTurn = validM.getPlayerTurn();
+        boards = validM.getBoards();
+        checkerBoard(boards);
 
         Draw(img, startUpMain);
 
