@@ -168,9 +168,9 @@ void Vision::cameraFeed(){
 // Finds the coordinates for the three calibration circles
 void Vision::calibrationCircles(){
     // Preset values for the three calibration circles
-    cv::Vec3b green = {170, 210, 200};
+    cv::Vec3b green = {160, 210, 205};
     cv::Vec3b yellow = {140, 241, 241};
-    cv::Vec3b magenta = {200, 140, 180};
+    cv::Vec3b magenta = {195, 120, 180};
     bool greenFound = false;
     bool yellowFound = false;
     bool magentaFound = false;

@@ -4,13 +4,8 @@
 
 
 # Configuration directories and files
-<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/DartConfiguration.tcl
-SourceDirectory: /home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5
-BuildDirectory: /home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build
-=======
 SourceDirectory: /home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5
 BuildDirectory: /home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build/Desktop-Debug
->>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/DartConfiguration.tcl
 
 # Where to place the cost data store
 CostDataFile: 
@@ -19,11 +14,7 @@ CostDataFile:
 Site: pascal-Aspire-A515-56G
 
 # Build name is osname-revision-compiler, i.e. Linux-2.4.2-2smp-c++
-<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/DartConfiguration.tcl
-BuildName: Linux-clang++-16
-=======
 BuildName: Linux-g++-11
->>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/DartConfiguration.tcl
 
 # Subprojects
 LabelsForSubprojects: 
@@ -36,13 +27,8 @@ SubmitInactivityTimeout:
 NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
-<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/DartConfiguration.tcl
-ConfigureCommand: "/usr/bin/cmake" "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5"
-MakeCommand: /usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}"
-=======
 ConfigureCommand: "/home/pascal/Qt/Tools/CMake/bin/cmake" "/home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5"
 MakeCommand: /home/pascal/Qt/Tools/CMake/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}"
->>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/DartConfiguration.tcl
 DefaultCTestConfigurationType: Release
 
 # version control
@@ -77,13 +63,8 @@ UpdateOptions:
 UpdateType: 
 
 # Compiler info
-<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/DartConfiguration.tcl
-Compiler: /usr/bin/clang++-16
-CompilerVersion: 16.0.6
-=======
 Compiler: /usr/bin/g++-11
 CompilerVersion: 11.4.0
->>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/DartConfiguration.tcl
 
 # Dynamic analysis (MemCheck)
 PurifyCommand: 

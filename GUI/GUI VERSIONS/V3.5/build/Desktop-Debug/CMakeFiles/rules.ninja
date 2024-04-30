@@ -17,11 +17,7 @@
 rule CXX_COMPILER__Project_GUI_unscanned_Debug
   depfile = $DEP_FILE
   deps = gcc
-<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/CMakeFiles/rules.ninja
-  command = ${LAUNCHER}${CODE_CHECK}/usr/bin/clang++-16 $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
-=======
   command = ${LAUNCHER}${CODE_CHECK}/usr/bin/g++-11 $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
->>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/CMakeFiles/rules.ninja
   description = Building CXX object $out
 
 
@@ -29,11 +25,7 @@ rule CXX_COMPILER__Project_GUI_unscanned_Debug
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_LINKER__Project_GUI_Debug
-<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/CMakeFiles/rules.ninja
-  command = $PRE_LINK && /usr/bin/clang++-16 $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
-=======
   command = $PRE_LINK && /usr/bin/g++-11 $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
->>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/CMakeFiles/rules.ninja
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
 
@@ -50,11 +42,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/CMakeFiles/rules.ninja
-  command = /usr/bin/cmake --regenerate-during-build -S"/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5" -B"/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build"
-=======
   command = /home/pascal/Qt/Tools/CMake/bin/cmake --regenerate-during-build -S"/home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5" -B"/home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build/Desktop-Debug"
->>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/CMakeFiles/rules.ninja
   description = Re-running CMake...
   generator = 1
 
@@ -63,11 +51,7 @@ rule RERUN_CMAKE
 # Rule for cleaning all built files.
 
 rule CLEAN
-<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/CMakeFiles/rules.ninja
-  command = /usr/bin/ninja $FILE_ARG -t clean $TARGETS
-=======
   command = /home/pascal/Qt/Tools/Ninja/ninja $FILE_ARG -t clean $TARGETS
->>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/CMakeFiles/rules.ninja
   description = Cleaning all built files...
 
 
@@ -75,10 +59,6 @@ rule CLEAN
 # Rule for printing all primary targets available.
 
 rule HELP
-<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/CMakeFiles/rules.ninja
-  command = /usr/bin/ninja -t targets
-=======
   command = /home/pascal/Qt/Tools/Ninja/ninja -t targets
->>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/CMakeFiles/rules.ninja
   description = All primary targets available:
 

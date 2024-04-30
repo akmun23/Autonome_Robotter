@@ -291,11 +291,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "Project_GUI::@6890427a1f51a3e7e1df",
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/codemodel-v2-3cc3a95800bf95a8e8a1.json
-					"jsonFile" : "target-Project_GUI-Debug-40ce432a93a1780329f2.json",
-========
 					"jsonFile" : "target-Project_GUI-Debug-25036b0e476090340865.json",
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/codemodel-v2-1241c55cf5d447abd045.json
 					"name" : "Project_GUI",
 					"projectIndex" : 0
 				}
@@ -305,13 +301,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/codemodel-v2-3cc3a95800bf95a8e8a1.json
-		"build" : "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build",
-		"source" : "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5"
-========
 		"build" : "/home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build/Desktop-Debug",
 		"source" : "/home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5"
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/codemodel-v2-1241c55cf5d447abd045.json
 	},
 	"version" : 
 	{

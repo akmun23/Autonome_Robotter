@@ -26,7 +26,8 @@ add_executable(Project_GUI main.cpp
     robot.h robot.cpp
     AtmegaCom.h AtmegaCom.cpp
     DrawFunctions.h
-    GameFunctions.h)
+    GameFunctions.h
+    checkersdatabase.h checkersdatabase.cpp)
 
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

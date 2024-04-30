@@ -30,6 +30,58 @@
 			"value" : ""
 		},
 		{
+			"name" : "Boost_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for Boost."
+				}
+			],
+			"type" : "PATH",
+			"value" : "/usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0"
+		},
+		{
+			"name" : "Boost_INCLUDE_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Path to a file."
+				}
+			],
+			"type" : "PATH",
+			"value" : "/usr/include"
+		},
+		{
+			"name" : "Boost_SYSTEM_LIBRARY_RELEASE",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : ""
+				}
+			],
+			"type" : "STRING",
+			"value" : "/usr/lib/x86_64-linux-gnu/libboost_system.so.1.74.0"
+		},
+		{
+			"name" : "Boost_THREAD_LIBRARY_RELEASE",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : ""
+				}
+			],
+			"type" : "STRING",
+			"value" : "/usr/lib/x86_64-linux-gnu/libboost_thread.so.1.74.0"
+		},
+		{
 			"name" : "CMAKE_ADDR2LINE",
 			"properties" : 
 			[
@@ -43,7 +95,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/llvm-addr2line-16"
+			"value" : "/usr/bin/addr2line"
 		},
 		{
 			"name" : "CMAKE_AR",
@@ -59,7 +111,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/llvm-ar-16"
+			"value" : "/usr/bin/ar"
 		},
 		{
 			"name" : "CMAKE_BUILD_TYPE",
@@ -83,11 +135,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"value" : "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build"
-========
 			"value" : "/home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build/Desktop-Debug"
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -126,8 +174,6 @@
 			"value" : "7"
 		},
 		{
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-========
 			"name" : "CMAKE_COLOR_DIAGNOSTICS",
 			"properties" : 
 			[
@@ -140,7 +186,6 @@
 			"value" : "1"
 		},
 		{
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 			"name" : "CMAKE_COMMAND",
 			"properties" : 
 			[
@@ -193,13 +238,8 @@
 					"value" : "CXX compiler"
 				}
 			],
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"type" : "FILEPATH",
-			"value" : "/usr/bin/clang++-16"
-========
 			"type" : "STRING",
 			"value" : "/usr/bin/g++-11"
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 		},
 		{
 			"name" : "CMAKE_CXX_COMPILER_AR",
@@ -211,31 +251,11 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "LLVM archiver"
+					"value" : "A wrapper around 'ar' adding the appropriate '--plugin' option for the GCC compiler"
 				}
 			],
 			"type" : "FILEPATH",
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"value" : "/usr/bin/llvm-ar-16"
-		},
-		{
-			"name" : "CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS",
-			"properties" : 
-			[
-				{
-					"name" : "ADVANCED",
-					"value" : "1"
-				},
-				{
-					"name" : "HELPSTRING",
-					"value" : "`clang-scan-deps` dependency scanner"
-				}
-			],
-			"type" : "FILEPATH",
-			"value" : "/usr/bin/clang-scan-deps-16"
-========
 			"value" : "/usr/bin/gcc-ar-11"
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 		},
 		{
 			"name" : "CMAKE_CXX_COMPILER_RANLIB",
@@ -247,15 +267,11 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "Generate index for LLVM archive"
+					"value" : "A wrapper around 'ranlib' adding the appropriate '--plugin' option for the GCC compiler"
 				}
 			],
 			"type" : "FILEPATH",
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"value" : "/usr/bin/llvm-ranlib-16"
-========
 			"value" : "/usr/bin/gcc-ranlib-11"
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 		},
 		{
 			"name" : "CMAKE_CXX_FLAGS",
@@ -362,13 +378,8 @@
 					"value" : "C compiler"
 				}
 			],
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"type" : "FILEPATH",
-			"value" : "/usr/bin/clang-16"
-========
 			"type" : "STRING",
 			"value" : "/usr/bin/gcc"
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 		},
 		{
 			"name" : "CMAKE_C_COMPILER_AR",
@@ -380,31 +391,11 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "LLVM archiver"
+					"value" : "A wrapper around 'ar' adding the appropriate '--plugin' option for the GCC compiler"
 				}
 			],
 			"type" : "FILEPATH",
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"value" : "/usr/bin/llvm-ar-16"
-		},
-		{
-			"name" : "CMAKE_C_COMPILER_CLANG_SCAN_DEPS",
-			"properties" : 
-			[
-				{
-					"name" : "ADVANCED",
-					"value" : "1"
-				},
-				{
-					"name" : "HELPSTRING",
-					"value" : "`clang-scan-deps` dependency scanner"
-				}
-			],
-			"type" : "FILEPATH",
-			"value" : "/usr/bin/clang-scan-deps-16"
-========
 			"value" : "/usr/bin/gcc-ar-11"
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 		},
 		{
 			"name" : "CMAKE_C_COMPILER_RANLIB",
@@ -416,15 +407,11 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "Generate index for LLVM archive"
+					"value" : "A wrapper around 'ranlib' adding the appropriate '--plugin' option for the GCC compiler"
 				}
 			],
 			"type" : "FILEPATH",
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"value" : "/usr/bin/llvm-ranlib-16"
-========
 			"value" : "/usr/bin/gcc-ranlib-11"
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 		},
 		{
 			"name" : "CMAKE_C_FLAGS",
@@ -532,7 +519,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/llvm-dlltool-16"
+			"value" : "CMAKE_DLLTOOL-NOTFOUND"
 		},
 		{
 			"name" : "CMAKE_EDIT_COMMAND",
@@ -664,11 +651,7 @@
 				}
 			],
 			"type" : "STATIC",
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"value" : "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build/CMakeFiles/pkgRedirects"
-========
 			"value" : "/home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/CMakeFiles/pkgRedirects"
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -679,11 +662,7 @@
 					"value" : "No help, variable specified on the command line."
 				}
 			],
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"type" : "INTERNAL",
-========
 			"type" : "STRING",
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 			"value" : "Ninja"
 		},
 		{
@@ -723,6 +702,18 @@
 			"value" : ""
 		},
 		{
+			"name" : "CMAKE_HAVE_LIBC_PTHREAD",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Test CMAKE_HAVE_LIBC_PTHREAD"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "1"
+		},
+		{
 			"name" : "CMAKE_HOME_DIRECTORY",
 			"properties" : 
 			[
@@ -732,11 +723,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"value" : "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5"
-========
 			"value" : "/home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5"
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -792,11 +779,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"value" : "/usr/bin/ninja"
-========
 			"value" : "/home/pascal/Qt/Tools/Ninja/ninja"
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 		},
 		{
 			"name" : "CMAKE_MODULE_LINKER_FLAGS",
@@ -892,7 +875,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/llvm-nm-16"
+			"value" : "/usr/bin/nm"
 		},
 		{
 			"name" : "CMAKE_NUMBER_OF_MAKEFILES",
@@ -920,7 +903,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/llvm-objcopy-16"
+			"value" : "/usr/bin/objcopy"
 		},
 		{
 			"name" : "CMAKE_OBJDUMP",
@@ -936,7 +919,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/llvm-objdump-16"
+			"value" : "/usr/bin/objdump"
 		},
 		{
 			"name" : "CMAKE_PLATFORM_INFO_INITIALIZED",
@@ -1084,7 +1067,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/llvm-ranlib-16"
+			"value" : "/usr/bin/ranlib"
 		},
 		{
 			"name" : "CMAKE_READELF",
@@ -1100,7 +1083,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/llvm-readelf-16"
+			"value" : "/usr/bin/readelf"
 		},
 		{
 			"name" : "CMAKE_ROOT",
@@ -1320,7 +1303,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/llvm-strip-16"
+			"value" : "/usr/bin/strip"
 		},
 		{
 			"name" : "CMAKE_TAPI",
@@ -1735,6 +1718,18 @@
 			"value" : "1500"
 		},
 		{
+			"name" : "FIND_PACKAGE_MESSAGE_DETAILS_Boost",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Details about finding Boost"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "[/usr/lib/x86_64-linux-gnu/cmake/Boost-1.74.0/BoostConfig.cmake][cfound components: system thread ][v1.74.0()]"
+		},
+		{
 			"name" : "FIND_PACKAGE_MESSAGE_DETAILS_OpenCV",
 			"properties" : 
 			[
@@ -1744,11 +1739,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"value" : "[/usr/local][v4.9.0()]"
-========
 			"value" : "[/usr][v4.5.4()]"
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 		},
 		{
 			"name" : "GITCOMMAND",
@@ -1796,11 +1787,7 @@
 				}
 			],
 			"type" : "STRING",
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"value" : "/usr/bin/cmake --build . --config \"${CTEST_CONFIGURATION_TYPE}\""
-========
 			"value" : "/home/pascal/Qt/Tools/CMake/bin/cmake --build . --config \"${CTEST_CONFIGURATION_TYPE}\""
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 		},
 		{
 			"name" : "MEMORYCHECK_COMMAND",
@@ -1844,7 +1831,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "/usr/local/lib/cmake/opencv4"
+			"value" : "/usr/lib/x86_64-linux-gnu/cmake/opencv4"
 		},
 		{
 			"name" : "P4COMMAND",
@@ -1872,11 +1859,7 @@
 				}
 			],
 			"type" : "STATIC",
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"value" : "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build"
-========
 			"value" : "/home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build/Desktop-Debug"
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 		},
 		{
 			"name" : "Project_GUI_IS_TOP_LEVEL",
@@ -1900,9 +1883,6 @@
 				}
 			],
 			"type" : "STATIC",
-<<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-9b591c882279837ee4ab.json
-			"value" : "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5"
-========
 			"value" : "/home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5"
 		},
 		{
@@ -1952,7 +1932,6 @@
 			],
 			"type" : "PATH",
 			"value" : "/usr/lib/x86_64-linux-gnu/cmake/Qt5Sql"
->>>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/.cmake/api/v1/reply/cache-v2-d1184c70088fcbbe8c13.json
 		},
 		{
 			"name" : "SITE",
@@ -1997,6 +1976,82 @@
 			],
 			"type" : "INTERNAL",
 			"value" : "TRUE"
+		},
+		{
+			"name" : "boost_atomic_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for boost_atomic."
+				}
+			],
+			"type" : "PATH",
+			"value" : "/usr/lib/x86_64-linux-gnu/cmake/boost_atomic-1.74.0"
+		},
+		{
+			"name" : "boost_headers_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for boost_headers."
+				}
+			],
+			"type" : "PATH",
+			"value" : "/usr/lib/x86_64-linux-gnu/cmake/boost_headers-1.74.0"
+		},
+		{
+			"name" : "boost_system_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for boost_system."
+				}
+			],
+			"type" : "PATH",
+			"value" : "/usr/lib/x86_64-linux-gnu/cmake/boost_system-1.74.0"
+		},
+		{
+			"name" : "boost_thread_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "ADVANCED",
+					"value" : "1"
+				},
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for boost_thread."
+				}
+			],
+			"type" : "PATH",
+			"value" : "/usr/lib/x86_64-linux-gnu/cmake/boost_thread-1.74.0"
+		},
+		{
+			"name" : "ur_rtde_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for ur_rtde."
+				}
+			],
+			"type" : "PATH",
+			"value" : "/usr/local/lib/cmake/ur_rtde"
 		}
 	],
 	"kind" : "cache",

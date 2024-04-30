@@ -1,14 +1,7 @@
-<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/CMakeFiles/3.27.4/CMakeCXXCompiler.cmake
-set(CMAKE_CXX_COMPILER "/usr/bin/clang++-16")
-set(CMAKE_CXX_COMPILER_ARG1 "")
-set(CMAKE_CXX_COMPILER_ID "Clang")
-set(CMAKE_CXX_COMPILER_VERSION "16.0.6")
-=======
 set(CMAKE_CXX_COMPILER "/usr/bin/g++-11")
 set(CMAKE_CXX_COMPILER_ARG1 "")
 set(CMAKE_CXX_COMPILER_ID "GNU")
 set(CMAKE_CXX_COMPILER_VERSION "11.4.0")
->>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/CMakeFiles/3.27.7/CMakeCXXCompiler.cmake
 set(CMAKE_CXX_COMPILER_VERSION_INTERNAL "")
 set(CMAKE_CXX_COMPILER_WRAPPER "")
 set(CMAKE_CXX_STANDARD_COMPUTED_DEFAULT "17")
@@ -29,21 +22,14 @@ set(CMAKE_CXX_SIMULATE_VERSION "")
 
 
 
-<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/CMakeFiles/3.27.4/CMakeCXXCompiler.cmake
-set(CMAKE_AR "/usr/bin/llvm-ar-16")
-set(CMAKE_CXX_COMPILER_AR "/usr/bin/llvm-ar-16")
-set(CMAKE_RANLIB "/usr/bin/llvm-ranlib-16")
-set(CMAKE_CXX_COMPILER_RANLIB "/usr/bin/llvm-ranlib-16")
-=======
 set(CMAKE_AR "/usr/bin/ar")
 set(CMAKE_CXX_COMPILER_AR "/usr/bin/gcc-ar-11")
 set(CMAKE_RANLIB "/usr/bin/ranlib")
 set(CMAKE_CXX_COMPILER_RANLIB "/usr/bin/gcc-ranlib-11")
->>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/CMakeFiles/3.27.7/CMakeCXXCompiler.cmake
 set(CMAKE_LINKER "/usr/bin/ld")
 set(CMAKE_MT "")
 set(CMAKE_TAPI "CMAKE_TAPI-NOTFOUND")
-set(CMAKE_COMPILER_IS_GNUCXX )
+set(CMAKE_COMPILER_IS_GNUCXX 1)
 set(CMAKE_CXX_COMPILER_LOADED 1)
 set(CMAKE_CXX_COMPILER_WORKS TRUE)
 set(CMAKE_CXX_ABI_COMPILED TRUE)
@@ -93,13 +79,7 @@ endif()
 
 
 
-<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/CMakeFiles/3.27.4/CMakeCXXCompiler.cmake
-set(CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES "/usr/include/c++/13;/usr/include/x86_64-linux-gnu/c++/13;/usr/include/c++/13/backward;/usr/lib/llvm-16/lib/clang/16/include;/usr/local/include;/usr/include/x86_64-linux-gnu;/usr/include")
-set(CMAKE_CXX_IMPLICIT_LINK_LIBRARIES "stdc++;m;gcc_s;gcc;c;gcc_s;gcc")
-set(CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES "/usr/lib/gcc/x86_64-linux-gnu/13;/usr/lib64;/lib/x86_64-linux-gnu;/lib64;/usr/lib/x86_64-linux-gnu;/lib;/usr/lib")
-=======
 set(CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES "/usr/include/c++/11;/usr/include/x86_64-linux-gnu/c++/11;/usr/include/c++/11/backward;/usr/lib/gcc/x86_64-linux-gnu/11/include;/usr/local/include;/usr/include/x86_64-linux-gnu;/usr/include")
 set(CMAKE_CXX_IMPLICIT_LINK_LIBRARIES "stdc++;m;gcc_s;gcc;c;gcc_s;gcc")
 set(CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES "/usr/lib/gcc/x86_64-linux-gnu/11;/usr/lib/x86_64-linux-gnu;/usr/lib;/lib/x86_64-linux-gnu;/lib")
->>>>>>> evolutionAI:GUI/GUI VERSIONS/V3.5/build/Desktop-Debug/CMakeFiles/3.27.7/CMakeCXXCompiler.cmake
 set(CMAKE_CXX_IMPLICIT_LINK_FRAMEWORK_DIRECTORIES "")
