@@ -450,8 +450,9 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
             setMove(playerStart, playerMove);
 
             if (depth == 1){
-                //insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
+                insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
             }
+
 
             //Checks if the piece has jumped
             jumped = pieceJump();
@@ -523,7 +524,7 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
             setMove(playerStart, playerMove);
 
             if (depth == 1){
-                //insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
+                insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
             }
 
             jumped = pieceJump();

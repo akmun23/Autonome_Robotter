@@ -1,5 +1,4 @@
 #include "mainfunctions.h"
-
 void resetDB(bool choise){
     if(choise == true){
         QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Opretter forbindelse til databasen
@@ -28,7 +27,6 @@ void DatabaseInit(int& UniqueBoardIDCounter, bool UploadTemp){
         std::cout << "Uploaded" << std::endl;
 
     }
-    RefreshTempTable(); // Refreshes the Temp table
 
 }
 
@@ -54,7 +52,6 @@ void loadBoardToString(std::vector<std::vector<std::string>> boards, std::string
 void MoveDBMain(std::string& BoardState, int& playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces, std::vector<std::string>& moveSet, int& CounterForTempTable, int& DrawChecker, bool& DatabaseMoveMade, int& TestCounterForDatabase, validMoves& validm, alphaBeta alphab){
     std::string DBmove = MovePlayer(BoardState, playerTurn); // Database best move on current board
     if (DBmove == "No moves"){
-        std::cout << "No moves found" << std::endl;
         MoveRandom(moveSet, DatabaseMoveMade, validm);
     } else {
         std::cout << "AI move from database: " << DBmove << std::endl;

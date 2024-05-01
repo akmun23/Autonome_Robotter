@@ -1,8 +1,4 @@
-<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/cmake_install.cmake
-# Install script for directory: /home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5
-=======
 # Install script for directory: /home/pascal/Documents/GitHub/Autonome_Robotter/Checker/V1.0
->>>>>>> evolutionAI:Checker/V1.0/build/Desktop-Debug/cmake_install.cmake
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -43,7 +39,7 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/usr/bin/llvm-objdump-16")
+  set(CMAKE_OBJDUMP "/usr/bin/objdump")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -54,9 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-<<<<<<< HEAD:GUI/GUI VERSIONS/V3.5/build/cmake_install.cmake
-file(WRITE "/home/mads-hyrup/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/build/${CMAKE_INSTALL_MANIFEST}"
-=======
 file(WRITE "/home/pascal/Documents/GitHub/Autonome_Robotter/Checker/V1.0/build/Desktop-Debug/${CMAKE_INSTALL_MANIFEST}"
->>>>>>> evolutionAI:Checker/V1.0/build/Desktop-Debug/cmake_install.cmake
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
