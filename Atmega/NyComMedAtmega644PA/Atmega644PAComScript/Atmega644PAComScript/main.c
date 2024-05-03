@@ -64,7 +64,7 @@ void InitPWM(){
 void InitADC(){
 	
 	ADMUX = (1 << REFS0) | (1 << MUX0);					// AVCC at AREF pin and ADC1 Chosen
-	ADCSRA = (1 << ADEN) | (ADPS2);						// Aden enables ADC and then 32 division factor is set to reach between 200khz and 50khz
+	ADCSRA = (1 << ADEN) | (ADPS2);						// Maybe set all 3 ADPS pins so division factor is 128 this would give a F_ADC of aprox 150khz
 }
 
 
