@@ -370,11 +370,10 @@ int main(int argc, char** argv) {
 
         //Database settings
         bool ResetDB = false; //If the database should be reset set this to true
-        bool LoadTempBeforeStart = false; //If there are a full temp table from previous games that should be loaded before the game starts set this to true
-        bool UploadTempToDB = true; //If the temp table should be uploaded to the database after the game ends set this to true
+        bool LoadTempBeforeStart = true; //If there are a full temp table from previous games that should be loaded before the game starts set this to true
+        bool UploadTempToDB = false; //If the temp table should be uploaded to the database after the game ends set this to true
         resetDB(ResetDB); // Resets the database
         int UniqueBoardIDCounter;
-
         int CounterForTempTable = 1;
         int depth = 5; //Depth of the alphaBeta algorithm
         int playerTurn = 1; //Which player's turn it is
@@ -389,15 +388,15 @@ int main(int argc, char** argv) {
         std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
         std::string MoveMade = {}; // Stores the move made to put it in the database
         bool DatabaseMoveMade = false;
-        validMoves validMoves;
-        alphaBeta alphaBeta(&validMoves, 0);
+
         int TestCounterForDatabase = 0;
 
 
-        for (int ii = 1; ii <= 100; ++ii) {
+        for (int ii = 1; ii <= 1; ++ii) {
+            validMoves validMoves;
+            alphaBeta alphaBeta(&validMoves, 0);
+            std::cout << "Game Started" << std::endl;
             std::cout << "Game number: " << ii << std::endl;
-            RefreshTempTable(); // Refreshes the Temp table
-            std::cout << "GameStartet" << std::endl;
             CounterForTempTable = 1;
             playerTurn = 1; //Which player's turn it is
             blackPieces = 12; //Initial number of black pieces
@@ -408,7 +407,7 @@ int main(int argc, char** argv) {
             moveSet = {}; //The moves that have been made during the turn
             MoveMade = {}; // Stores the move made to put it in the database
 
-
+            thisTurn = playerTurn; //Which player's turn it is
             validMoves.setPlayerTurn(playerTurn);
             validMoves.setPieceCount(blackPieces, redPieces);
 
@@ -417,7 +416,8 @@ int main(int argc, char** argv) {
             int UniqueBoardIDCounter;
             // Skriv true i nr 2 input hvis temp skal uploades til databasen inden man starter spillet
             DatabaseInit(UniqueBoardIDCounter,LoadTempBeforeStart); //Initializes the database
-
+            std::cout << "Database initialized" << std::endl;
+            while(1);
             // Construct initial board
             std::vector<std::vector<std::string>> boards = startUp();
             validMoves.setBoards(boards);
@@ -439,7 +439,7 @@ int main(int argc, char** argv) {
 
                 //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
                 if((validMoves.movePossible().size()) > 0 && redPieces > 0 && blackPieces > 0){
-                    //std::cout << "Player " << playerTurn << "'s turn:" << std::endl; //Prints which player's turn it is
+                    std::cout << "Player " << playerTurn << "'s turn:" << std::endl; //Prints which player's turn it is
                     std::vector<std::vector<std::string>> tempBoard = boards; // To be used in robotMove
 
                     if((playerTurn == 1 && player == "p") || (playerTurn == 2 && player2 == "p")){
@@ -481,7 +481,7 @@ int main(int argc, char** argv) {
                     MoveMade = moveSet[0]+moveSet[1];
                     std::string *MoveMadePtr = &MoveMade;
 
-                    //InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
+                    InsertToTemp(*outputPtr, *MoveMadePtr, CounterForTempTable, thisTurn);  // Indsætter rykket hvis det ikke er en kopi af et move den allerede har lavet i spillet
 
                     //printGameState(ii,DrawChecker,redPieces,blackPieces,playerTurn,boards,depth,alphaBeta); //Prints the game state
 
@@ -490,7 +490,7 @@ int main(int argc, char** argv) {
                     i++;
 
                 } else { //If no valid moves, or no more pieces on the board
-                    checkerBoard(boards);
+                    //checkerBoard(boards);
                     gameEnd = true; //Game has ended
                     break;
                 }
@@ -500,6 +500,7 @@ int main(int argc, char** argv) {
             if(gameEnd){
                 GameEnd(redPieces,blackPieces,playerTurn);
             }
+
             std::cout << "Game Ended " << std::endl;
 
             UploadTempToDatabase(UniqueBoardIDCounter, UploadTempToDB); // Uploads the temp table to the database
