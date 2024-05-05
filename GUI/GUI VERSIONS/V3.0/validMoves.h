@@ -455,7 +455,19 @@ bool DB_move(int& playerTurn, std::vector<std::vector<std::string>>& boards, int
 //Gives the board a game score based on the number of pieces and the number of possible moves
 //Used in the alphaBeta function
 int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTurn, int& black, int& red, int& depth){
-    int score = 0;
+    double score = 0;
+
+    //Values used to calculate the score
+    double _piece = 9.559397480568023;
+    double _king = 14.66551921526645;
+    double _forward = 0.8713181519315153;
+    double _lock = 2.886680350048823;
+    double _lockKing = 3.4905191066448387;
+    double _TwoEmpty = 22.023951943802267;
+    double _OneJump = 24.64160311651794;
+    double _OneEmpty = 5.227387139291636;
+    double _TwoJump = 141.6052036767301;
+    double _depth = 1.2327709215647928;
 
     std::random_device rd;  // Obtain a random number from hardware
     std::mt19937 eng(rd()); // Seed the generator
@@ -464,6 +476,7 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
 
     // Checks if a jump is possible
     std::vector<std::string> jump1 = jumpPossible(1, boards);
+
     std::vector<std::string> jump2 = jumpPossible(2, boards);
 
     bool moreMove = false;
@@ -473,53 +486,53 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             if(boards[i][j] == "B "){
-                score += 10;
-                score += i/2;
+                score += _piece;
+                score += i/_forward;
                 if((i == 5) && (boards[i+2][j] == "R " || boards[i+2][j] == "RK")){
-                    score += 5;
+                    score += _lock;
                 }
                 if((j == 2) && (boards[i][j-2] == "R " || boards[i][j-2] == "RK")){
-                    score += 5;
+                    score += _lock;
                 } else if((j == 5) && (boards[i][j+2] == "R " || boards[i][j+2] == "RK")){
-                    score += 5;
+                    score += _lock;
                 }
             }
             else if(boards[i][j] == "BK"){
-                score += 20;
+                score += _king;
                 if((i == 5) && (boards[i+2][j] == "R " || boards[i+2][j] == "RK")){
-                    score += 5;
+                    score += _lockKing;
                 } else if((i == 2) && (boards[i-2][j] == "R " || boards[i-2][j] == "RK")){
-                    score += 5;
+                    score += _lockKing;
                 }
                 if((j == 2) && (boards[i][j-2] == "R " || boards[i][j-2] == "RK")){
-                    score += 5;
+                    score += _lockKing;
                 } else if((j == 5) && (boards[i][j+2] == "R " || boards[i][j+2] == "RK")){
-                    score += 5;
+                    score += _lockKing;
                 }
             }
             else if(boards[i][j] == "R "){
-                score -= 10;
-                score -= -(4-(i+1)/2);
+                score -= _piece;
+                score -= -(4-(i+1)/_forward);
                 if((i == 2) && (boards[i-2][j] == "B " || boards[i-2][j] == "BK")){
-                    score -= 5;
+                    score -= _lock;
                 }
                 if((j == 2) && (boards[i][j-2] == "B " || boards[i][j-2] == "BK")){
-                    score -= 5;
+                    score -= _lock;
                 } else if((j == 5) && (boards[i][j+2] == "B " || boards[i][j+2] == "BK")){
-                    score -= 5;
+                    score -= _lock;
                 }
             }
             else if(boards[i][j] == "RK"){
-                score -= 20;
+                score -= _king;
                 if((i == 2) && (boards[i-2][j] == "B " || boards[i-2][j] == "BK")){
-                    score -= 5;
+                    score -= _lockKing;
                 } else if((i == 5) && (boards[i+2][j] == "B " || boards[i+2][j] == "BK")){
-                    score -= 5;
+                    score -= _lockKing;
                 }
                 if((j == 2) && (boards[i][j-2] == "B " || boards[i][j-2] == "BK")){
-                    score -= 5;
+                    score -= _lockKing;
                 } else if((j == 5) && (boards[i][j+2] == "B " || boards[i][j+2] == "BK")){
-                    score -= 5;
+                    score -= _lockKing;
                 }
             }
         }
@@ -529,16 +542,16 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
     //And if the game is in a winning state
 
     if(jump2.empty()){
-        score += 20;
+        score += _TwoEmpty;
         if(!(jump1.empty())){
-            score += 50;
+            score += _OneJump;
         }
     }
 
     if(jump1.empty()){
-        score -= 10;
+        score -= _OneEmpty;
         if(!(jump2.empty())){
-            score -= 80;
+            score -= _TwoJump;
         }
     }
 
@@ -547,16 +560,16 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
     }
 
     if(jump1.empty()){
-        score -= 20;
+        score -= _TwoEmpty;
         if(!jump2.empty()){
-            score -= 50;
+            score -= _OneJump;
         }
     }
 
     if(jump2.empty()){
-        score += 10;
+        score += _OneEmpty;
         if(!(jump1.empty())){
-            score += 80;
+            score += _TwoJump;
         }
     }
 
@@ -565,9 +578,9 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
     }
 
     if(playerTurn == 1){
-        score += depth*10;
+        score += depth*_depth;
     } else {
-        score -= depth*10;
+        score -= depth*_depth;
     }
 
     score *= 1000;
@@ -578,8 +591,10 @@ int giveBoardScore(std::vector<std::vector<std::string>>& boards, int& playerTur
         score -= random;
     }
 
+    int roundedScore = score;
+
     //Returns the score
-    return score;
+    return roundedScore;
 }
 
 // The alphaBeta function

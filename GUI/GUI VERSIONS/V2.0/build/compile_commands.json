@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt/build",
-  "command": "/usr/bin/g++  -isystem /usr/include/opencv4 -g -o CMakeFiles/Project_GUI.dir/main.cpp.o -c /home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt/main.cpp",
-  "file": "/home/mads-hyrup/Uni/2.-Semester/SemesterProjekt/Projekt/main.cpp",
-  "output": "CMakeFiles/Project_GUI.dir/main.cpp.o"
-}
-]

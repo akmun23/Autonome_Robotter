@@ -19,10 +19,23 @@ alphaBeta::alphaBeta(validMoves* vm):_vm(vm){
     _depth *= distr(eng);
 }
 
+alphaBeta::alphaBeta(validMoves* vm, std::string setValues):_vm(vm){
+    _piece = 10;
+    _king = 20;
+    _lock = 5;
+    _lockKing = 5;
+    _forward = 2;
+    _TwoEmpty = 20;
+    _OneJump = 50;
+    _OneEmpty = 10;
+    _TwoJump = 80;
+    _depth = 2;
+}
+
 alphaBeta::alphaBeta(validMoves* vm, int depth):_depthAI(depth), _vm(vm){}
 
 // The constructor for the alphaBeta class with defined values
-alphaBeta::alphaBeta(validMoves* vm, double piece, double king, double lock, double lockKing, double forward, double TwoEmpty, double OneJump, double OneEmpty, double TwoJump, double depth) {
+alphaBeta::alphaBeta(validMoves* vm, double id, double piece, double king, double lock, double lockKing, double forward, double TwoEmpty, double OneJump, double OneEmpty, double TwoJump, double depth) {
     _vm = vm;
     _piece = piece;
     _king = king;
@@ -34,10 +47,13 @@ alphaBeta::alphaBeta(validMoves* vm, double piece, double king, double lock, dou
     _OneEmpty = OneEmpty;
     _TwoJump = TwoJump;
     _depth = depth;
+    _id = id;
+}
 
+void alphaBeta::allTimeID(){
     // Finds the id in the database that matches the values
     query.prepare("SELECT ai_id "
-                  "FROM points "
+                  "FROM allTime "
                   "WHERE piece = :piece "
                   "AND king <= :king "
                   "AND locked = :lock "
@@ -450,7 +466,7 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
             setMove(playerStart, playerMove);
 
             if (depth == 1){
-                insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
+                // insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
             }
 
             //Checks if the piece has jumped
@@ -523,7 +539,7 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
             setMove(playerStart, playerMove);
 
             if (depth == 1){
-                insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
+                // insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
             }
 
             jumped = pieceJump();
@@ -594,16 +610,37 @@ void alphaBeta::evolve(double rate){
     std::random_device rd;  // Obtain a random number from hardware
     std::mt19937 eng(rd()); // Seed the generator
     std::uniform_real_distribution<> distr(1-rate, 1+rate); // Define the range for the random number
-    _piece *= distr(eng); // Generate a random number
-    _king *= distr(eng);
-    _lock *= distr(eng);
-    _lockKing *= distr(eng);
-    _forward *= distr(eng);
-    _TwoEmpty *= distr(eng);
-    _OneJump *= distr(eng);
-    _OneEmpty *= distr(eng);
-    _TwoJump *= distr(eng);
-    _depth *= distr(eng);
+    std::uniform_real_distribution<> evolveChance(0, 100); // Only if number is higher than 90 will the value be evolved
+    if(evolveChance(eng) > 90){
+        _piece *= distr(eng); // Generate a random number
+    }
+    if(evolveChance(eng) > 90){
+        _king *= distr(eng);
+    }
+    if(evolveChance(eng) > 90){
+        _lock *= distr(eng);
+    }
+    if(evolveChance(eng) > 90){
+        _lockKing *= distr(eng);
+    }
+    if(evolveChance(eng) > 90){
+        _forward *= distr(eng);
+    }
+    if(evolveChance(eng) > 90){
+        _TwoEmpty *= distr(eng);
+    }
+    if(evolveChance(eng) > 90){
+        _OneJump *= distr(eng);
+    }
+    if(evolveChance(eng) > 90){
+        _OneEmpty *= distr(eng);
+    }
+    if(evolveChance(eng) > 90){
+        _TwoJump *= distr(eng);
+    }
+    if(evolveChance(eng) > 90){
+        _depth *= distr(eng);
+    }
 
     query.prepare("UPDATE points "
                   "SET piece = :piece, "
@@ -669,20 +706,52 @@ void alphaBeta::dbInsert(){
 
 // Adds a winner to the database
 void alphaBeta::addWinner(){
-    query.prepare("INSERT INTO allTime(ai_id, piece, king, locked, lockKing, forward, TwoEmpty, OneJump, OneEmpty, TwoJump, depth) "
-                  "VALUES (:id, :piece, :king, :lock, :lockKing, :forward, :TwoEmpty, :OneJump, :OneEmpty, :TwoJump, :depth)");
+    query.prepare("SELECT (winner.wins + (winner.draws * 0.33)) AS winrate "
+                  "FROM points "
+                  "JOIN winner ON points.ai_id = winner.ai_id "
+                  "WHERE points.ai_id = :id");
     query.bindValue(":id", _id);
-    query.bindValue(":piece", _piece);
-    query.bindValue(":king", _king);
-    query.bindValue(":lock", _lock);
-    query.bindValue(":lockKing", _lockKing);
-    query.bindValue(":forward", _forward);
-    query.bindValue(":TwoEmpty", _TwoEmpty);
-    query.bindValue(":OneJump", _OneJump);
-    query.bindValue(":OneEmpty", _OneEmpty);
-    query.bindValue(":TwoJump", _TwoJump);
-    query.bindValue(":depth", _depth);
     query.exec();
+    query.next();
+    double winrate = query.value(0).toDouble();
+
+    if(winrate < 10){
+        return;
+    }
+
+    query.prepare("SELECT COUNT(*) FROM allTime WHERE ai_id = :id");
+    query.bindValue(":id", _id);
+    query.exec();
+    query.next(); // Move to the first record
+    int count = query.value(0).toInt();
+
+    if (count > 0) {
+        // AI ID exists, update the existing record
+        query.prepare("UPDATE allTime SET winrate = :winrate WHERE ai_id = :id");
+        query.bindValue(":winrate", winrate);
+        query.bindValue(":id", _id);
+        query.exec();
+
+    } else {
+        // AI ID does not exist, insert a new record
+        query.prepare("INSERT INTO allTime(ai_id, piece, king, locked, lockKing, forward, TwoEmpty, OneJump, "
+                            "OneEmpty, TwoJump, depth, winrate) "
+                            "VALUES (:id, :piece, :king, :lock, :lockKing, :forward, :TwoEmpty, :OneJump, :OneEmpty, "
+                            ":TwoJump, :depth, :winrate)");
+        query.bindValue(":id", _id);
+        query.bindValue(":piece", _piece);
+        query.bindValue(":king", _king);
+        query.bindValue(":lock", _lock);
+        query.bindValue(":lockKing", _lockKing);
+        query.bindValue(":forward", _forward);
+        query.bindValue(":TwoEmpty", _TwoEmpty);
+        query.bindValue(":OneJump", _OneJump);
+        query.bindValue(":OneEmpty", _OneEmpty);
+        query.bindValue(":TwoJump", _TwoJump);
+        query.bindValue(":depth", _depth);
+        query.bindValue(":winrate", winrate);
+        query.exec();
+    }
 }
 
 void alphaBeta::makeMove(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, int alpha, int beta, std::string playerMove,int& CounterForTempTable){

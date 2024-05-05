@@ -168,21 +168,21 @@ void Vision::cameraFeed(){
 // Finds the coordinates for the three calibration circles
 void Vision::calibrationCircles(){
     // Preset values for the three calibration circles
-    cv::Vec3b green = {170, 210, 200};
-    cv::Vec3b yellow = {140, 241, 241};
-    cv::Vec3b magenta = {200, 140, 180};
-    bool greenFound = false;
+    cv::Vec3b red = {70, 70, 255};
+    cv::Vec3b yellow = {150, 255, 255};
+    cv::Vec3b blue = {255, 70, 0};
+    bool redFound = false;
     bool yellowFound = false;
-    bool magentaFound = false;
+    bool blueFound = false;
     int i = 0;
-    while(!greenFound || !yellowFound || !magentaFound){
+    while(!redFound || !yellowFound || !blueFound){
         if(i > 0){
             cameraFeed();
             detectAndDrawCentersOfCircles();
 
-            greenFound = false;
+            redFound = false;
             yellowFound = false;
-            magentaFound = false;
+            blueFound = false;;
         }
 
         // Stores the coordinates of the three calibration circles
@@ -191,19 +191,19 @@ void Vision::calibrationCircles(){
         _magentaFunc = {0, 0};
 
         // Tolerance for the color detection
-        int tolerance = 25;
+        int tolerance = 75;
 
         // Finds the coordinates of the three calibration circles by iterating through all the detected circles
         for (int k = 0; k < _circles.size(); k++) {
-            if((green[0]-tolerance < _colors[k][0]) && (green[0]+tolerance > _colors[k][0]) && (green[1]-tolerance < _colors[k][1]) && (green[1]+tolerance > _colors[k][1]) && (green[2]-tolerance < _colors[k][2]) && (green[2]+tolerance > _colors[k][2])){
+            if((red[0]-tolerance < _colors[k][0]) && (red[0]+tolerance > _colors[k][0]) && (red[1]-tolerance < _colors[k][1]) && (red[1]+tolerance > _colors[k][1]) && (red[2]-tolerance < _colors[k][2]) && (red[2]+tolerance > _colors[k][2])){
                 _greenFunc = {_circles[k][0], _circles[k][1]};
-                greenFound = true;
+                redFound = true;
             } else if((yellow[0]-tolerance < _colors[k][0]) && (yellow[0]+tolerance > _colors[k][0]) && (yellow[1]-tolerance < _colors[k][1]) && (yellow[1]+tolerance > _colors[k][1]) && (yellow[2]-tolerance < _colors[k][2]) && (yellow[2]+tolerance > _colors[k][2])){
                 _yellowFunc = {_circles[k][0], _circles[k][1]};
                 yellowFound = true;
-            } else if((magenta[0]-tolerance < _colors[k][0]) && (magenta[0]+tolerance > _colors[k][0]) && (magenta[1]-tolerance < _colors[k][1]) && (magenta[1]+tolerance > _colors[k][1]) && (magenta[2]-tolerance < _colors[k][2]) && (magenta[2]+tolerance > _colors[k][2])){
+            } else if((blue[0]-tolerance < _colors[k][0]) && (blue[0]+tolerance > _colors[k][0]) && (blue[1]-tolerance < _colors[k][1]) && (blue[1]+tolerance > _colors[k][1]) && (blue[2]-tolerance < _colors[k][2]) && (blue[2]+tolerance > _colors[k][2])){
                 _magentaFunc = {_circles[k][0], _circles[k][1]};
-                magentaFound = true;
+                blueFound = true;
             }
         }
         i++;

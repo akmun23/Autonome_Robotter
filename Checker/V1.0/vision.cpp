@@ -168,9 +168,9 @@ void Vision::cameraFeed(){
 // Finds the coordinates for the three calibration circles
 void Vision::calibrationCircles(){
     // Preset values for the three calibration circles
-    cv::Vec3b green = {170, 210, 200};
-    cv::Vec3b yellow = {130, 220, 235};
-    cv::Vec3b magenta = {200, 138, 160};
+    cv::Vec3b red = {100, 100, 255};
+    cv::Vec3b yellow = {160, 255, 255};
+    cv::Vec3b blue = {105, 255, 0};
     bool greenFound = false;
     bool yellowFound = false;
     bool magentaFound = false;
@@ -191,17 +191,17 @@ void Vision::calibrationCircles(){
         _magentaFunc = {0, 0};
 
         // Tolerance for the color detection
-        int tolerance = 25;
+        int tolerance = 50;
 
         // Finds the coordinates of the three calibration circles by iterating through all the detected circles
         for (int k = 0; k < _circles.size(); k++) {
-            if((green[0]-tolerance < _colors[k][0]) && (green[0]+tolerance > _colors[k][0]) && (green[1]-tolerance < _colors[k][1]) && (green[1]+tolerance > _colors[k][1]) && (green[2]-tolerance < _colors[k][2]) && (green[2]+tolerance > _colors[k][2])){
+            if((red[0]-tolerance < _colors[k][0]) && (red[0]+tolerance > _colors[k][0]) && (red[1]-tolerance < _colors[k][1]) && (red[1]+tolerance > _colors[k][1]) && (red[2]-tolerance < _colors[k][2]) && (red[2]+tolerance > _colors[k][2])){
                 _greenFunc = {_circles[k][0], _circles[k][1]};
                 greenFound = true;
             } else if((yellow[0]-tolerance < _colors[k][0]) && (yellow[0]+tolerance > _colors[k][0]) && (yellow[1]-tolerance < _colors[k][1]) && (yellow[1]+tolerance > _colors[k][1]) && (yellow[2]-tolerance < _colors[k][2]) && (yellow[2]+tolerance > _colors[k][2])){
                 _yellowFunc = {_circles[k][0], _circles[k][1]};
                 yellowFound = true;
-            } else if((magenta[0]-tolerance < _colors[k][0]) && (magenta[0]+tolerance > _colors[k][0]) && (magenta[1]-tolerance < _colors[k][1]) && (magenta[1]+tolerance > _colors[k][1]) && (magenta[2]-tolerance < _colors[k][2]) && (magenta[2]+tolerance > _colors[k][2])){
+            } else if((blue[0]-tolerance < _colors[k][0]) && (blue[0]+tolerance > _colors[k][0]) && (blue[1]-tolerance < _colors[k][1]) && (blue[1]+tolerance > _colors[k][1]) && (blue[2]-tolerance < _colors[k][2]) && (blue[2]+tolerance > _colors[k][2])){
                 _magentaFunc = {_circles[k][0], _circles[k][1]};
                 magentaFound = true;
             }

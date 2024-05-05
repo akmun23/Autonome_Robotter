@@ -1,99 +1,36 @@
-//Returns a vector of possible moves for a player
-std::vector<std::string> validMoves::movePossible(int playerTurn, std::vector<std::vector<std::string>>& boards, std::vector<std::string>& playerJump, bool& moreMove, std::string& playerMove){
-    char column;
-    char column2;
-    std::vector<std::string> posMove = {};
-
-    //If a jump is possible it goes into this if-statement since a jump is mandatory
-    if(playerJump.size() > 0){
-        //If the player is able to jump again, it checks all the possible jumps for the new board-state
-        if(moreMove){
-            for(int i = 0; i < playerJump.size(); i +=2){
-                if(playerMove == playerJump[i]){
-                    posMove.push_back(playerJump[i]);
-                    posMove.push_back(playerJump[i+1]);
-                }
-            }
-        } else {
-            //Set posMove to all possible jumps, since no piece has jumped yet
-            posMove = playerJump;
-        }
-        //Returns the vector posMove
-        return posMove;
-    }
-
-    //If no jump is possible, it goes into this if-statement
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-
-            if(boards[i][j] == "1 " || boards[i][j] == "  "){
-                continue;
-            }
-
-            if(playerTurn == 1 && ((boards[i][j] == "B ") || (boards[i][j] == "BK"))){ //If it is player 1's turn, it checks if the player's piece is able to move
-                if(i < 7){
-                    if((j < 7) && (boards[i+1][j+1] == "1 ")){
-                        column = 'a' + i;
-                        column2 = 'a' + i + 1;
-                        posMove.push_back(column + std::to_string(j+1));
-                        posMove.push_back(column2 + std::to_string(j+2));
-                    }
-                    if((j > 0) && (boards[i+1][j-1] == "1 ")){
-                        column = 'a' + i;
-                        column2 = 'a' + i + 1;
-                        posMove.push_back(column + std::to_string(j+1));
-                        posMove.push_back(column2 + std::to_string(j));
-                    }
-                }
-                if(i > 0){
-                    if((j < 7) && (boards[i][j] == "BK") && (boards[i-1][j+1] == "1 ")){
-                        column = 'a' + i;
-                        column2 = 'a' + i - 1;
-                        posMove.push_back(column + std::to_string(j+1));
-                        posMove.push_back(column2 + std::to_string(j+2));
-                    }
-                    if((j > 0) && (boards[i][j] == "BK") && (boards[i-1][j-1] == "1 ")){
-                        column = 'a' + i;
-                        column2 = 'a' + i - 1;
-                        posMove.push_back(column + std::to_string(j+1));
-                        posMove.push_back(column2 + std::to_string(j));
-                    }
-                }
-
-            } else if((playerTurn == 2) && ((boards[i][j] == "R ") || (boards[i][j] == "RK"))){ //If it is player 2's turn, it checks if the player's piece is able to move
-                if(i > 0){
-                    if((j < 7) && (boards[i-1][j+1] == "1 ")){
-                        column = 'a' + i;
-                        column2 = 'a' + i - 1;
-                        posMove.push_back(column + std::to_string(j+1));
-                        posMove.push_back(column2 + std::to_string(j+2));
-                    }
-                    if((j > 0) && (boards[i-1][j-1] == "1 ")){
-                        column = 'a' + i;
-                        column2 = 'a' + i - 1;
-                        posMove.push_back(column + std::to_string(j+1));
-                        posMove.push_back(column2 + std::to_string(j));
-                    }
-                }
-                if(i < 7){
-                    if((j < 7) && (boards[i][j] == "RK") && (boards[i+1][j+1] == "1 ")){
-                        column = 'a' + i;
-                        column2 = 'a' + i + 1;
-                        posMove.push_back(column + std::to_string(j+1));
-                        posMove.push_back(column2 + std::to_string(j+2));
-                    }
-                    if((j > 0) && (boards[i][j] == "RK") && (boards[i+1][j-1] == "1 ")){
-                        column = 'a' + i;
-                        column2 = 'a' + i + 1;
-                        posMove.push_back(column + std::to_string(j+1));
-                        posMove.push_back(column2 + std::to_string(j));
-
-                    }
-                }
-            }
-        }
-    }
-
-    //Returns the vector posMove
-    return posMove;
-}
+CREATE TABLE points (
+    ai_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    piece DOUBLE,
+    king DOUBLE,
+    locked DOUBLE,
+    lockKing DOUBLE,
+    forward DOUBLE,
+    TwoEmpty DOUBLE,
+    OneJump DOUBLE,
+    OneEmpty DOUBLE,
+    TwoJump DOUBLE,
+    depth DOUBLE
+);
+    
+create table winner (
+	ai_id INT NOT NULL,
+	wins INT DEFAULT 0,
+	loses INT DEFAULT 0,
+	draws INT DEFAULT 0,
+	FOREIGN KEY (ai_id) REFERENCES points(ai_id)
+);
+    
+CREATE TABLE allTime (
+    ai_id INT NOT NULL PRIMARY KEY,
+    piece DOUBLE,
+    king DOUBLE,
+    locked DOUBLE,
+    lockKing DOUBLE,
+    forward DOUBLE,
+    TwoEmpty DOUBLE,
+    OneJump DOUBLE,
+    OneEmpty DOUBLE,
+    TwoJump DOUBLE,
+    depth DOUBLE,
+    winrate double
+);

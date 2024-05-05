@@ -35,26 +35,38 @@ int main(int argc, char** argv) {
         validMoves validMoves;
 
         std::vector<alphaBeta> alphaBetas;
+        std::vector<alphaBeta> topFour;
+        int AIamount = 32;
         // If the database has no entries, create 36 alphaBeta objects
         query.exec("SELECT COUNT(*) FROM points");
         query.next();
         int count = query.value(0).toInt();
-        if (count < 36){
-            query.exec("SELECT * FROM points");
-            for(int i = 0; i < count; i++){
-                query.next();
-                alphaBetas.push_back(alphaBeta(&validMoves, query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
+        int added = 0;
+        if (count < AIamount){
+            if(count == 0){
+                query.exec("SELECT * FROM allTime ORDER BY winrate desc LIMIT 4");
+                while (query.next()) {
+                    alphaBetas.push_back(alphaBeta(&validMoves, query.value(0).toDouble(), query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
+                    alphaBetas[alphaBetas.size()-1].dbInsert();
+                    added++;
+                }
+            } else {
+                query.exec("SELECT * FROM points");
+                for(int i = 0; i < count; i++){
+                    query.next();
+                    alphaBetas.push_back(alphaBeta(&validMoves, query.value(0).toDouble(), query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
+                }
             }
-            for (int i = 0; i < 36-count; i++) {
+            for (int i = added+count; i < AIamount; i++) {
                 alphaBetas.push_back(alphaBeta(&validMoves));
                 alphaBetas[i].dbInsert();
             }
         } else {
-            // If the database has entries, create 36 alphaBeta objects with the data from the database
+            // If the database has entries, create 32 alphaBeta objects with the data from the database
             query.exec("SELECT * FROM points");
             int i = 0;
             while(query.next()){
-                alphaBetas.push_back(alphaBeta(&validMoves, query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
+                alphaBetas.push_back(alphaBeta(&validMoves, query.value(0).toDouble(), query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
                 i++;
             }
         }
@@ -65,10 +77,19 @@ int main(int argc, char** argv) {
 
         double evoRate = 0.3;
         while(true){ //Game loop
+
+            query.exec("SELECT * FROM allTime ORDER BY winrate desc LIMIT 4");
+            for(int i = 0; i < 4; i++){
+                query.next();
+                topFour.push_back(alphaBeta(&validMoves, query.value(0).toDouble(), query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
+                topFour[i].allTimeID();
+            }
+
             for(int i = 0; i < alphaBetas.size(); i++){
-                for (int j = 0; j < alphaBetas.size(); ++j) {
+                for (int j = 0; j < topFour.size()*4; j++) {
                     int trash = 0;
                     int playerTurn = 1; //Which player's turn it is
+                    int depth = 5;
                     int blackPieces = 12; //Initial number of black pieces
                     int redPieces = 12; //Initial number of red pieces
                     bool gameEnd = false; //If the game has ended
@@ -93,12 +114,22 @@ int main(int argc, char** argv) {
 
                         //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
                         if((validMoves.movePossible().size()) > 0 && redPieces > 0 && blackPieces > 0){
-                            if(playerTurn == 1){
-                                //alphaBetas[i].makeMove(boards, 5, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {},trash); //AI's move
-                                moveSet = alphaBetas[i].getMove();
+                            if(j < topFour.size()*2){
+                                if(playerTurn == 1){
+                                    alphaBetas[i].makeMove(boards, depth, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {},trash); //AI's move
+                                    moveSet = alphaBetas[i].getMove();
+                                } else {
+                                    topFour[j%4].makeMove(boards, depth, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {},trash); //AI's move
+                                    moveSet = topFour[j%4].getMove();
+                                }
                             } else {
-                                //alphaBetas[j].makeMove(boards, 5, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {},trash); //AI's move
-                                moveSet = alphaBetas[j].getMove();
+                                if(playerTurn == 1){
+                                    topFour[j%4].makeMove(boards, depth, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {},trash); //AI's move
+                                    moveSet = topFour[j%4].getMove();
+                                } else {
+                                    alphaBetas[i].makeMove(boards, depth, playerTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {},trash); //AI's move
+                                    moveSet = alphaBetas[i].getMove();
+                                }
                             }
                         } else { //If no valid moves, or no more pieces on the board
                             gameEnd = true; //Game has ended
@@ -110,47 +141,53 @@ int main(int argc, char** argv) {
                         redPieces = validMoves.getPieceCount()[1];
                         DrawChecker++;
                     }
-                                    // Checks how the game ended and gives points to the winning AI
-                   if(gameEnd){
-                        if(redPieces == 0){
+                    // Checks how the game ended and gives points to the winning AI
+                    if(j < topFour.size()*2){
+                        if(gameEnd){
+                            if(redPieces == 0){
+                                query.prepare("UPDATE winner "
+                                              "SET wins = wins + 1 "
+                                              "WHERE ai_id = :id");
+                                query.bindValue(":id", alphaBetas[i].getId());
+                                query.exec();
+                            } else if(playerTurn == 2){
+                                query.prepare("UPDATE winner "
+                                              "SET wins = wins + 1 "
+                                              "WHERE ai_id = :id");
+                                query.bindValue(":id", alphaBetas[i].getId());
+                                query.exec();
+                            }
+                        } else if(draw){
                             query.prepare("UPDATE winner "
-                                          "SET wins = wins + 1 "
-                                          "WHERE ai_id = :id");
-                            query.bindValue(":id", alphaBetas[i].getId());
-                            query.exec();
-                        } else if(blackPieces == 0){
-                            query.prepare("UPDATE winner "
-                                          "SET wins = wins + 1 "
-                                          "WHERE ai_id = :id");
-                            query.bindValue(":id", alphaBetas[j].getId());
-                            query.exec();
-                        } else if(playerTurn == 1){
-                            query.prepare("UPDATE winner "
-                                          "SET wins = wins + 1 "
-                                          "WHERE ai_id = :id");
-                            query.bindValue(":id", alphaBetas[j].getId());
-                            query.exec();;
-                        } else if(playerTurn == 2){
-                            query.prepare("UPDATE winner "
-                                          "SET wins = wins + 1 "
+                                          "SET draws = draws + 1 "
                                           "WHERE ai_id = :id");
                             query.bindValue(":id", alphaBetas[i].getId());
                             query.exec();
                         }
-                    } else if(draw){
-                        query.prepare("UPDATE winner "
-                                      "SET draws = draws + 1 "
-                                      "WHERE ai_id = :id");
-                        query.bindValue(":id", alphaBetas[i].getId());
-                        query.exec();
-
-                        query.prepare("UPDATE winner "
-                                      "SET draws = draws + 1 "
-                                      "WHERE ai_id = :id");
-                        query.bindValue(":id", alphaBetas[j].getId());
-                        query.exec();
+                    } else {
+                        if(gameEnd){
+                            if(blackPieces == 0){
+                                query.prepare("UPDATE winner "
+                                              "SET wins = wins + 1 "
+                                              "WHERE ai_id = :id");
+                                query.bindValue(":id", alphaBetas[i].getId());
+                                query.exec();
+                            } else if(playerTurn == 1){
+                                query.prepare("UPDATE winner "
+                                              "SET wins = wins + 1 "
+                                              "WHERE ai_id = :id");
+                                query.bindValue(":id", alphaBetas[i].getId());
+                                query.exec();;
+                            } else if(draw){
+                                query.prepare("UPDATE winner "
+                                              "SET draws = draws + 1 "
+                                              "WHERE ai_id = :id");
+                                query.bindValue(":id", alphaBetas[i].getId());
+                                query.exec();
+                            }
+                        }
                     }
-                    std::cout << "Winners updated: " << j+i*36 << std::endl;
+                    std::cout << "Winners updated: " << j+i*16 << std::endl;
                 }
             }
 
@@ -173,15 +210,14 @@ int main(int argc, char** argv) {
             while(i < size){
                 if(i < 4){
                     query.next();
-                    winners.push_back(alphaBeta(&validMoves, query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
+                    winners.push_back(alphaBeta(&validMoves, query.value(0).toDouble(), query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
+                    winners[i].addWinner();
                 } else {
                     query.next();
                     remove.push_back(query.value(0).toInt());
                 }
                 i++;
             }
-
-            winners[0].addWinner();
 
             for(int i = 0; i < remove.size(); i++){
                 query.prepare("DELETE FROM winner "
@@ -197,6 +233,8 @@ int main(int argc, char** argv) {
 
             alphaBetas = {};
             alphaBetas.clear();
+            topFour = {};
+            topFour.clear();
 
             // Create 32 new alphaBeta objects with the data from the 4 best AI's
             query.exec("SELECT COUNT(*) "
@@ -208,12 +246,12 @@ int main(int argc, char** argv) {
                 alphaBetas = winners;
                 query.exec("SELECT * FROM points");
                while(query.next()) {
-                    for (int i = 0; i < 8; i++) {
-                        alphaBetas.push_back(alphaBeta(&validMoves, query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
+                    for (int i = 0; i < (AIamount-1)/4; i++) {
+                        alphaBetas.push_back(alphaBeta(&validMoves, query.value(0).toDouble(), query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble()));
                     }
                 }
-                // Evolve the 32 new alphaBeta objects
-                for (int k = 4; k < 36; ++k) {
+                // Evolve the 28 new alphaBeta objects
+                for (int k = 4; k < AIamount; ++k) {
                     alphaBetas[k].dbInsert();
                     alphaBetas[k].evolve(evoRate);
                 }
@@ -227,7 +265,6 @@ int main(int argc, char** argv) {
             }
             evoRate *= 0.9;
         }
-
     }
 
     else if (RunMode == "RobotWithVision"){
@@ -255,15 +292,15 @@ int main(int argc, char** argv) {
 
 
                 // Constructs the vision object for ComputerVision
-                // AtmegaCom atmegaCom;
-                // Robot robot(&atmegaCom);
-                // robot.setArguments(argv);
-                // robot.prepForPic();
+                AtmegaCom atmegaCom;
+                Robot robot(&atmegaCom);
+                robot.setArguments(argv);
+                robot.prepForPic();
                 // Finds the new corners of the chessboard
-                // robot.robotStartVision();
-                Vision vision(argv);
-                vision.firstLoop();
-                std::vector<std::vector<std::string>> boards = vision.getBoard();
+                robot.robotStartVision();
+                // Vision vision(argv);
+                // vision.firstLoop();
+                std::vector<std::vector<std::string>> boards = robot.getBoard();
                 validMoves validMoves;
                 validMoves.setBoards(boards);
                 validMoves.setPlayerTurn(playerTurn);
@@ -305,7 +342,7 @@ int main(int argc, char** argv) {
                                 std::cout << "Please make your move and then press enter: " << std::endl;
                                 std::cin.get();
                                 // robot.prepForPic();
-                                std::vector<std::string> move = vision.boardLoop(boards, playerTurn); // Player's move
+                                std::vector<std::string> move = robot.boardLoop(boards, playerTurn); // Player's move
                                 std::cout << move[0] << " " << move[1] << std::endl;
                                 valid = validMoves.DB_move(move[0], move[1]); //Player's move
                                 moveSet = move;
@@ -368,6 +405,15 @@ int main(int argc, char** argv) {
         QSqlQuery query;
 */
 
+        QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
+        db.setHostName("localhost");
+        db.setDatabaseName("alphaBeta");
+        db.setUserName("aksel");  // Change to username
+        db.setPassword("password");  // Change to password
+        db.open();
+
+        QSqlQuery query;
+
         //Database settings
         bool ResetDB = false; //If the database should be reset set this to true
         bool LoadTempBeforeStart = false; //If there are a full temp table from previous games that should be loaded before the game starts set this to true
@@ -377,7 +423,7 @@ int main(int argc, char** argv) {
         int UniqueBoardIDCounter;
 
         int CounterForTempTable = 1;
-        int depth = 2; //Depth of the alphaBeta algorithm
+        int depth = 7; //Depth of the alphaBeta algorithm
         int playerTurn = 1; //Which player's turn it is
         int blackPieces = 12; //Initial number of black pieces
         int redPieces = 12; //Initial number of red pieces
@@ -391,10 +437,16 @@ int main(int argc, char** argv) {
         std::string MoveMade = {}; // Stores the move made to put it in the database
         bool DatabaseMoveMade = false;
         validMoves validMoves;
-        alphaBeta alphaBeta(&validMoves, 0);
+        alphaBeta alphaBeta1(&validMoves, 0);
+        alphaBeta alphaNotEvo(&validMoves, "");
+        query.exec("SELECT * FROM allTime WHERE ai_id = 74");
+        query.next();
+        alphaBeta alphaEvo(&validMoves, query.value(0).toDouble(), query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble());
+        int player1Wins = 0;
+        int player2Wins = 0;
+        int playerDraws = 0;
 
-
-        for (int ii = 1; ii <= 2000000; ++ii) {
+        for (int ii = 0; ii < 100; ++ii) {
             DatabaseInit(UniqueBoardIDCounter,LoadTempBeforeStart); //Initializes the database
             std::cout << "GameStartet" << std::endl;
             CounterForTempTable = 1;
@@ -450,7 +502,7 @@ int main(int argc, char** argv) {
                     } else {
                         if (playerTurn == 1 && player == "DB" || playerTurn == 2 && player2 == "DB"){
 
-                            MoveDBMain(BoardState, playerTurn, boards, redPieces, blackPieces, moveSet, CounterForTempTable, DrawChecker, DatabaseMoveMade, TestCounterForDatabase,validMoves,alphaBeta); // Database AI's move
+                            // MoveDBMain(BoardState, playerTurn, boards, redPieces, blackPieces, moveSet, CounterForTempTable, DrawChecker, DatabaseMoveMade, TestCounterForDatabase,validMoves,alphaBeta); // Database AI's move
 
                         }
                         else if (playerTurn == 1 && player == "Random" || playerTurn == 2 && player2 == "Random"){
@@ -462,8 +514,13 @@ int main(int argc, char** argv) {
                         else if (playerTurn == 1 && player == "AI" || playerTurn == 2 && player2 == "AI"){
                             CounterForTempTable = 0;
                             checkerBoard(boards);
-                            alphaBeta.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
-                            moveSet = alphaBeta.getMove();
+                            if(playerTurn == 1){
+                                alphaNotEvo.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
+                                moveSet = alphaNotEvo.getMove();
+                            } else {
+                                alphaEvo.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
+                                moveSet = alphaEvo.getMove();
+                            }
                         }
                     }
 
@@ -496,13 +553,27 @@ int main(int argc, char** argv) {
                 }
             }
 
+            if(DrawChecker == 201){
+                playerDraws++;
+            }
+
             //Prints the winner of the game
             if(gameEnd){
+
                 std::cout << "Game played at depth: " << depth << std::endl;
                 auto stop = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
                 std::cout << "Game took: " << duration.count() << " milliseconds" << std::endl;
                 // GameEnd(redPieces,blackPieces,playerTurn);
+                if(blackPieces == 0){
+                    player2Wins++;
+                } else if(redPieces == 0){
+                    player1Wins++;
+                } else if(playerTurn == 1){
+                    player2Wins++;
+                } else if(playerTurn == 2){
+                    player1Wins++;
+                }
             }
 
             	//UploadTempToDatabase(UniqueBoardIDCounter, UploadTempToDB); // Uploads the temp table to the database
@@ -510,11 +581,11 @@ int main(int argc, char** argv) {
                 //std::cout << "GameEnded" << std::endl;
                 //GameEnd(redPieces,blackPieces,playerTurn);
             }
-
-            UploadTempToDatabase(UniqueBoardIDCounter, UploadTempToDB); // Uploads the temp table to the database
-        }
+        std::cout << "The evolved AI wins: " << player1Wins << std::endl;
+        std::cout << "The initial AI wins: " << player2Wins << std::endl;
+        std::cout << "Draws: " << playerDraws << std::endl;
+        // UploadTempToDatabase(UniqueBoardIDCounter, UploadTempToDB); // Uploads the temp table to the database
     }
-
     else if (RunMode == "SimOnly"){
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
@@ -561,7 +632,7 @@ int main(int argc, char** argv) {
 
     for (int ii = 1; ii <= 10000000; ++ii) {
 
-        int depth = 6; //Depth of the alphaBeta algorithm
+        int depth = 5; //Depth of the alphaBeta algorithm
         int playerTurn = 1; //Which player's turn it is
         int blackPieces = 12; //Initial number of black pieces
         int redPieces = 12; //Initial number of red pieces
