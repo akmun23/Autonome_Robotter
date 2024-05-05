@@ -1,0 +1,68 @@
+<mxfile host="app.diagrams.net" modified="2024-05-01T09:42:19.306Z" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0" etag="VeW6Wgiw6vla1gx0PYTD" version="24.3.1" type="device">
+  <diagram name="Page-1" id="oUWdM--b5Z2VBPjC2ZNO">
+    <mxGraphModel dx="941" dy="548" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="perqIOe3M6I6XWpaOImT-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="perqIOe3M6I6XWpaOImT-1" target="perqIOe3M6I6XWpaOImT-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-1" value="Find All moves for this player on this boardstate" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="140" y="170" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="perqIOe3M6I6XWpaOImT-2" target="perqIOe3M6I6XWpaOImT-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-2" value="Sort by winrate highest to lowest" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="170" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="perqIOe3M6I6XWpaOImT-5" target="perqIOe3M6I6XWpaOImT-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-5" value="Select highest" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="460" y="170" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="perqIOe3M6I6XWpaOImT-7" target="perqIOe3M6I6XWpaOImT-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="perqIOe3M6I6XWpaOImT-7" target="perqIOe3M6I6XWpaOImT-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-7" value="&lt;div&gt;are there&amp;nbsp;&lt;/div&gt;&lt;div&gt;a move&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="610" y="160" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-9" value="Return Move" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="720" y="110" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-11" value="Return a move made by alphabeta" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="720" y="230" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="perqIOe3M6I6XWpaOImT-13" target="perqIOe3M6I6XWpaOImT-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="perqIOe3M6I6XWpaOImT-13" target="perqIOe3M6I6XWpaOImT-11">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="90" y="260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-13" value="&lt;div&gt;Is this&amp;nbsp;&lt;/div&gt;&lt;div&gt;boardstate&amp;nbsp;&lt;/div&gt;&lt;div&gt;in the database&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry y="140" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-15" value="Yes" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="90" y="160" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-17" value="No" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="90" y="270" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-18" value="No" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="650" y="270" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="perqIOe3M6I6XWpaOImT-19" value="Yes" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="650" y="140" width="60" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

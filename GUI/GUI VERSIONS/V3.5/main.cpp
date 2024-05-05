@@ -5,6 +5,7 @@
 #include <opencv4/opencv2/highgui.hpp>
 #include <thread>
 
+#include "checkersdatabase.h"
 #include "validmoves.h"
 #include "robot.h"
 #include "alphabeta.h"
@@ -249,20 +250,38 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
             alphaBeta.makeMove(boards, depth, thisTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {}, thisTurn); //AI's move
             moveSet = alphaBeta.getMove();
         } else{
-            //std::string DBmove = MovePlayer(OldBoard, playerTurn); // Database best move on current board
-            string DBmove = "";
-
-            if(/*DBmove == "no moves"*/1){
-                //std::cout << "No moves found" << std::endl;
+            std::string BoardState;
+            for (int i = 0; i < 8; ++i) {
+                for (int j = 0; j < 8; ++j) {
+                    if(boards[i][j] == "1 "){
+                        BoardState += "1";
+                    } else if(boards[i][j] == "B "){
+                        BoardState += "2";
+                    } else if(boards[i][j] == "BK"){
+                        BoardState += "3";
+                    } else if(boards[i][j] == "R "){
+                        BoardState += "4";
+                    } else if(boards[i][j] == "RK"){
+                        BoardState += "5";
+                    }
+                }
+            }
+            std::string DBmove = MovePlayer(BoardState, thisTurn); // Database best move on current board
+            if (DBmove == "No moves"){
+                std::cout << "No moves found" << std::endl;
                 alphaBeta.makeMove(boards, depth, thisTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {}, thisTurn); //AI's move
                 moveSet = alphaBeta.getMove();
+            }   else{
+                    std::cout << "AI move from database: " << DBmove << std::endl;
+                    moveSet = {DBmove.substr(0,2), DBmove.substr(2,2)};
+                    if (validM.DB_move(moveSet[0], moveSet[1])){
 
-            } else{
-                std::string DBmoveFrom = DBmove.substr(0,2);
-                std::string DBmoveTo = DBmove.substr(2,2);
-                validM.DB_move(moveSet[0], moveSet[1]);
-                moveSet = {DBmoveFrom, DBmoveTo};
-            }
+                    }
+                    else{
+                        alphaBeta.makeMove(boards, depth, thisTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {}, thisTurn); //AI's move
+                        moveSet = alphaBeta.getMove();
+                    }
+                }
         }
 
         cout << moveSet[0] << "," << moveSet[1] << endl;
@@ -367,6 +386,14 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
 
 int main(int argc, char* argv[]){
 
+    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
+    db.setHostName("localhost");
+    db.setDatabaseName("CheckersDatabase");
+    db.setUserName("IndsætBrugernavn");  // Change to username
+    db.setPassword("IndsætPassword!");  // Change to password
+    db.open();
+
+    QSqlQuery query;
     while(!gameEnd){
         //start:
         if(startUpMain){
