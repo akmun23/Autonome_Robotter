@@ -1,0 +1,36 @@
+CREATE TABLE points (
+    ai_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    piece DOUBLE,
+    king DOUBLE,
+    locked DOUBLE,
+    lockKing DOUBLE,
+    forward DOUBLE,
+    TwoEmpty DOUBLE,
+    OneJump DOUBLE,
+    OneEmpty DOUBLE,
+    TwoJump DOUBLE,
+    depth DOUBLE
+);
+    
+create table winner (
+	ai_id INT NOT NULL,
+	wins INT DEFAULT 0,
+	loses INT DEFAULT 0,
+	draws INT DEFAULT 0,
+	FOREIGN KEY (ai_id) REFERENCES points(ai_id)
+);
+    
+CREATE TABLE allTime (
+    ai_id INT NOT NULL PRIMARY KEY,
+    piece DOUBLE,
+    king DOUBLE,
+    locked DOUBLE,
+    lockKing DOUBLE,
+    forward DOUBLE,
+    TwoEmpty DOUBLE,
+    OneJump DOUBLE,
+    OneEmpty DOUBLE,
+    TwoJump DOUBLE,
+    depth DOUBLE,
+    winrate double
+);

@@ -1,5 +1,9 @@
+#include "alphabeta.h"
 #include "boardUpdate.h"
-#include "validMoves.h"
+#include "robot.h"
+#include "validmoves.h"
+#include "GameFunctions.h"
+
 #include <iostream>
 #include <opencv4/opencv2/opencv.hpp>
 #include <opencv4/opencv2/core.hpp>
@@ -12,10 +16,11 @@ using namespace cv;
 Mat3b img(500, 1000, Vec3b(255, 255, 255)); //Creates drawing surface, img.
 vector<Rect> rectangles; //Vec consisting of instances of "Rect", as segments of board.
 vector<Circle> bCheckers, rCheckers; //Vec consisting of instances of "Circle" for black checkers.
-vector<int> latestScores;
-vector<std::string> moveSet = {}; //The moves that have been made during the turn
+vector<int> latestScores = {};
+vector<std::string> moveSet = {"",""}; //The moves that have been made during the turn
 Rect blackGraveyardRect(600, 75, 50, 50); //Instance of Rect, used as a graveyard Rect.
 Rect redGraveyardRect(600, 175, 50, 50);
+Rect takePicture(Point(redGraveyardRect.x - 30, redGraveyardRect.y + 100), Point(redGraveyardRect.x + 80, redGraveyardRect.y + 150));
 Rect promotionRect(600, 225, 50, 50);
 Mat graveyardDownSized;
 
@@ -25,9 +30,16 @@ string moveStart = "", moveEnd = "";
 int thisTurn; //Which player's turn it is
 int blackPieces = 12; //Initial number of black pieces
 int redPieces = 12; //Initial number of red pieces
-int depth = 9; //Depth of the minimax algorithm
+int depth = 7; //Depth of the minimax algorithm
+std::vector<std::vector<std::string>> boards; //2D vec of strings, that represent the board state.
 
 bool startUpMain = true; //Bool, true if code is being run for the first time.
+
+
+Robot robot;
+Vision vision;
+validMoves validM;
+alphaBeta alphaBeta(&validM, 0);
 
 //Updates text displayed, depending player turn.
 void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves, string moveStart, string moveEnd){
@@ -35,7 +47,7 @@ void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves
     string spiller2 = "Det er spiller 2's tur.";
     string playerTurnString, outputString;
 
-    ((thisTurn%2 == 1) ? playerTurnString = spiller1 : playerTurnString = spiller2);
+    ((thisTurn%2 == 0) ? playerTurnString = spiller1 : playerTurnString = spiller2);
 
     rectangle(img, Point(115,0), Point(500,35), Scalar(255,255,255), -1); //Creates a white rectangle, that covers the old text.
     putText(img, playerTurnString, Point(115, 25), FONT_HERSHEY_COMPLEX, 1, Scalar(0,0,0), 1); //Prints new text.
@@ -43,7 +55,7 @@ void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves
     if(turnVal > 0){
         outputString = moveStart + " To " + moveEnd + ": ";
         moves.push_back(outputString);
-        scores.push_back(giveBoardScore(boards, thisTurn, blackPieces, redPieces, depth)/1000);
+        scores.push_back(alphaBeta.giveScoreAI(boards, thisTurn, blackPieces, redPieces, depth)/1000);
 
         rectangle(img, Point(700,75), Point(1000,200), Scalar(255,255,255), -1);
 
@@ -52,10 +64,9 @@ void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves
             putText(img, outputString, Point(700, 90 + (i - (scores.size() < 5 ? 0 : scores.size()-5)) * 25), FONT_HERSHEY_COMPLEX_SMALL, 1, Scalar(0,0,0), 1);
         }
     }
-
 }
 
-void drawGameMode(Mat img){
+void drawGameMode(Mat& img){
 
     Rect gameModeRectPVP((img.cols/2) - 200, (img.rows/2) - 40, 100, 50);
     Rect gameModeRectAI((img.cols/2) - 50, (img.rows/2) - 40, 100, 50);
@@ -100,7 +111,7 @@ void winAnimation(string winName, Mat img, bool redWon, vector<Rect> rectangles)
 }
 
 //Draws all elements of the GUI.
-void Draw(Mat img, bool& startUpMain){
+void Draw(Mat& img, bool& startUpMain){
     int redGrave = 0;
     int blackGrave = 0;
     int lineNum = 0;
@@ -114,7 +125,7 @@ void Draw(Mat img, bool& startUpMain){
     //If first time running the code, run this section.
     if(startUpMain){
         
-        rectangle(img, Point(0,0), Point(img.cols, img.rows), Scalar(255,255,255), -1);
+        rectangle(img, Point(0,0), Point(img.cols, img.rows), Scalar(255,255,255), -1); //Clears the screen
 
         //Generates row and col names along board edge.
         for(int i = 0; i < 8; i++){
@@ -123,7 +134,7 @@ void Draw(Mat img, bool& startUpMain){
         }
 
         //Loads graveyard segment image, and resizes it to fit inside rect.
-        resize(imread("/home/aksel/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/graveyard.jpg"), graveyardDownSized, Size(50, 50), INTER_LINEAR);
+        resize(imread("/home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/graveyard.jpg"), graveyardDownSized, Size(50, 50), INTER_LINEAR);
         graveyardDownSized.copyTo(img(blackGraveyardRect)); //Draws graveyard onto img.
         graveyardDownSized.copyTo(img(redGraveyardRect));
 
@@ -174,6 +185,7 @@ void Draw(Mat img, bool& startUpMain){
 
             (i%8 == 7) ? lineNum++ : lineNum;
         }
+
         startUpMain = false;
     }
     //Runs if not first time running the code - Replaces old board image with new game state.
@@ -201,6 +213,12 @@ void Draw(Mat img, bool& startUpMain){
             (i%8 == 7) ? lineNum++ : lineNum;
         }
     }
+
+    //COPY
+    rectangle(img, takePicture, Scalar(0,0,0), -1);
+    putText(img, "Take Picture", Point(takePicture.x + 8, takePicture.y + 30), FONT_HERSHEY_COMPLEX_SMALL, 0.6, Scalar(255,255,255));
+    //
+
     //Draws checkers on new positions.
     for(int j = 0; j < 12; j++){
         for(int i = 0; i < 64; i++){
@@ -268,6 +286,8 @@ void Draw(Mat img, bool& startUpMain){
             }
         }
     }
+
+
 }
 
 //Checks if a jump is possible for an element of given vector at a given position.
@@ -329,9 +349,10 @@ bool isJumpPossible(int x, int y, int checkerID, vector<Circle> checkerVec, vect
 }
 
 void jumps(int x, int y, int i, int checkerID, vector<Circle> checkerVec, vector<Circle> enemyCheckerVec){
+
     if(isJumpPossible(x, y, checkerID, checkerVec, enemyCheckerVec)){ //Checks if there is a jump possible for a checker at the given position, where the enemy is given also.
         //Checks if there is a checker across from the selected checker - Both right and left.
-        if(checkerVec == rCheckers && checkerID < 12){
+        if(checkerVec == rCheckers && checkerID < 12){ 
             if((doesRectContainChecker(x + 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, checkerVec)) && (doesRectContainChecker(x - 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x - 100, y - 100, enemyCheckerVec) && !doesRectContainChecker(x - 100, y - 100, checkerVec))){
                 if(rectangles[i-14].contains(Point(x + 100, y - 100))){
                     img(rectangles[i-14]) = Vec3b(14,17,175); //Highlights the possible jump locations.
@@ -339,7 +360,7 @@ void jumps(int x, int y, int i, int checkerID, vector<Circle> checkerVec, vector
                 if(rectangles[i-18].contains(Point(x - 100, y - 100))){
                 img(rectangles[i-18]) = Vec3b(14,17,175);
                 }
-
+                
                 selected.push_back(2); //Represents multiple jumps possible.
             }
             //Checks if there is a checker across from the selected checker - Right.
@@ -396,7 +417,7 @@ void jumps(int x, int y, int i, int checkerID, vector<Circle> checkerVec, vector
                 img(rectangles[i+14]) = Vec3b(14,17,175);
                 img(rectangles[i+18]) = Vec3b(14,17,175);
                 selected.push_back(3);
-
+                
                 if((doesRectContainChecker(x + 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, checkerVec))){
                     img(rectangles[i-14]) = Vec3b(14,17,175); //Highlights the possible jump locations.
                 }
@@ -409,7 +430,7 @@ void jumps(int x, int y, int i, int checkerID, vector<Circle> checkerVec, vector
                 img(rectangles[i-14]) = Vec3b(14,17,175); //Highlights the possible jump locations.
                 img(rectangles[i-18]) = Vec3b(14,17,175);
                 selected.push_back(3);
-
+                
                 if((doesRectContainChecker(x + 50, y + 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y + 100, enemyCheckerVec) && !doesRectContainChecker(x + 100, y + 100, checkerVec))){
                     img(rectangles[i+18]) = Vec3b(14,17,175);
                 }
@@ -457,7 +478,7 @@ void jumps(int x, int y, int i, int checkerID, vector<Circle> checkerVec, vector
                 }
             }
             else if((doesRectContainChecker(x + 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, checkerVec) && doesPosContainRect(x + 100, y - 100, rectangles)) || (doesRectContainChecker(x - 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x - 100, y - 100, enemyCheckerVec) && !doesRectContainChecker(x - 100, y - 100, checkerVec) && doesPosContainRect(x - 100, y - 100, rectangles)) || (doesRectContainChecker(x + 50, y + 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y + 100, enemyCheckerVec) && !doesRectContainChecker(x + 100, y + 100, checkerVec) && doesPosContainRect(x + 100, y + 100, rectangles)) || (doesRectContainChecker(x - 50, y + 50, enemyCheckerVec) && !doesRectContainChecker(x - 100, y + 100, enemyCheckerVec) && !doesRectContainChecker(x - 100, y + 100, checkerVec) && doesPosContainRect(x - 100, y + 100, rectangles))){
-
+                
                 selected.push_back(1); //3
 
                 if(doesRectContainChecker(x + 50, y - 50, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, enemyCheckerVec) && !doesRectContainChecker(x + 100, y - 100, checkerVec) && doesPosContainRect(x + 100, y - 100, rectangles)){
@@ -505,15 +526,11 @@ void promotionGUI(vector<Circle> checkerVector){
 }
 
 bool isGameWon(vector<Circle> checkerVec, vector<Circle> enemyCheckerVec, int turn){
-    std::vector<std::string> jumps = jumpPossible(turn, boards);
-    bool moreMove = false;
-    std::string move = "";
-
     if(checkerVec == rCheckers){
         if(piecesLeft(rectangles, enemyCheckerVec) < 1){
             return true;
         }
-        else if(movePossible(turn, boards, jumps, moreMove, move).size() < 1){
+        else if(validM.movePossible().size() < 1){
             return true;
         }
         else{
@@ -524,7 +541,7 @@ bool isGameWon(vector<Circle> checkerVec, vector<Circle> enemyCheckerVec, int tu
         if(piecesLeft(rectangles, enemyCheckerVec) < 1){
             return true;
         }
-        else if(movePossible(turn, boards, jumps, moreMove, move).size() < 1){
+        else if(validM.movePossible().size() < 1){
             return true;
         }
         else{

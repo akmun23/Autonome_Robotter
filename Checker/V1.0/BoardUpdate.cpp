@@ -1,7 +1,4 @@
 #include "boardUpdate.h"
-#include <iostream>
-#include <vector>
-
 
 std::vector<std::vector<std::string>> startUp(){
     std::vector<std::vector<std::string>> boards = {
@@ -16,13 +13,12 @@ std::vector<std::vector<std::string>> startUp(){
     };
 
     //Print the initial board
-    std::cout << "Welcome to Checkers!" << std::endl;
-    std::cout << "Here is the board:" << std::endl;
-    checkerBoard(boards);
-    std::cout << std::endl;
+    //std::cout << "Welcome to Checkers!" << std::endl;
+    //std::cout << "Here is the board:" << std::endl;
+    //checkerBoard(boards);
+    //std::cout << std::endl;
     return boards;
 }
-
 
 //Prints the board with input given by the vector boards
 void checkerBoard(std::vector<std::vector<std::string>>& boards){
@@ -35,5 +31,6 @@ void checkerBoard(std::vector<std::vector<std::string>>& boards){
     std::cout << "F" << " "  << boards[5][0] << " " << boards[5][1] << " " << boards[5][2] << " " << boards[5][3] << " " << boards[5][4] << " " << boards[5][5] << " " << boards[5][6] << " " << boards[5][7] << std::endl;
     std::cout << "G" << " "  << boards[6][0] << " " << boards[6][1] << " " << boards[6][2] << " " << boards[6][3] << " " << boards[6][4] << " " << boards[6][5] << " " << boards[6][6] << " " << boards[6][7] << std::endl;
     std::cout << "H" << " "  << boards[7][0] << " " << boards[7][1] << " " << boards[7][2] << " " << boards[7][3] << " " << boards[7][4] << " " << boards[7][5] << " " << boards[7][6] << " " << boards[7][7] << std::endl;
+    std::cout << "-------------------------" << std::endl;
 }
 

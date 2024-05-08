@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 
     Mat frame;
 
-    string dir = argv[1];
+    string dir = argv[0];
     int index = 0;
     while (true)
     {
@@ -50,7 +50,6 @@ int main(int argc, char** argv)
 
         string path = dir + std::to_string(index) + ".jpg";
         imwrite(path, frame);
-        index ++;
 
         //wait for for 10 ms until any key is pressed.
         //If the 'Esc' key is pressed, break the while loop.

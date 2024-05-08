@@ -1,7 +1,8 @@
 #include "matrix.h"
-#include <iostream>
 
-Matrix::Matrix(int rows, int cols, double val):_rows(rows), _cols(cols) {
+Matrix::Matrix(){}
+
+Matrix::Matrix(int rows, int cols, float val):_rows(rows), _cols(cols) {
     for(int i = 0; i < rows*cols; i++){
         _data.push_back(val);
     }
@@ -29,15 +30,15 @@ void Matrix::print(){
     }
 }
 
-double Matrix::read(int r, int c){
+float Matrix::read(int r, int c){
     return _data[r*_cols + c];
 }
 
-void Matrix::set(int r, int c, double val){
+void Matrix::set(int r, int c, float val){
     _data[r*_cols + c] = val;
 }
 
-double& Matrix::at(int r, int c){
+float& Matrix::at(int r, int c){
     return _data[r*_cols + c];
 }
 
@@ -63,7 +64,7 @@ Matrix Matrix::multiply(Matrix& matrix){
         Matrix result(_rows, matrix.getCols());
         for(int r = 0; r < _rows; r++){
             for (int c = 0; c < matrix.getCols(); c++) {
-                double sum = 0;
+                float sum = 0;
                 for(int i = 0; i < _cols; i++){
                    sum += read(r,i) * matrix.read(i,c);
 
@@ -78,7 +79,7 @@ Matrix Matrix::multiply(Matrix& matrix){
 
 void Matrix::transpose(){
     Matrix result(_cols, _rows);
-    double value;
+    float value;
     for(int r = 0; r < _rows; r++){
         for(int c = 0; c < _cols; c++){
             value = read(r,c);
@@ -90,7 +91,7 @@ void Matrix::transpose(){
     _data = result._data;
 }
 
-double& Matrix::operator()(int r, int c){
+float& Matrix::operator()(int r, int c){
     return at(r,c);
 }
 
@@ -125,7 +126,7 @@ std::shared_ptr<Matrix> Matrix::multiply(std::shared_ptr<Matrix> matrix){
         Matrix result(_rows, matrix -> getCols());
         for(int r = 0; r < _rows; r++){
             for (int c = 0; c < matrix -> getCols(); c++) {
-                double sum = 0;
+                float sum = 0;
                 for(int i = 0; i < _cols; i++){
                     sum += read(r,i) * matrix -> read(i,c);
 
