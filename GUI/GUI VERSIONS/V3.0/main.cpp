@@ -69,7 +69,7 @@ void gameModeCallBack(int event, int userX, int userY, int flags, void* userdata
 //callBack function, that runs every time you click.
 void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
 
-    if(gameMode == "PVP" || thisTurn == 2 && gameMode == "AI" || thisTurn == 1 && gameMode == "DB"){
+    if(gameMode == "PVP" || thisTurn == 1 && gameMode == "AI" || thisTurn == 1 && gameMode == "DB"){
         if(selected.size() != 0 && event == EVENT_LBUTTONDOWN){ //Runs this code left mouse button clicked and "Rect" is already selected.
 
             for(int i = 0; i < 64; i++){
@@ -269,7 +269,7 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
             setBool(gameEnd, false); //Stops animation
         }
     }
-    else if(thisTurn == 1 && gameMode == "AI" && !gameEnd || thisTurn == 2 && gameMode == "DB" && !gameEnd){
+    else if(thisTurn == 2 && gameMode == "AI" && !gameEnd || thisTurn == 2 && gameMode == "DB" && !gameEnd){
         cout << "----- AI's turn -----" << endl;
         do{
             if(gameMode == "AI"){
@@ -299,8 +299,8 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                 if(rectangles[i].contains(Point(intPos[intPos.size()-2], intPos[intPos.size()-1]))){
                     //selected.push_back(i);
 
-                    for(int j = 0; j < bCheckers.size(); j++){
-                        if(bCheckers[j].contains(Point(intPos[intPos.size()-2], intPos[intPos.size()-1]))){
+                    for(int j = 0; j < rCheckers.size(); j++){
+                        if(rCheckers[j].contains(Point(intPos[intPos.size()-2], intPos[intPos.size()-1]))){
 
                             selected.push_back(j);
                             break;
@@ -309,10 +309,10 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
 
                     stringToPosConvert(moveSet[moveSet.size()-1], intPos);
 
-                    for(int j = 0; j < rCheckers.size(); j++){
-                        if(rCheckers[j].contains(Point((intPos[intPos.size()-2] + intPos[intPos.size()-4])/2, (intPos[intPos.size()-1] + intPos[intPos.size()-3])/2))){
-                            rCheckers[j].x = redGraveyardRect.x;
-                            rCheckers[j].y = redGraveyardRect.y;
+                    for(int j = 0; j < bCheckers.size(); j++){
+                        if(bCheckers[j].contains(Point((intPos[intPos.size()-2] + intPos[intPos.size()-4])/2, (intPos[intPos.size()-1] + intPos[intPos.size()-3])/2))){
+                            bCheckers[j].x = blackGraveyardRect.x;
+                            bCheckers[j].y = blackGraveyardRect.y;
                             setBool(jumpPerformed, true);
                             break;
                         }
@@ -324,15 +324,15 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
             circle(img, {rectangles[selected[selected.size()-2]].x + 25, rectangles[selected[selected.size()-2]].y + 25}, 20, Vec3b(14,17,175), -1);
             imshow(winName, img);
 
-            bCheckers[selected[selected.size()-1]].x = intPos[intPos.size()-2];
-            bCheckers[selected[selected.size()-1]].y = intPos[intPos.size()-1];
+            rCheckers[selected[selected.size()-1]].x = intPos[intPos.size()-2];
+            rCheckers[selected[selected.size()-1]].y = intPos[intPos.size()-1];
 
             checkerBoard(boards);
             Draw(img, startUpMain);
 
         }while(isJumpPossible(intPos[intPos.size()-2], intPos[intPos.size()-1], selected[selected.size()-1], rCheckers, bCheckers) && jumpPerformed);
 
-        if(isGameWon(rCheckers, bCheckers, thisTurn)){
+        if(isGameWon(bCheckers, bCheckers, thisTurn)){
             setBool(gameEnd, true);
             setBool(redWon, true);
             Draw(img, startUpMain);
