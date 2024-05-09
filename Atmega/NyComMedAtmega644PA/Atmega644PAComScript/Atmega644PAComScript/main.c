@@ -64,14 +64,14 @@ void InitPWM(){
 void InitADC(){
 	
 	ADMUX = (1 << REFS0) | (1 << MUX0);					// AVCC at AREF pin and ADC1 Chosen
-	ADCSRA = (1 << ADEN) | (ADPS2);						// Maybe set all 3 ADPS pins so division factor is 128 this would give a F_ADC of aprox 150khz
+	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);						// Maybe set all 3 ADPS pins so division factor is 128 this would give a F_ADC of aprox 150khz
 }
 
 
 void CloseGripper(){
 	PORTC = (0 << PORTC3);						// Makes sure the motor is going the correct way
 	DDRC = (0 << PORTC3);
-	dutycycle = 60;							// Enables the motor at approximately 60% duty cycle 
+	dutycycle = 60;								// Enables the motor at approximately 60% duty cycle 
 	_delay_ms(300);								// Short delay before first reading since starting the motor requires more power than running
 	int ObjectHit = 0;							// variable for checking when object is hit
 	while (ObjectHit == 0) {					// Loop waiting for bool set true when object is hit
@@ -83,7 +83,6 @@ void CloseGripper(){
 	}
 	dutycycle = 0;								// Turn off motor
 	swrite('7');								// Send signal to pc telling script that is has picked up a piece
-	
 }
 
 void OpenGripper(){
@@ -101,8 +100,6 @@ void OpenGripper(){
 	}
 	dutycycle = 0;								// Turn off motor
 	swrite('7');								// Send signal to pc telling script that is has picked up a piece
-	
-	
 }
 
 
