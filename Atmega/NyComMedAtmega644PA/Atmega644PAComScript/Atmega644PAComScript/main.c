@@ -26,12 +26,10 @@ void OpenGripper();
 
 int main(void)
 {
-	UBRR1 = 119;											// Sets the baudrate calculated by (F_CPU/(16*9600-1))
+	UBRR1 = 118;											// Sets the baudrate calculated by (F_CPU/(16*9600)-1)
 	UCSR1B = (1 << RXEN1) | (1 << TXEN1) | (1 << RXCIE1);	// Enables reading and writing and allows for read interupt flags
 	UCSR1C = (1 << UCSZ11) | (1 << UCSZ10);					// Sets frame as 8 bits
 	
-	// 	UCSR1A = (1 << RXC1);									// Skal måske bare slettes da det bliver gjort gennem RXCIE1
-
 	sei();		// Enables global interupts
 	InitPWM();	// Setup for PWM
 	InitADC();	// Setup for ADC
@@ -50,6 +48,7 @@ void InitPWM(){
 	
 	DDRD = (1 << PORTD4);												// Enables power for the PWM port	
 	PORTD = (1 << PORTD4);												// Same
+	
 	TCCR1A = (1 << COM1B1) | (1 << WGM11) | (1 << WGM10);				// Sets up the timer for fast PWM 10-bit and non inverting mode
 	TCCR1B = (1 << CS10) | (1 << WGM13) | (1 << WGM12);					// Sets prescaler to 1
 	OCR1A = 100;														// Sets the top of the counter to 100
@@ -63,7 +62,7 @@ void InitPWM(){
 
 void InitADC(){
 	
-	ADMUX = (1 << REFS0) | (1 << MUX0);					// AVCC at AREF pin and ADC1 Chosen
+	ADMUX = (1 << REFS0) | (1 << MUX0);									// AVCC at AREF pin and ADC1 Chosen
 	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);						// Maybe set all 3 ADPS pins so division factor is 128 this would give a F_ADC of aprox 150khz
 }
 
