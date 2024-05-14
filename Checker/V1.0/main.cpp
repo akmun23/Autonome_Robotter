@@ -362,7 +362,7 @@ int main(int argc, char** argv) {
         db.setHostName("localhost");
         db.setDatabaseName("CheckersDatabase");
         db.setUserName("IndsætBrugernavn");  // Change to username
-        db.setPassword("IndsætPassword!");  // Change to password
+        db.setPassword("IndsætPassword");  // Change to password
         db.open();
 
         QSqlQuery query;
@@ -370,12 +370,12 @@ int main(int argc, char** argv) {
 
         //Database settings
         bool ResetDB = false; //If the database should be reset set this to true
-        bool LoadTempBeforeStart = true; //If there are a full temp table from previous games that should be loaded before the game starts set this to true
-        bool UploadTempToDB = false; //If the temp table should be uploaded to the database after the game ends set this to true
+        bool LoadTempBeforeStart = false; //If there are a full temp table from previous games that should be loaded before the game starts set this to true
+        bool UploadTempToDB = true; //If the temp table should be uploaded to the database after the game ends set this to true
         resetDB(ResetDB); // Resets the database
         int UniqueBoardIDCounter;
         int CounterForTempTable = 1;
-        int depth = 5; //Depth of the alphaBeta algorithm
+        int depth = 7; //Depth of the alphaBeta algorithm
         int playerTurn = 1; //Which player's turn it is
         int blackPieces = 12; //Initial number of black pieces
         int redPieces = 12; //Initial number of red pieces
@@ -383,8 +383,8 @@ int main(int argc, char** argv) {
         int thisTurn; //Which player's turn it is
         int DrawChecker = 1; //When this equal 200 the game is called draw
 
-        std::string player = "AI"; //If the player is human or AI
-        std::string player2 = "AI"; //If the player is human or AI
+        std::string player = "DB"; //If the player is human or AI
+        std::string player2 = "p"; //If the player is human or AI
         std::vector<std::string> moveSet = {}; //The moves that have been made during the turn
         std::string MoveMade = {}; // Stores the move made to put it in the database
         bool DatabaseMoveMade = false;
@@ -395,7 +395,6 @@ int main(int argc, char** argv) {
         for (int ii = 1; ii <= 1; ++ii) {
             validMoves validMoves;
             alphaBeta alphaBeta(&validMoves, 0);
-            std::cout << "Game Started" << std::endl;
             std::cout << "Game number: " << ii << std::endl;
             CounterForTempTable = 1;
             playerTurn = 1; //Which player's turn it is
@@ -416,8 +415,7 @@ int main(int argc, char** argv) {
             int UniqueBoardIDCounter;
             // Skriv true i nr 2 input hvis temp skal uploades til databasen inden man starter spillet
             DatabaseInit(UniqueBoardIDCounter,LoadTempBeforeStart); //Initializes the database
-            std::cout << "Database initialized" << std::endl;
-            while(1);
+            RefreshTempTable(); // Refreshes the Temp table
             // Construct initial board
             std::vector<std::vector<std::string>> boards = startUp();
             validMoves.setBoards(boards);
@@ -431,7 +429,7 @@ int main(int argc, char** argv) {
                 thisTurn = playerTurn; //Which player's turn it is
 
                 if (DrawChecker == 201){ // Tjekker om der er gået 175 træk uden en vinder
-                    query.exec("UPDATE TempMoves SET WinOrLoss = 0.5"); // Sætter en halv ind i wincase for uafgjort
+                    query.exec("UPDATE TempMoves SET WinOrLoss = 0.35"); // Sætter en halv ind i wincase for uafgjort
                     std::cout << "The game is a draw!" << std::endl;
                     break;
                 }
@@ -439,12 +437,12 @@ int main(int argc, char** argv) {
 
                 //Checks if the game has ended either by player not having any possible moves or no more pieces on the board
                 if((validMoves.movePossible().size()) > 0 && redPieces > 0 && blackPieces > 0){
-                    std::cout << "Player " << playerTurn << "'s turn:" << std::endl; //Prints which player's turn it is
+                    //std::cout << "Player " << playerTurn << "'s turn:" << std::endl; //Prints which player's turn it is
                     std::vector<std::vector<std::string>> tempBoard = boards; // To be used in robotMove
 
                     if((playerTurn == 1 && player == "p") || (playerTurn == 2 && player2 == "p")){
 
-                        //checkerBoard(boards);
+                        checkerBoard(boards);
                         while(!validMoves.move()){} //Player's move
 
                     } else {
@@ -500,8 +498,6 @@ int main(int argc, char** argv) {
             if(gameEnd){
                 GameEnd(redPieces,blackPieces,playerTurn);
             }
-
-            std::cout << "Game Ended " << std::endl;
 
             UploadTempToDatabase(UniqueBoardIDCounter, UploadTempToDB); // Uploads the temp table to the database
         }
