@@ -2,15 +2,6 @@
 
 Robot::Robot(){}
 
-// Function to set the values of a matrix from the Matrix class
-void Robot::setMatrixValues(Matrix& m, std::vector<double> v){
-    for(int r=0; r<m.getRows(); r++){
-        for(int c=0; c<m.getCols(); c++){
-            m.at(r,c) = v[r*m.getCols() + c];
-        }
-    }
-}
-
 // Calculates the unit vectors for the x and y axis
 void Robot::calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis){
     // Calculates the vectors for the x and y axis
@@ -52,8 +43,8 @@ void Robot::robotStartVision(){
 
     // Defines the frame for the camera
     cv::Point2f oregoPicture = cv::Point2f(_calibrate[0].x*_pixToMeters, _calibrate[0].y*_pixToMeters);
-    cv::Point2f xaxisPicture = cv::Point2f(_calibrate[2].x*_pixToMeters, _calibrate[2].y*_pixToMeters);
-    cv::Point2f yaxisPicture = cv::Point2f(_calibrate[1].x*_pixToMeters, _calibrate[1].y*_pixToMeters);
+    cv::Point2f xaxisPicture = cv::Point2f(_calibrate[1].x*_pixToMeters, _calibrate[1].y*_pixToMeters);
+    cv::Point2f yaxisPicture = cv::Point2f(_calibrate[2].x*_pixToMeters, _calibrate[2].y*_pixToMeters);
 
     calcUnitVec2D(yaxis, orego, xaxis);
     // Makes a transformation matrix for the robot
@@ -61,36 +52,52 @@ void Robot::robotStartVision(){
 
     calcUnitVec2D(yaxisPicture, oregoPicture, xaxisPicture);
     // Makes a transformation matrix for the camera
-    Matrix Camera(4, 4);
-    setMatrixValues(Camera, {_unit1[0], _unit2[0], 0, 0, _unit1[1], _unit2[1], 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
+    Matrix CameraRot(3, 3);
+    Matrix CameraTrans(3, 1);
+    setMatrixValues(CameraRot, {_unit1[0], _unit2[0], 0, _unit1[1], _unit2[1], 0, 0, 0, 1});
+    setMatrixValues(CameraTrans, {0, 0, 0});
 
+    // Find the inverse of the transformation matrix
+    CameraRot.transpose();
+    Matrix CameraNegRot(3, 3);
+    setMatrixValues(CameraNegRot, {-CameraRot.at(0,0), -CameraRot.at(0,1), -CameraRot.at(0,2), -CameraRot.at(1,0), -CameraRot.at(1,1), -CameraRot.at(1,2), -CameraRot.at(2,0), -CameraRot.at(2,1), -CameraRot.at(2,2)});
+    CameraTrans = CameraNegRot*CameraTrans;
+
+    Matrix Camera(4, 4);
+    setMatrixValues(Camera, {CameraRot.at(0,0), CameraRot.at(0,1), CameraRot.at(0,2), CameraTrans.at(0,0), CameraRot.at(1,0), CameraRot.at(1,1), CameraRot.at(1,2), CameraTrans.at(1,0), CameraRot.at(2,0), CameraRot.at(2,1), CameraRot.at(2,2), CameraTrans.at(2,0), 0, 0, 0, 1});
+
+    // Recalculate the new corners to be in the frame that was previously defined instead of the cameras perspective
     calcUnitVec2D(_newCorners[0], _newCorners[1], _newCorners[2]);
+    Matrix newCornerMat(4, 4);
+    setMatrixValues(newCornerMat, {_unit1[0], _unit2[0], 0, _newCorners[1].x-oregoPicture.x, _unit1[1], _unit2[1], 0, _newCorners[1].y-oregoPicture.y, 0, 0, 1, 0, 0, 0, 0, 1});
+
     // Makes a transformation matrix for the chess board
-    Matrix Chess(4, 4);
-    setMatrixValues(Chess, {_unit1[0], _unit2[0], 0, _newCorners[1].x-oregoPicture.x, _unit1[1], _unit2[1], 0, _newCorners[1].y-oregoPicture.y, 0, 0, 1, 0, 0, 0, 0, 1});
+    Matrix Chess = Camera*newCornerMat;
 
     // Calculates the transformation matrix from the camera to the chessboard
-    _CamToChess = Camera*Chess;
+    //_CamToChess = Camera*Chess;
+    Matrix RotateY(4, 4);
+    setMatrixValues(RotateY, {-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1});
+    Matrix RotateZ(4, 4);
+    setMatrixValues(RotateZ, {0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
 
     // Makes a transformation matrix for a point on the chessboard
     Matrix checker(4, 4);
     setMatrixValues(checker, {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
 
     // Calculates the transformation matrix for the peice in the camera frame
-    Matrix pieceLocation = _CamToChess*checker;
-
-    // Makes a translation matrix for the checker piece
-    Matrix Translation(4, 1);
-    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3) , pieceLocation(2,3), 1});
+    Matrix pieceLocation = Chess*checker;
+    pieceLocation = RotateY*pieceLocation;
+    pieceLocation = RotateZ*pieceLocation;
 
     // Calculates the transformation matrix for the robot to the checker piece
-    Matrix RobotToChesspieceTransformation = _robot*Translation;
+    Matrix RobotToChesspieceTransformation = _robot*pieceLocation;
 
     sendmsg('6');
     // Finds the height of a piece on the chessboard
     rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, pieceLocation.at(2,2)}, 2, 0.5);
     std::vector<double> target = rtde_receive.getActualTCPPose();
-    rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), target[2], target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({RobotToChesspieceTransformation.at(0,3), RobotToChesspieceTransformation.at(1,3), 0.1, target[3], target[4], target[5]}, 1, 0.2);
 
     rtde_control.speedL({0, 0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){   }
@@ -99,13 +106,14 @@ void Robot::robotStartVision(){
     rtde_control.speedStop();
 
     // Moves robot above the found piece
-    rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({RobotToChesspieceTransformation.at(0,3), RobotToChesspieceTransformation.at(1,3), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
 
     // Sets up to move to middle of chess board
     setMatrixValues(checker, {1, 0, 0, (3.5*_factor), 0, 1, 0, (3.5*_factor), 0, 0, 1, 0, 0, 0, 0, 1});
-    pieceLocation = _CamToChess*checker;
-    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3) , pieceLocation(2,3), 1});
-    RobotToChesspieceTransformation = _robot*Translation;
+    pieceLocation = Chess*checker;
+    pieceLocation = RotateZ*pieceLocation;
+    pieceLocation = RotateY*pieceLocation;
+    RobotToChesspieceTransformation = _robot*pieceLocation;
 
     // Finds heigh of chessboard on table
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
@@ -117,9 +125,10 @@ void Robot::robotStartVision(){
 
     // Sets up to move to graveyard
     setMatrixValues(checker, {1, 0, 0, (1*_factor), 0, 1, 0, (-4*_factor), 0, 0, 1, 0, 0, 0, 0, 1});
-    pieceLocation = _CamToChess*checker;
-    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3) , pieceLocation(2,3), 1});
-    RobotToChesspieceTransformation = _robot*Translation;
+    pieceLocation = Chess*checker;
+    pieceLocation = RotateZ*pieceLocation;
+    pieceLocation = RotateY*pieceLocation;
+    RobotToChesspieceTransformation = _robot*pieceLocation;
 
     // Finds height of graveyard on table
     rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
@@ -133,6 +142,13 @@ void Robot::robotStartVision(){
     sendmsg('8');
 
     _hover = (_piece - _chess) * 2;
+
+    /*
+    // Rotate the camera 180 degres around y-axis
+    Matrix Rotate(4, 4);
+    setMatrixValues(Rotate, {-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1});
+    Camera = Camera*Rotate;
+    */
 }
 
 // Function to make the robot promote a piece by placiing a previously captured piece ontop of the piece to be promoted

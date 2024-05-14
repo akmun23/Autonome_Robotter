@@ -20,16 +20,16 @@ alphaBeta::alphaBeta(validMoves* vm):_vm(vm){
 }
 
 alphaBeta::alphaBeta(validMoves* vm, std::string setValues):_vm(vm){
-    _piece = 10;
-    _king = 20;
-    _lock = 5;
-    _lockKing = 5;
-    _forward = 2;
-    _TwoEmpty = 20;
-    _OneJump = 50;
-    _OneEmpty = 10;
-    _TwoJump = 80;
-    _depth = 2;
+    _piece = 1;
+    _king = 1.5;
+    _lock = 0;
+    _lockKing = 0;
+    _forward = 1000000;
+    _TwoEmpty = 0;
+    _OneJump = 0;
+    _OneEmpty = 0;
+    _TwoJump = 0;
+    _depth = 0;
 }
 
 alphaBeta::alphaBeta(validMoves* vm, int depth):_depthAI(depth), _vm(vm){}
@@ -468,9 +468,6 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
             if (depth == 1){
                 // insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
             }
-            insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
-
-
 
             //Checks if the piece has jumped
             jumped = pieceJump();
@@ -544,8 +541,6 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
             if (depth == 1){
                 // insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
             }
-            insertAlphaBetaToTemp(boards, MoveMade, playerTurn, CounterForTempTable);
-
 
             jumped = pieceJump();
             promotion = boardChange();

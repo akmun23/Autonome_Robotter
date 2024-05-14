@@ -394,17 +394,6 @@ int main(int argc, char** argv) {
 
 
     else if (RunMode == "DatabaseSimulation"){
-
-        QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
-        db.setHostName("localhost");
-        db.setDatabaseName("CheckersDatabase");
-        db.setUserName("IndsætBrugernavn");  // Change to username
-        db.setPassword("IndsætPassword!");  // Change to password
-        db.open();
-
-        QSqlQuery query;
-
-
         QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
         db.setHostName("localhost");
         db.setDatabaseName("alphaBeta");
@@ -443,8 +432,8 @@ int main(int argc, char** argv) {
         int player1Wins = 0;
         int player2Wins = 0;
         int playerDraws = 0;
-
-        for (int ii = 0; ii < 100; ++ii) {
+        auto start = std::chrono::high_resolution_clock::now();
+        for (int ii = 0; ii < 20; ++ii) {
             DatabaseInit(UniqueBoardIDCounter,LoadTempBeforeStart); //Initializes the database
        	    int TestCounterForDatabase = 0;
             std::cout << "Game Started" << std::endl;
@@ -467,9 +456,8 @@ int main(int argc, char** argv) {
 
             int UniqueBoardIDCounter;
             // Skriv true i nr 2 input hvis temp skal uploades til databasen inden man starter spillet
-            DatabaseInit(UniqueBoardIDCounter,LoadTempBeforeStart); //Initializes the database
+            //DatabaseInit(UniqueBoardIDCounter,LoadTempBeforeStart); //Initializes the database
             std::cout << "Database initialized" << std::endl;
-            while(1);
             // Construct initial board
             std::vector<std::vector<std::string>> boards = startUp();
             validMoves.setBoards(boards);
@@ -514,7 +502,7 @@ int main(int argc, char** argv) {
                         else if (playerTurn == 1 && player == "AI" || playerTurn == 2 && player2 == "AI"){
                             CounterForTempTable = 0;
 
-/*
+
                             checkerBoard(boards);
                             if(playerTurn == 1){
                                 alphaNotEvo.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
@@ -523,15 +511,15 @@ int main(int argc, char** argv) {
                                 alphaEvo.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
                                 moveSet = alphaEvo.getMove();
                             }
-*/
+
                             //checkerBoard(boards);
-                            alphaBeta.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
-                            moveSet = alphaBeta.getMove();
+                            //alphaBeta.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
+                            //moveSet = alphaBeta.getMove();
 
                         }
                     }
 
-                    moveSet = validMoves.getMove();
+                    //moveSet = validMoves.getMove();
                     playerTurn = validMoves.getPlayerTurn();
                     boards = validMoves.getBoards();
                     blackPieces = validMoves.getPieceCount()[0];
@@ -566,7 +554,7 @@ int main(int argc, char** argv) {
 
             //Prints the winner of the game
             if(gameEnd){
-/*
+
 
                 std::cout << "Game played at depth: " << depth << std::endl;
                 auto stop = std::chrono::high_resolution_clock::now();
@@ -592,16 +580,15 @@ int main(int argc, char** argv) {
         std::cout << "The evolved AI wins: " << player1Wins << std::endl;
         std::cout << "The initial AI wins: " << player2Wins << std::endl;
         std::cout << "Draws: " << playerDraws << std::endl;
-*/
+
                 GameEnd(redPieces,blackPieces,playerTurn);
-            }
+
 
             std::cout << "Game Ended " << std::endl;
 
-            UploadTempToDatabase(UniqueBoardIDCounter, UploadTempToDB); // Uploads the temp table to the database
-        }
-    }
-    else if (RunMode == "SimOnly"){
+            //UploadTempToDatabase(UniqueBoardIDCounter, UploadTempToDB); // Uploads the temp table to the database
+
+    } else if (RunMode == "SimOnly"){
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
     db.setDatabaseName("CheckersDatabase");

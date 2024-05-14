@@ -18,6 +18,8 @@ public:
 
     Matrix(Matrix& m);
 
+    void setMatrixValues(Matrix& m, std::vector<double> v);
+
     int getRows();
 
     int getCols();

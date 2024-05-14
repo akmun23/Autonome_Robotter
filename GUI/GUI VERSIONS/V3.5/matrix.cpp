@@ -14,6 +14,15 @@ Matrix::Matrix(Matrix& m):_rows(m.getRows()), _cols(m.getCols()){
     }
 }
 
+// Function to set the values of a matrix from the Matrix class
+void Matrix::setMatrixValues(Matrix& m, std::vector<double> v){
+    for(int r=0; r<m.getRows(); r++){
+        for(int c=0; c<m.getCols(); c++){
+            m.at(r,c) = v[r*m.getCols() + c];
+        }
+    }
+}
+
 int Matrix::getCols(){
     return _cols;
 }
