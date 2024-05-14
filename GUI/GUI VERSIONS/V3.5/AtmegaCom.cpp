@@ -23,10 +23,7 @@ AtmegaCom::AtmegaCom() {
     tty.c_cflag &= ~CRTSCTS;                                            // Disable RTS/CTS som betyder at man har 2 ekstra ledninger til at fortælle hvornår den skal sende og modtage det har vi ikke så den er slået fra
 
     tty.c_cflag |= CREAD | CLOCAL;                                      // CREAD betyder at vi kan læse fra porten og CLOCAL betyder at vi ignorerer modem control lines
-
     tty.c_lflag &= ~ICANON;                                             // Her slår vi canonical mode fra som betyder at vi læser en byte ad gangen
-
-    // De her 3 ting burde ikke være nødvendige at slå fra da de bruges af canonical mode men de slås fra for en sikkerheds skyld
     tty.c_lflag &= ~ECHO;                                               // Disable echo
     tty.c_lflag &= ~ECHOE;                                              // Disable erasure
     tty.c_lflag &= ~ECHONL;                                             // Disable new-line echo
@@ -40,10 +37,8 @@ AtmegaCom::AtmegaCom() {
     tty.c_oflag &= ~OPOST;                                              // Her fjerner vi speciel tolkelse af output data som fx newline chars
     tty.c_oflag &= ~ONLCR;                                              // Igen bare at vi fortsætter med at fjerne special tolkelse af output data
 
-    // Måske skal vi køre på timer istedet i forhold til at måle strøm
     tty.c_cc[VTIME] = 0;                                                // Her sætter vi timeout til 0 så den venter ikke på at der kommer noget data i forhold til tid hvis den ikke får noget data så går den videre
-        // men hvis den får data indenfor intervaller af timeout fortsætter den
-
+                                                                        // men hvis den får data indenfor intervaller af timeout fortsætter den
     tty.c_cc[VMIN] = 1;                                                 // Venter på at mindst 1 byte er læst ind før den går videre altså den venter her for evigt indtil den får en byte data
 
     cfsetispeed(&tty, B9600);                                           // Sætter in og output baud rate til 9600
