@@ -22,7 +22,7 @@ void Vision::detectAndDrawCentersOfCircles(){
     //![houghcircles]
     cv::HoughCircles(gray, _circles, cv::HOUGH_GRADIENT_ALT, 1,
                      (gray.rows)/100,  // change this value to detect circles with different distances to each other
-                     250, 0.72, 5, 20 // change the last two parameters
+                     300, 0.8, 5, 25 // change the last two parameters
                      // (min_radius & max_radius) to detect larger circles
                      );
     //![houghcircles]
@@ -161,16 +161,16 @@ void Vision::cameraFeed(){
             break;
         }
     }
-    _src = cv::imread("/home/aksel/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/CameraFeed0.jpg");
+    _src = cv::imread(path);
     capture.release();
 }
 
 // Finds the coordinates for the three calibration circles
 void Vision::calibrationCircles(){
     // Preset values for the three calibration circles
-    cv::Vec3b red = {50, 50, 255};
+    cv::Vec3b red = {100, 100, 255};
     cv::Vec3b yellow = {160, 255, 255};
-    cv::Vec3b blue = {210, 140, 130};
+    cv::Vec3b blue = {210, 100, 10};
     bool redFound = false;
     bool yellowFound = false;
     bool blueFound = false;

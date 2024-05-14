@@ -1,6 +1,10 @@
 #include "robot.h"
 
-Robot::Robot(){}
+Robot::Robot(){
+
+    setMatrixValues(_RotateY, {-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1});
+    setMatrixValues(_RotateZ, {0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
+}
 
 // Calculates the unit vectors for the x and y axis
 void Robot::calcUnitVec2D(cv::Point2f yaxis, cv::Point2f orego, cv::Point2f xaxis){
@@ -72,32 +76,28 @@ void Robot::robotStartVision(){
     setMatrixValues(newCornerMat, {_unit1[0], _unit2[0], 0, _newCorners[1].x-oregoPicture.x, _unit1[1], _unit2[1], 0, _newCorners[1].y-oregoPicture.y, 0, 0, 1, 0, 0, 0, 0, 1});
 
     // Makes a transformation matrix for the chess board
-    Matrix Chess = Camera*newCornerMat;
+    _Chess = Camera*newCornerMat;
 
     // Calculates the transformation matrix from the camera to the chessboard
     //_CamToChess = Camera*Chess;
-    Matrix RotateY(4, 4);
-    setMatrixValues(RotateY, {-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1});
-    Matrix RotateZ(4, 4);
-    setMatrixValues(RotateZ, {0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
 
     // Makes a transformation matrix for a point on the chessboard
     Matrix checker(4, 4);
     setMatrixValues(checker, {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
 
     // Calculates the transformation matrix for the peice in the camera frame
-    Matrix pieceLocation = Chess*checker;
-    pieceLocation = RotateY*pieceLocation;
-    pieceLocation = RotateZ*pieceLocation;
+    _pieceLocation = _Chess*checker;
+    _pieceLocation = _RotateY*_pieceLocation;
+    _pieceLocation = _RotateZ*_pieceLocation;
 
     // Calculates the transformation matrix for the robot to the checker piece
-    Matrix RobotToChesspieceTransformation = _robot*pieceLocation;
+    _RobotToChesspieceTransformation = _robot*_pieceLocation;
 
     sendmsg('6');
     // Finds the height of a piece on the chessboard
-    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, pieceLocation.at(2,2)}, 2, 0.5);
+    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, _pieceLocation.at(2,2)}, 2, 0.5);
     std::vector<double> target = rtde_receive.getActualTCPPose();
-    rtde_control.moveL({RobotToChesspieceTransformation.at(0,3), RobotToChesspieceTransformation.at(1,3), 0.1, target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({_RobotToChesspieceTransformation.at(0,3), _RobotToChesspieceTransformation.at(1,3), 0.1, target[3], target[4], target[5]}, 1, 0.2);
 
     rtde_control.speedL({0, 0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){   }
@@ -106,39 +106,39 @@ void Robot::robotStartVision(){
     rtde_control.speedStop();
 
     // Moves robot above the found piece
-    rtde_control.moveL({RobotToChesspieceTransformation.at(0,3), RobotToChesspieceTransformation.at(1,3), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({_RobotToChesspieceTransformation.at(0,3), _RobotToChesspieceTransformation.at(1,3), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
 
     // Sets up to move to middle of chess board
     setMatrixValues(checker, {1, 0, 0, (3.5*_factor), 0, 1, 0, (3.5*_factor), 0, 0, 1, 0, 0, 0, 0, 1});
-    pieceLocation = Chess*checker;
-    pieceLocation = RotateZ*pieceLocation;
-    pieceLocation = RotateY*pieceLocation;
-    RobotToChesspieceTransformation = _robot*pieceLocation;
+    _pieceLocation = _Chess*checker;
+    _pieceLocation = _RotateY*_pieceLocation;
+    _pieceLocation = _RotateZ*_pieceLocation;
+    _RobotToChesspieceTransformation = _robot*_pieceLocation;
 
     // Finds heigh of chessboard on table
-    rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({_RobotToChesspieceTransformation.at(0,3), _RobotToChesspieceTransformation.at(1,3), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){}
     _chess = rtde_receive.getActualTCPPose()[2]+0.0015;
     rtde_control.speedStop();
-    rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({_RobotToChesspieceTransformation.at(0,3), _RobotToChesspieceTransformation.at(1,3), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
 
     // Sets up to move to graveyard
     setMatrixValues(checker, {1, 0, 0, (1*_factor), 0, 1, 0, (-4*_factor), 0, 0, 1, 0, 0, 0, 0, 1});
-    pieceLocation = Chess*checker;
-    pieceLocation = RotateZ*pieceLocation;
-    pieceLocation = RotateY*pieceLocation;
-    RobotToChesspieceTransformation = _robot*pieceLocation;
+    _pieceLocation = _Chess*checker;
+    _pieceLocation = _RotateY*_pieceLocation;
+    _pieceLocation = _RotateZ*_pieceLocation;
+    _RobotToChesspieceTransformation = _robot*_pieceLocation;
 
     // Finds height of graveyard on table
-    rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({_RobotToChesspieceTransformation.at(0,3), _RobotToChesspieceTransformation.at(1,3), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.speedL({0,0,-0.01, 0, 0, 0});
     while(rtde_receive.getActualTCPForce()[2] < 30){}
     _table = rtde_receive.getActualTCPPose()[2]+0.0015;
     rtde_control.speedStop();
-    rtde_control.moveL({RobotToChesspieceTransformation.at(0,0), RobotToChesspieceTransformation.at(0,1), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
+    rtde_control.moveL({_RobotToChesspieceTransformation.at(0,3), _RobotToChesspieceTransformation.at(1,3), _piece+0.05, target[3], target[4], target[5]}, 1, 0.2);
 
-    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, pieceLocation.at(2,2)}, 2, 0.5);
+    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, _pieceLocation.at(2,2)}, 2, 0.5);
     sendmsg('8');
 
     _hover = (_piece - _chess) * 2;
@@ -163,14 +163,16 @@ void Robot::checkerJump(int piecesLeft){
     Matrix checker(4, 4);
     setMatrixValues(checker, {1, 0, 0, column*_factor, 0, 1, 0, row*_factor, 0, 0, 1, 0, 0, 0, 0, 1});
 
-    Matrix pieceLocation = _CamToChess*checker;
 
-    Matrix Translation(4, 1);
-    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3), pieceLocation(2,3), 1});
+    _pieceLocation = _Chess*checker;
+    _pieceLocation = _RotateY*_pieceLocation;
+    _pieceLocation = _RotateZ*_pieceLocation;
+    _RobotToChesspieceTransformation = _robot*_pieceLocation;
 
-    Matrix location = _robot*Translation;
-    double xcord = location.at(0,0);
-    double ycord = location.at(1,0);
+
+
+    double xcord = _RobotToChesspieceTransformation.at(0,3);
+    double ycord = _RobotToChesspieceTransformation.at(1,3);
 
     piecesLeft = (12 - piecesLeft) * (_hover/2);
 
@@ -192,11 +194,13 @@ void Robot::checkerJump(int piecesLeft){
     int gravey = -4;
 
     setMatrixValues(checker, {1, 0, 0, gravex*_factor, 0, 1, 0, gravey*_factor, 0, 0, 1, 0, 0, 0, 0, 1});
-    pieceLocation = _CamToChess*checker;
-    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3), pieceLocation(2,3), 1});
-    location = _robot*Translation;
-    double xcord2 = location.at(0,0);
-    double ycord2 = location.at(1,0);
+    _pieceLocation = _Chess*checker;
+    _pieceLocation = _RotateY*_pieceLocation;
+    _pieceLocation = _RotateZ*_pieceLocation;
+    _RobotToChesspieceTransformation = _robot*_pieceLocation;
+
+    double xcord2 = _RobotToChesspieceTransformation.at(0,3);
+    double ycord2 = _RobotToChesspieceTransformation.at(1,3);
 
     rtde_control.moveL({xcord2 + offset, ycord2 + offset, _piece + _hover + piecesLeft, target[3], target[4], target[5]}, 1, 0.2);
 
@@ -221,14 +225,13 @@ void Robot::promotePiece(std::vector<std::vector<std::string>> boards, int piece
     Matrix checker(4, 4);
     setMatrixValues(checker, {1, 0, 0, column*_factor, 0, 1, 0, row*_factor, 0, 0, 1, 0, 0, 0, 0, 1});
 
-    Matrix pieceLocation = _CamToChess*checker;
+    _pieceLocation = _Chess*checker;
+    _pieceLocation = _RotateY*_pieceLocation;
+    _pieceLocation = _RotateZ*_pieceLocation;
+    _RobotToChesspieceTransformation = _robot*_pieceLocation;
 
-    Matrix Translation(4, 1);
-    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3), pieceLocation(2,3), 1});
-
-    Matrix location = _robot*Translation;
-    double xcord = location.at(0,0);
-    double ycord = location.at(1,0);
+    double xcord = _RobotToChesspieceTransformation.at(0,3);
+    double ycord = _RobotToChesspieceTransformation.at(1,3);
     piecesLeft = (12 - piecesLeft) * (_hover/2);
 
     double offset = 0.005;
@@ -244,11 +247,13 @@ void Robot::promotePiece(std::vector<std::vector<std::string>> boards, int piece
     int gravey = -4;
 
     setMatrixValues(checker, {1, 0, 0, gravex*_factor, 0, 1, 0, gravey*_factor, 0, 0, 1, 0, 0, 0, 0, 1});
-    pieceLocation = _CamToChess*checker;
-    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3), pieceLocation(2,3), 1});
-    location = _robot*Translation;
-    double xcord2 = location.at(0,0);
-    double ycord2 = location.at(1,0);
+    _pieceLocation = _Chess*checker;
+    _pieceLocation = _RotateY*_pieceLocation;
+    _pieceLocation = _RotateZ*_pieceLocation;
+    _RobotToChesspieceTransformation = _robot*_pieceLocation;
+
+    double xcord2 = _RobotToChesspieceTransformation.at(0,3);
+    double ycord2 = _RobotToChesspieceTransformation.at(1,3);
 
     rtde_control.moveL({target[0],       target[1],       _piece + _hover + piecesLeft, target[3], target[4], target[5]}, 1, 0.2);
     rtde_control.moveL({xcord2 + offset, ycord2 + offset, _piece + _hover + piecesLeft, target[3], target[4], target[5]}, 1, 0.2);
@@ -294,27 +299,28 @@ bool Robot::robotMove(std::vector<std::string> moveSet, std::vector<std::vector<
     Matrix checker(4, 4);
     setMatrixValues(checker, {1, 0, 0, column*_factor, 0, 1, 0, row*_factor, 0, 0, 1, 0, 0, 0, 0, 1});
 
-    Matrix pieceLocation = _CamToChess*checker;
+    _pieceLocation = _Chess*checker;
+    _pieceLocation = _RotateY*_pieceLocation;
+    _pieceLocation = _RotateZ*_pieceLocation;
+    _RobotToChesspieceTransformation = _robot*_pieceLocation;
 
-    Matrix Translation(4, 1);
-    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3), pieceLocation(2,3), 1});
-
-    Matrix location = _robot*Translation;
-    xcord = location.at(0,0);
-    ycord = location.at(1,0);
+    xcord = _RobotToChesspieceTransformation.at(0,3);
+    ycord = _RobotToChesspieceTransformation.at(1,3);
 
     char column2 = moveSet[1][0]; //Ending column
     column2 = column2 - 'a';
     int row2 = 7-(moveSet[1][1] - '1'); //Ending row
 
     setMatrixValues(checker, {1, 0, 0, column2*_factor, 0, 1, 0, row2*_factor, 0, 0, 1, 0, 0, 0, 0, 1});
-    pieceLocation = _CamToChess*checker;
-    setMatrixValues(Translation, {pieceLocation.at(0,3), pieceLocation(1,3), pieceLocation(2,3), 1});
-    location = _robot*Translation;
-    xcord2 = location.at(0,0);
-    ycord2 = location.at(1,0);
+    _pieceLocation = _Chess*checker;
+    _pieceLocation = _RotateY*_pieceLocation;
+    _pieceLocation = _RotateZ*_pieceLocation;
+    _RobotToChesspieceTransformation = _robot*_pieceLocation;
 
-    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, pieceLocation.at(2,2)}, 2, 0.5);
+    xcord2 = _RobotToChesspieceTransformation.at(0,3);
+    ycord2 = _RobotToChesspieceTransformation.at(1,3);
+
+    rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, _pieceLocation.at(2,2)}, 2, 0.5);
     std::vector<double> target = rtde_receive.getActualTCPPose();
 
     rtde_control.moveL({xcord,  ycord,  _piece + _hover, target[3], target[4], target[5]}, speed,  acc);
