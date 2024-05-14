@@ -225,7 +225,7 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
             for(int i = 0; i < 64; i++){
                 if(rectangles[i].contains(Point(userX,userY))){ //Checks if click is inside game board.
                         for(int j = 0; j < (rCheckers.size() > bCheckers.size() ? rCheckers.size() : bCheckers.size()); j++){
-                            if(rCheckers[j].contains(Point(userX, userY)) && turnVal%2 == 1){ //Checks if there is a checker on the Rect, corresponding to the which players turn it is.
+                            if(rCheckers[j].contains(Point(userX, userY)) && thisTurn%2 == 0){ //Checks if there is a checker on the Rect, corresponding to the which players turn it is.
                                 //Use doesRectContainChecker
                                 img(rectangles[i]) = Vec3b(0,0,255); //Highlights the chosen checker.
                                 circle(img, {rectangles[i].x + 25, rectangles[i].y + 25}, 20, Vec3b(14,17,175), -1); //Redraws the checker, as the highlighting (previous line of code) draws over it.
@@ -242,7 +242,7 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
 
                                 jumps(rectangles[i].x, rectangles[i].y, i, j, rCheckers, bCheckers);
                             }
-                            else if(bCheckers[j].contains(Point(userX, userY)) && turnVal%2 == 0){ //Same as for the previous section.
+                            else if(bCheckers[j].contains(Point(userX, userY)) && thisTurn%2 == 1){ //Same as for the previous section.
                                 
                                 img(rectangles[i]) = Vec3b(0,0,255);
                                 circle(img, {rectangles[i].x + 25, rectangles[i].y + 25}, 20, Vec3b(0,0,0), -1);
@@ -332,7 +332,7 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
 
         }while(isJumpPossible(intPos[intPos.size()-2], intPos[intPos.size()-1], selected[selected.size()-1], rCheckers, bCheckers) && jumpPerformed);
 
-        if(isGameWon(rCheckers, bCheckers, thisTurn)){
+        if(isGameWon(bCheckers, bCheckers, thisTurn)){
             setBool(gameEnd, true);
             setBool(redWon, true);
             Draw(img, startUpMain);

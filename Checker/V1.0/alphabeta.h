@@ -40,8 +40,11 @@ class alphaBeta : public validMoves
 public:
     QSqlQuery query;
     alphaBeta(validMoves* vm);
+    alphaBeta(validMoves* vm, std::string setValues);
     alphaBeta(validMoves* vm, int depth);
-    alphaBeta(validMoves* vm, double piece, double king, double lock, double lockKing, double forward, double TwoEmpty, double OneJump, double OneEmpty, double TwoJump, double depth);
+    alphaBeta(validMoves* vm, double id, double piece, double king, double lock, double lockKing, double forward, double TwoEmpty, double OneJump, double OneEmpty, double TwoJump, double depth);
+
+    void allTimeID();
 
     std::vector<std::string> jumpPossible(int playerTurn, std::vector<std::vector<std::string>>& boards);
     std::vector<std::string> movePossible(int playerTurn, std::vector<std::vector<std::string>>& boards);

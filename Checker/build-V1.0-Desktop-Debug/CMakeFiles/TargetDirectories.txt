@@ -1,3 +1,0 @@
-/home/pascal/Documents/GitHub/Autonome_Robotter/Checker/build-V1.0-Desktop-Debug/CMakeFiles/main.dir
-/home/pascal/Documents/GitHub/Autonome_Robotter/Checker/build-V1.0-Desktop-Debug/CMakeFiles/edit_cache.dir
-/home/pascal/Documents/GitHub/Autonome_Robotter/Checker/build-V1.0-Desktop-Debug/CMakeFiles/rebuild_cache.dir

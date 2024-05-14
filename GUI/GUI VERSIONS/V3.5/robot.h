@@ -19,6 +19,7 @@ class Robot : public Vision, public Matrix, public AtmegaCom
     RTDEControlInterface rtde_control = RTDEControlInterface("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
     RTDEReceiveInterface rtde_receive = RTDEReceiveInterface("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
 
+    /*
     std::vector<double> _yaxis1 = {0.4076880, -0.0492708, 0.125247};
     std::vector<double> _yaxis2 = {0.4077010, -0.0492651, 0.125247};
     std::vector<double> _yaxis3 = {0.4076790, -0.0492790, 0.12528};
@@ -28,6 +29,19 @@ class Robot : public Vision, public Matrix, public AtmegaCom
     std::vector<double> _orego1 = {-0.294341, -0.338338, 0.12538};
     std::vector<double> _orego2 = {-0.294350, -0.338339, 0.125314};
     std::vector<double> _orego3 = {-0.294359, -0.338352, 0.125344};
+    */
+
+    std::vector<double> _orego1 = {-0.30305, -0.43205, 0.12538};
+    std::vector<double> _orego2 = {-0.30305, -0.43205, 0.12538};
+    std::vector<double> _orego3 = {-0.30305, -0.43205, 0.12538};
+
+    std::vector<double> _xaxis1 = {-0.02675, -0.98675, 0.126027};
+    std::vector<double> _xaxis2 = {-0.02675, -0.98675, 0.126027};
+    std::vector<double> _xaxis3 = {-0.02675, -0.98675, 0.126027};
+
+    std::vector<double> _yaxis1 = {0.4987, -0.00960, 0.125247};
+    std::vector<double> _yaxis2 = {0.4987, -0.00960, 0.125247};
+    std::vector<double> _yaxis3 = {0.4987, -0.00960, 0.125247};
 
     std::vector<cv::Point2f> _newCorners;
     std::vector<cv::Point2f> _calibrate;
@@ -48,9 +62,6 @@ class Robot : public Vision, public Matrix, public AtmegaCom
 
 public:
     Robot();
-
-    // Function to set the values of a matrix from the Matrix class
-    void setMatrixValues(Matrix& m, std::vector<double> v);
 
     // Finds the median of the three vectors
     cv::Point2f meanPoints(std::vector<double> point1, std::vector<double> point2, std::vector<double> point3);

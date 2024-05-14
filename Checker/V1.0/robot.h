@@ -16,8 +16,8 @@ using namespace ur_rtde;
 
 class Robot : public Vision, public Matrix
 {
-    RTDEControlInterface rtde_control = RTDEControlInterface("192.168.50.164", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
-    RTDEReceiveInterface rtde_receive = RTDEReceiveInterface("192.168.50.164", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
+    RTDEControlInterface rtde_control = RTDEControlInterface("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
+    RTDEReceiveInterface rtde_receive = RTDEReceiveInterface("192.168.1.54", RTDEControlInterface::FLAG_NO_WAIT | RTDEControlInterface::FLAG_USE_EXT_UR_CAP);
 
     std::vector<float> _yaxis1 = {0.4076880, -0.0492708, 0.125247};
     std::vector<float> _yaxis2 = {0.4077010, -0.0492651, 0.125247};

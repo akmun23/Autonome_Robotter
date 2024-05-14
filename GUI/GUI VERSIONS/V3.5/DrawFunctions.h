@@ -43,11 +43,11 @@ alphaBeta alphaBeta(&validM, 0);
 
 //Updates text displayed, depending player turn.
 void updateText(Mat img, int turnVal, vector<int>& scores, vector<string>& moves, string moveStart, string moveEnd){
-    string spiller1 = "Det er spiller 1's tur.";
-    string spiller2 = "Det er spiller 2's tur.";
+    string spiller1 = "It is Player 1's turn.";
+    string spiller2 = "It is Player 2's turn.";
     string playerTurnString, outputString;
 
-    ((thisTurn%2 == 0) ? playerTurnString = spiller1 : playerTurnString = spiller2);
+    ((thisTurn%2 == 1) ? playerTurnString = spiller1 : playerTurnString = spiller2);
 
     rectangle(img, Point(115,0), Point(500,35), Scalar(255,255,255), -1); //Creates a white rectangle, that covers the old text.
     putText(img, playerTurnString, Point(115, 25), FONT_HERSHEY_COMPLEX, 1, Scalar(0,0,0), 1); //Prints new text.
@@ -134,7 +134,7 @@ void Draw(Mat& img, bool& startUpMain){
         }
 
         //Loads graveyard segment image, and resizes it to fit inside rect.
-        resize(imread("/home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/graveyard.jpg"), graveyardDownSized, Size(50, 50), INTER_LINEAR);
+        resize(imread("/home/aksel/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/graveyard.jpg"), graveyardDownSized, Size(50, 50), INTER_LINEAR);
         graveyardDownSized.copyTo(img(blackGraveyardRect)); //Draws graveyard onto img.
         graveyardDownSized.copyTo(img(redGraveyardRect));
 
