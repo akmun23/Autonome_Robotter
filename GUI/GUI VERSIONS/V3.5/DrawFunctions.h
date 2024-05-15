@@ -134,7 +134,7 @@ void Draw(Mat& img, bool& startUpMain){
         }
 
         //Loads graveyard segment image, and resizes it to fit inside rect.
-        resize(imread("/home/pascal/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/graveyard.jpg"), graveyardDownSized, Size(50, 50), INTER_LINEAR);
+        resize(imread("/home/aksel/Documents/GitHub/Autonome_Robotter/GUI/GUI VERSIONS/V3.5/graveyard.jpg"), graveyardDownSized, Size(50, 50), INTER_LINEAR);
         graveyardDownSized.copyTo(img(blackGraveyardRect)); //Draws graveyard onto img.
         graveyardDownSized.copyTo(img(redGraveyardRect));
 
