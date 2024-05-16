@@ -27,7 +27,6 @@ void DatabaseInit(int& UniqueBoardIDCounter, bool UploadTemp){
         std::cout << "Uploaded" << std::endl;
 
     }
-    RefreshTempTable(); // Refreshes the Temp table
 
 }
 
@@ -55,7 +54,6 @@ void MoveDBMain(std::string& BoardState, int& playerTurn, std::vector<std::vecto
     if (DBmove == "No moves"){
         MoveRandom(moveSet, DatabaseMoveMade, validm);
     } else {
-        std::cout << "AI move from database: " << DBmove << std::endl;
         moveSet = {DBmove.substr(0,2), DBmove.substr(2,2)};
         if (validm.DB_move(moveSet[0], moveSet[1])){
 
@@ -131,18 +129,18 @@ void GameEnd(int redPieces, int blackPieces, int playerTurn){
     if(redPieces == 0){
         query.exec("UPDATE TempMoves SET WinOrLoss = 1 WHERE PlayerId = 1");
         query.exec("UPDATE TempMoves SET WinOrLoss = 0 WHERE PlayerId = 2");
-        //std::cout << "Player 1 wins! No more red pieces" << std::endl;
+        std::cout << "Player 1 wins! No more red pieces" << std::endl;
     } else if(blackPieces == 0){
         query.exec("UPDATE TempMoves SET WinOrLoss = 1 WHERE PlayerId = 2");
         query.exec("UPDATE TempMoves SET WinOrLoss = 0 WHERE PlayerId = 1");
-        //std::cout << "Player 2 wins! No more black pieces" << std::endl;
+        std::cout << "Player 2 wins! No more black pieces" << std::endl;
     } else if(playerTurn == 1){
         query.exec("UPDATE TempMoves SET WinOrLoss = 1 WHERE PlayerId = 2");
         query.exec("UPDATE TempMoves SET WinOrLoss = 0 WHERE PlayerId = 1");
-        //std::cout << "Player 2 wins! No more moves for black" << std::endl;
+        std::cout << "Player 2 wins! No more moves for black" << std::endl;
     } else if(playerTurn == 2){
         query.exec("UPDATE TempMoves SET WinOrLoss = 1 WHERE PlayerId = 1");
         query.exec("UPDATE TempMoves SET WinOrLoss = 0 WHERE PlayerId = 2");
-        //std::cout << "Player 1 wins! No more moves for red" << std::endl;
+        std::cout << "Player 1 wins! No more moves for red" << std::endl;
     }
 }

@@ -12,8 +12,8 @@ void InsertMove(int board_id, QString Move, int PlayerID, float WinOrLoss){
                       " (:board_id, :Move, :WinRate, :WinCases, 1)");
         query.bindValue(":board_id", board_id);
         query.bindValue(":Move", Move);
-        query.bindValue(":WinRate", 50);        // Skal sættes til WinOrLoss * 100
-        query.bindValue(":WinCases", 0.5);      // Skal sættes til WinOrLoss
+        query.bindValue(":WinRate", WinOrLoss * 100);        // Skal sættes til WinOrLoss * 100
+        query.bindValue(":WinCases", WinOrLoss);      // Skal sættes til WinOrLoss
         query.exec();
     }
     else if (PlayerID == 2){
@@ -23,8 +23,8 @@ void InsertMove(int board_id, QString Move, int PlayerID, float WinOrLoss){
                       " (:board_id, :Move, :WinRate, :WinCases, 1)");
         query.bindValue(":board_id", board_id);
         query.bindValue(":Move", Move);
-        query.bindValue(":WinRate", 50);        // Skal sættes til WinOrLoss * 100
-        query.bindValue(":WinCases", 0.5);      // Skal sættes til WinOrLoss
+        query.bindValue(":WinRate", WinOrLoss * 100);        // Skal sættes til WinOrLoss * 100
+        query.bindValue(":WinCases", WinOrLoss);      // Skal sættes til WinOrLoss
         query.exec();
     }
 }
@@ -43,7 +43,7 @@ void HandleNewMoves(QString Move, int PlayerID, float WinOrLoss, int BoardID){
         query.bindValue(":Move", Move);
         query.exec();
         if (query.first()){
-            //UpdateMoveWinRate(Move, BoardID, WinOrLoss, PlayerID);
+            UpdateMoveWinRate(Move, BoardID, WinOrLoss, PlayerID);
             return;
         }
         else{
@@ -59,7 +59,7 @@ void HandleNewMoves(QString Move, int PlayerID, float WinOrLoss, int BoardID){
         query.bindValue(":Move", Move);
         query.exec();
         if (query.first()){
-            //UpdateMoveWinRate(Move, BoardID, WinOrLoss, PlayerID);
+            UpdateMoveWinRate(Move, BoardID, WinOrLoss, PlayerID);
             return;
         }
         else{
@@ -172,11 +172,11 @@ void UpdateMoveWinRate(QString& Move, int& BoardID, float& WinOrLoss, int& Playe
 
     QSqlDatabase db = QSqlDatabase::database("QMYSQL");
     QSqlQuery query = QSqlQuery(db);
-/*
+
     if (PlayerId == 1){
-        query.prepare(" UPDATE MovesP1"
+        query.prepare(" UPDATE MovesP1 "
                       " SET "
-                      " WinCases = WinCases + :WinCases,"
+                      " WinCases = WinCases + :WinCases, "
                       " UseCases = UseCases + 1, "
                       " WinRate = (WinCases/UseCases)*100"
                       " WHERE board_id = :board_id "
@@ -187,9 +187,9 @@ void UpdateMoveWinRate(QString& Move, int& BoardID, float& WinOrLoss, int& Playe
         query.exec();
     }
     else if (PlayerId == 2){
-        query.prepare(" UPDATE MovesP2"
+        query.prepare(" UPDATE MovesP2 "
                       " SET "
-                      " WinCases = WinCases + :WinCases,"
+                      " WinCases = WinCases + :WinCases, "
                       " UseCases = UseCases + 1, "
                       " WinRate = (WinCases/UseCases)*100"
                       " WHERE board_id = :board_id "
@@ -198,28 +198,7 @@ void UpdateMoveWinRate(QString& Move, int& BoardID, float& WinOrLoss, int& Playe
         query.bindValue(":board_id", BoardID);
         query.bindValue(":Move", Move);
         query.exec();
-    }*/
-    /*
-    if (PlayerId == 1){
-        query.prepare(" UPDATE MovesP1"
-                      " SET "
-                      " WinRate = WinRate-1 "
-                      " WHERE board_id = :board_id "
-                      " AND Move = :Move");
-        query.bindValue(":board_id", BoardID);
-        query.bindValue(":Move", Move);
-        query.exec();
     }
-    else if (PlayerId == 2){
-        query.prepare(" UPDATE MovesP2"
-                      " SET "
-                      " WinRate = WinRate-1 "
-                      " WHERE board_id = :board_id "
-                      " AND Move = :Move");
-        query.bindValue(":board_id", BoardID);
-        query.bindValue(":Move", Move);
-        query.exec();
-    }*/
 }
 
 std::string MovePlayer(std::string& BoardState,int& PlayerTurn){
@@ -252,7 +231,7 @@ std::string MovePlayer(std::string& BoardState,int& PlayerTurn){
             PlayersMoveDB = "MovesP2";
         }
 
-        query.prepare(" SELECT Move"                        // Finder det bedste move og returnere det
+        query.prepare(" SELECT Move, WinRate"                        // Finder det bedste move og returnere det
                       " FROM "+ PlayersMoveDB +
                       " WHERE board_id = " + QString::number(BoardID) + " "
                       " ORDER BY WinRate DESC");
@@ -264,16 +243,13 @@ std::string MovePlayer(std::string& BoardState,int& PlayerTurn){
 
             query.first();
             std::string Move = query.value(0).toString().toStdString();
-            query.prepare(" UPDATE "+ PlayersMoveDB +
-                          " SET "
-                          " WinRate = WinRate-1 "
-                          " WHERE board_id = :board_id "
-                          " AND Move = :Move");
-            query.bindValue(":board_id", BoardID);
-            query.bindValue(":Move", QString::fromStdString(Move));
-            query.exec();
-
-            return Move;
+            int WinRate = query.value(1).toInt();
+            if (WinRate < 15){
+                return "No moves";
+            }
+            else{
+                return Move;
+            }
         }
     }
 }

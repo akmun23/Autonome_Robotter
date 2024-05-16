@@ -72,7 +72,7 @@ void Robot::robotStartVision(){
     // Calculates the transformation matrix from the camera to the chessboard
     _CamToChess = Camera*Chess;
 
-    // Makes a transformation matrix for a point on the chessboard
+    // Makes a transformation Smatrix for a point on the chessboard
     Matrix checker(4, 4);
     setMatrixValues(checker, {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
 

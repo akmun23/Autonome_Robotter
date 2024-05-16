@@ -3,12 +3,13 @@
 #include <opencv4/opencv2/core.hpp>
 #include <opencv4/opencv2/imgcodecs.hpp>
 #include <opencv4/opencv2/highgui.hpp>
+#include <atomic>
+#include <thread>
 
 #include "checkersdatabase.h"
 #include "validmoves.h"
 #include "robot.h"
 #include "alphabeta.h"
-#include "vision.h"
 #include "GameFunctions.h"
 #include "DrawFunctions.h"
 
@@ -23,12 +24,19 @@ vector<int> intPos;
 vector<string> latestMoves = {};
 
 int currentChecker;
-int turnVal = 0; //Array containing INT representing how many turns have been taken.
-
-bool jumpPerformed = false;
 bool gameEnd = false;
 bool redWon = false;
 bool button = false;
+
+std::atomic_bool robotMoving(false);
+
+void robotMoveThread(std::vector<std::vector<std::string>>& prevBoard, int thisTurn, Robot& robot){
+    robotMoving = true;
+
+    robot.robotMove(moveSet, prevBoard, thisTurn);
+
+    robotMoving = false;
+}
 
 void gameModeCallBack(int event, int userX, int userY, int flags, void* userdata){
 
@@ -62,8 +70,13 @@ void gameModeCallBack(int event, int userX, int userY, int flags, void* userdata
 
 //callBack function, that runs every time you click.
 void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
-    std::vector<std::vector<std::string>> prevBoard = vision.getBoard();
-    if(gameMode == "PVP" || thisTurn == 1 && gameMode == "AI" || thisTurn == 1 && gameMode == "DB"){
+    if(robotMoving){
+        imshow(winName, img);
+        return;
+    }
+
+    std::vector<std::vector<std::string>> prevBoard = robot.getBoard();
+    if(gameMode == "PVP"  && (!button)|| (thisTurn == 1 && gameMode == "AI" && (!button)) || (thisTurn == 1 && gameMode == "DB" && (!button))){
         if(selected.size() != 0 && event == EVENT_LBUTTONDOWN){ //Runs this code left mouse button clicked and "Rect" is already selected.
             for(int i = 0; i < 64; i++){
                 if(rectangles[i].contains(Point(userX,userY))){ //Checks if the click is inside of the game board.
@@ -73,11 +86,8 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                         clearVecInt(selected); //Clears vector selected.
                         clearVecString(stringPos);
                     }
-                    else if(thisTurn == 2){ //If it is player 1's turn, run this code.
+                    else if(thisTurn == 2){ //If it is player 2's turn, run this code.
                         posToStringConvert(rectangles[i].x, rectangles[i].y, stringPos);
-                        if(!jumpPerformed){
-                            moveEnd = stringPos[stringPos.size()-1];
-                        }
 
                         //Checks if move is legal.
                         if(validM.DB_move(stringPos[0], stringPos[1])){
@@ -99,41 +109,35 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                                         break;
                                     }
                                 }
-                                setBool(jumpPerformed, true);
                             }
 
-                                //End of turn.
-                                clearVecInt(selected); //Clears vector selected.
-                                clearVecString(stringPos);
-                                setBool(jumpPerformed, false);
+                            //End of turn.
+                            if(isGameWon(rCheckers, bCheckers, thisTurn)){
+                                setBool(gameEnd, true);
+                                setBool(redWon, true);
+                            }
 
-                                turnVal++;
-                                updateText(img, thisTurn, latestScores, latestMoves, moveStart, moveEnd); //Updates text.
-                                promotionGUI(rCheckers);
-                                Draw(img, startUpMain); //Draws new gamestate.
+                            std::thread moveThread(robotMoveThread, std::ref(prevBoard), thisTurn, std::ref(robot));
+                            moveThread.detach();
+                            thisTurn = validM.getPlayerTurn();
+                            updateText(img, thisTurn, latestScores, latestMoves, moveStart, moveEnd); //Updates text.
+                            promotionGUI(rCheckers);
+                            boards = validM.getBoards();
+                            checkerBoard(boards);
+                            Draw(img, startUpMain);
+                            imshow(winName, img);
+                            clearVecInt(selected); //Clears vector selected.
+                            clearVecString(stringPos);
 
-                                if(isGameWon(rCheckers, bCheckers, thisTurn)){
-                                    setBool(gameEnd, true);
-                                    setBool(redWon, true);
-                                }
-
-                                robot.robotMove(moveSet, boards, thisTurn);
-                                thisTurn = validM.getPlayerTurn();
-                                boards = validM.getBoards();
-                                checkerBoard(boards);
-
-                                cout << "----- Red turn end -----" << endl;
+                            cout << "----- Red turn end -----" << endl;
                         }
                         else{
                             stringPos.pop_back(); //If the move is invalid, remove invalid position.
                         }
                     }
-                    else if(thisTurn == 1){ //If it is player 2's turn, run this code - To see code explaination see previous section, as they are basically identical.
+                    else if(thisTurn == 1){ //If it is player 1's turn, run this code - To see code explaination see previous section, as they are basically identical.
 
                         posToStringConvert(rectangles[i].x, rectangles[i].y, stringPos);
-                        if(!jumpPerformed){
-                            moveEnd = stringPos[stringPos.size()-1];
-                        }
 
                         if(validM.DB_move(stringPos[0], stringPos[1])){
 
@@ -152,25 +156,24 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                                         break;
                                     }
                                 }
-                                setBool(jumpPerformed, true);
                             }
-                                clearVecInt(selected); //Clears vector selected.
-                                clearVecString(stringPos);
-                                setBool(jumpPerformed, false);
 
-                                turnVal++;
-                                updateText(img, thisTurn, latestScores, latestMoves, moveSet[0], moveSet[1]); //Updates text.
-                                promotionGUI(bCheckers);
-                                Draw(img, startUpMain); //Draws new gamestate.
+                            if(isGameWon(bCheckers, rCheckers, thisTurn)){
+                                setBool(gameEnd, true);
+                            }
 
-                                if(isGameWon(bCheckers, rCheckers, thisTurn)){
-                                    setBool(gameEnd, true);
-                                }
+                            std::thread moveThread(robotMoveThread, std::ref(prevBoard), thisTurn, std::ref(robot));
+                            moveThread.detach();
+                            thisTurn = validM.getPlayerTurn();
+                            boards = validM.getBoards();
+                            checkerBoard(boards);
 
-                                robot.robotMove(moveSet, boards, thisTurn);
-                                thisTurn = validM.getPlayerTurn();
-                                boards = validM.getBoards();
-                                checkerBoard(boards);
+                            updateText(img, thisTurn, latestScores, latestMoves, moveSet[0], moveSet[1]); //Updates text.
+                            promotionGUI(bCheckers);
+                            Draw(img, startUpMain);
+                            imshow(winName, img);
+                            clearVecInt(selected); //Clears vector selected.
+                            clearVecString(stringPos);
 
                             cout << "----- Black turn end -----" << endl;
                         }
@@ -183,16 +186,16 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
         }
         else if(event == EVENT_LBUTTONDOWN){ //If left mouse button is clicked and no checker was previously selected, run this code.
             if(takePicture.contains(Point(userX, userY))){
+                moveSet = {};
                 std::cout << "Pressed button" << std::endl;
                 robot.prepForPic();
                 moveSet = robot.boardLoop(boards, thisTurn); // Player's move
                 std::cout << moveSet[0] << " " << moveSet[1] << std::endl;
                 if(validM.DB_move(moveSet[0], moveSet[1])){
-                    goto AI_exec;
+                    button = true;
                 } else {
-                    goto AI_end;
+                    return;
                 }
-
             } else {
                 for(int i = 0; i < 64; i++){
                     if(rectangles[i].contains(Point(userX,userY))){ //Checks if click is inside game board.
@@ -243,51 +246,53 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
             winAnimation(winName, img, redWon, rectangles);
             setBool(gameEnd, false); //Stops animation
         }
-    } else if(thisTurn == 2 && gameMode == "AI" && !gameEnd || thisTurn == 2 && gameMode == "DB" && !gameEnd){
-        cout << "----- AI's turn -----" << endl;
-        if(gameMode == "AI"){
-            alphaBeta.makeMove(boards, depth, thisTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {}, thisTurn); //AI's move
-            moveSet = alphaBeta.getMove();
-        } else{
-            std::string BoardState;
-            for (int i = 0; i < 8; ++i) {
-                for (int j = 0; j < 8; ++j) {
-                    if(boards[i][j] == "1 "){
-                        BoardState += "1";
-                    } else if(boards[i][j] == "B "){
-                        BoardState += "2";
-                    } else if(boards[i][j] == "BK"){
-                        BoardState += "3";
-                    } else if(boards[i][j] == "R "){
-                        BoardState += "4";
-                    } else if(boards[i][j] == "RK"){
-                        BoardState += "5";
-                    }
-                }
-            }
-            std::string DBmove = MovePlayer(BoardState, thisTurn); // Database best move on current board
-            if (DBmove == "No moves"){
-                std::cout << "No moves found" << std::endl;
+    } else if((thisTurn == 2 && gameMode == "AI" && !gameEnd) || (thisTurn == 2 && gameMode == "DB" && !gameEnd) || button){
+        if(!button){
+            cout << "----- AI's turn -----" << endl;
+            if(gameMode == "AI" && thisTurn == 2){
                 alphaBeta.makeMove(boards, depth, thisTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {}, thisTurn); //AI's move
                 moveSet = alphaBeta.getMove();
-            }   else{
-                    std::cout << "AI move from database: " << DBmove << std::endl;
-                    moveSet = {DBmove.substr(0,2), DBmove.substr(2,2)};
-                    if (validM.DB_move(moveSet[0], moveSet[1])){
-
-                    }
-                    else{
-                        alphaBeta.makeMove(boards, depth, thisTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {}, thisTurn); //AI's move
-                        moveSet = alphaBeta.getMove();
+            } else if ("DB" && thisTurn == 2){
+                std::string BoardState;
+                for (int i = 0; i < 8; ++i) {
+                    for (int j = 0; j < 8; ++j) {
+                        if(boards[i][j] == "1 "){
+                            BoardState += "1";
+                        } else if(boards[i][j] == "B "){
+                            BoardState += "2";
+                        } else if(boards[i][j] == "BK"){
+                            BoardState += "3";
+                        } else if(boards[i][j] == "R "){
+                            BoardState += "4";
+                        } else if(boards[i][j] == "RK"){
+                            BoardState += "5";
+                        }
                     }
                 }
+                std::string DBmove = MovePlayer(BoardState, thisTurn); // Database best move on current board
+                if (DBmove == "No moves"){
+                    std::cout << "No moves found" << std::endl;
+                    alphaBeta.makeMove(boards, depth, thisTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {}, thisTurn); //AI's move
+                    moveSet = alphaBeta.getMove();
+                }   else{
+                        std::cout << "AI move from database: " << DBmove << std::endl;
+                        moveSet = {DBmove.substr(0,2), DBmove.substr(2,2)};
+                        if (validM.DB_move(moveSet[0], moveSet[1])){
+
+                        }
+                        else{
+                            alphaBeta.makeMove(boards, depth, thisTurn, redPieces, blackPieces, INT_MIN, INT_MAX, {}, thisTurn); //AI's move
+                            moveSet = alphaBeta.getMove();
+                        }
+                    }
+            }
+
+            cout << moveSet[0] << "," << moveSet[1] << endl;
+
+            std::thread moveThread(robotMoveThread, std::ref(prevBoard), thisTurn, std::ref(robot));
+            moveThread.detach();
         }
-
-        cout << moveSet[0] << "," << moveSet[1] << endl;
-
-        robot.robotMove(moveSet, boards, thisTurn);
-
-        AI_exec:
+        button = false;
         stringToPosConvert(moveSet[0], intPos);
 
         if(thisTurn == 2){
@@ -302,13 +307,12 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                         }
                     }
 
-                    stringToPosConvert(moveSet[moveSet.size()-1], intPos);
+                    stringToPosConvert(moveSet[1], intPos);
 
                     for(int j = 0; j < bCheckers.size(); j++){
                         if(bCheckers[j].contains(Point((intPos[intPos.size()-2] + intPos[intPos.size()-4])/2, (intPos[intPos.size()-1] + intPos[intPos.size()-3])/2))){
                             bCheckers[j].x = blackGraveyardRect.x;
                             bCheckers[j].y = blackGraveyardRect.y;
-                            setBool(jumpPerformed, true);
                             break;
                         }
                     }
@@ -317,11 +321,11 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
 
             img(rectangles[selected[selected.size()-2]]) = Vec3b(0,0,255);
             circle(img, {rectangles[selected[selected.size()-2]].x + 25, rectangles[selected[selected.size()-2]].y + 25}, 20, Vec3b(14,17,175), -1);
-            imshow(winName, img);
 
             rCheckers[selected[selected.size()-1]].x = intPos[intPos.size()-2];
             rCheckers[selected[selected.size()-1]].y = intPos[intPos.size()-1];
-        } else {
+
+        } else if(thisTurn == 1){
             for(int i = 0; i < 64; i++){
                 if(rectangles[i].contains(Point(intPos[intPos.size()-2], intPos[intPos.size()-1]))){
                     //selected.push_back(i);
@@ -333,13 +337,12 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
                         }
                     }
 
-                    stringToPosConvert(moveSet[moveSet.size()-1], intPos);
+                    stringToPosConvert(moveSet[1], intPos);
 
                     for(int j = 0; j < rCheckers.size(); j++){
                         if(rCheckers[j].contains(Point((intPos[intPos.size()-2] + intPos[intPos.size()-4])/2, (intPos[intPos.size()-1] + intPos[intPos.size()-3])/2))){
                             rCheckers[j].x = redGraveyardRect.x;
                             rCheckers[j].y = redGraveyardRect.y;
-                            setBool(jumpPerformed, true);
                             break;
                         }
                     }
@@ -348,38 +351,33 @@ void callBackFunc(int event, int userX, int userY, int flags, void* userdata){
 
             img(rectangles[selected[selected.size()-2]]) = Vec3b(0,0,255);
             circle(img, {rectangles[selected[selected.size()-2]].x + 25, rectangles[selected[selected.size()-2]].y + 25}, 20, Vec3b(14,17,175), -1);
-            imshow(winName, img);
 
             bCheckers[selected[selected.size()-1]].x = intPos[intPos.size()-2];
             bCheckers[selected[selected.size()-1]].y = intPos[intPos.size()-1];
         }
-
-        blackPieces = validM.getPieceCount()[0];
-        redPieces = validM.getPieceCount()[1];
-        thisTurn = validM.getPlayerTurn();
-        boards = validM.getBoards();
-        checkerBoard(boards);
-
-        Draw(img, startUpMain);
 
         if(isGameWon(rCheckers, bCheckers, thisTurn)){
             setBool(gameEnd, true);
             setBool(redWon, true);
             Draw(img, startUpMain);
         }
-
         clearVecInt(selected);
-        setBool(jumpPerformed, false);
+        blackPieces = validM.getPieceCount()[0];
+        redPieces = validM.getPieceCount()[1];
+        thisTurn = validM.getPlayerTurn();
+        boards = validM.getBoards();
+        checkerBoard(boards);
 
-        turnVal++;
         updateText(img, thisTurn, latestScores, latestMoves, moveSet[0], moveSet[1]);
         promotionGUI(rCheckers);
         promotionGUI(bCheckers);
         Draw(img, startUpMain); //Draws new gamestate.
-        } else if(gameMode == "AI" && gameEnd || gameMode == "DB" && gameEnd){
-            winAnimation(winName, img, redWon, rectangles);
-        }
-    AI_end:
+        imshow(winName, img);
+
+    } else if(gameMode == "AI" && gameEnd && thisTurn == 2 || gameMode == "DB" && gameEnd && thisTurn == 2){
+        winAnimation(winName, img, redWon, rectangles);
+    }
+
     imshow(winName, img);
 }
 
@@ -419,8 +417,12 @@ int main(int argc, char* argv[]){
         namedWindow(winName, WINDOW_AUTOSIZE);
         setMouseCallback(winName, callBackFunc);
 
-        if(waitKey() == 27){
-            exit(0);
+        while(true){
+            callBackFunc(0, 0, 0, 0, nullptr); // Call callBackFunc without relying on mouse events
+            imshow(winName, img); // Update GUI
+            if(waitKey(1) == 27){ // Check for ESC key press to exit
+                exit(0);
+            }
         }
     }
 

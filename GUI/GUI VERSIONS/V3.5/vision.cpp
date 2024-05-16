@@ -20,9 +20,9 @@ void Vision::detectAndDrawCentersOfCircles(){
     //![reduce_noise]
 
     //![houghcircles]
-    cv::HoughCircles(gray, _circles, cv::HOUGH_GRADIENT, 1,
+    cv::HoughCircles(gray, _circles, cv::HOUGH_GRADIENT_ALT, 1,
                      (gray.rows)/100,  // change this value to detect circles with different distances to each other
-                     125, 25, 5, 30 // change the last two parameters
+                     300, 0.8, 5, 25 // change the last two parameters
                      // (min_radius & max_radius) to detect larger circles
                      );
     //![houghcircles]
@@ -168,9 +168,9 @@ void Vision::cameraFeed(){
 // Finds the coordinates for the three calibration circles
 void Vision::calibrationCircles(){
     // Preset values for the three calibration circles
-    cv::Vec3b red = {70, 70, 255};
-    cv::Vec3b yellow = {150, 255, 255};
-    cv::Vec3b blue = {255, 70, 0};
+    cv::Vec3b red = {100, 100, 255};
+    cv::Vec3b yellow = {160, 255, 255};
+    cv::Vec3b blue = {210, 100, 10};
     bool redFound = false;
     bool yellowFound = false;
     bool blueFound = false;
@@ -191,7 +191,7 @@ void Vision::calibrationCircles(){
         _magentaFunc = {0, 0};
 
         // Tolerance for the color detection
-        int tolerance = 75;
+        int tolerance = 30;
 
         // Finds the coordinates of the three calibration circles by iterating through all the detected circles
         for (int k = 0; k < _circles.size(); k++) {
@@ -281,82 +281,87 @@ bool Vision::startBoard(){
 // Runs the first time the board is detected and finds the orientation of the board
 void Vision::firstLoop(){
 // Detects the circles and the chessboard corners
-start:
-    cameraFeed();
-    detectAndDrawCentersOfCircles();
-    detectAndDrawChessboardCorners();
-    calibrationCircles();
-
-    if(_circles.size() < 24 || _circles.empty()){
-        goto start;
-    }
-
-    // Startup variables
-    int checkLoop = 0;
-
-    newChessCorners(_axis[0], _axis[2], _axis[3]);
-
     while(1){
-        // Boolean variables that checks if the orientation of the board is correct
-        bool orego = false;
-        bool xaxis = false;
-        bool yaxis = false;
+        while(1){
+            cameraFeed();
+            detectAndDrawCentersOfCircles();
+            detectAndDrawChessboardCorners();
+            calibrationCircles();
 
-        // The first time it loops through all circles and removes the ones that are outside the board
-        if(checkLoop == 0){
-            while(1){
-                int iterator = 0;
-                for (int i = 0; i < _circles.size()+iterator; i++) {
-                    findCoordInFrame(cv::Point2f(_circles[i-iterator][0]*_pixToMeters, _circles[i-iterator][1]*_pixToMeters), iterator);
+            if(_circles.size() < 24 || _circles.empty()){
+                std::cout << "Only " << _circles.size() << "circles detected. Trying new picture" << std::endl;
+            } else {
+                break;
+            }
+        }
+
+        // Startup variables
+        int checkLoop = 0;
+
+        newChessCorners(_axis[0], _axis[2], _axis[3]);
+
+        while(1){
+            // Boolean variables that checks if the orientation of the board is correct
+            bool orego = false;
+            bool xaxis = false;
+            bool yaxis = false;
+
+            // The first time it loops through all circles and removes the ones that are outside the board
+            if(checkLoop == 0){
+                while(1){
+                    int iterator = 0;
+                    for (int i = 0; i < _circles.size()+iterator; i++) {
+                        findCoordInFrame(cv::Point2f(_circles[i-iterator][0]*_pixToMeters, _circles[i-iterator][1]*_pixToMeters), iterator);
+                    }
+                    if(_circleChecked.size() != 24){
+                        cameraFeed();
+                        detectAndDrawCentersOfCircles();
+                        detectAndDrawChessboardCorners();
+                        std::cout << "Only " << _circleChecked.size() << "circles detected. Trying new picture" << std::endl;
+                        _circleChecked.clear();
+                        iterator = 0;
+                    } else {
+                        break;
+                    }
                 }
-                if(_circleChecked.size() != 24){
-                    cameraFeed();
-                    detectAndDrawCentersOfCircles();
-                    detectAndDrawChessboardCorners();
-                    std::cout << "Only " << _circleChecked.size() << "circles detected. Trying new picture" << std::endl;
-                    _circleChecked.clear();
-                    iterator = 0;
-                } else {
+            } else { // The other times it only checks the circles that are inside the board
+                _circleChecked.clear();
+                int  iterator = 0;
+                for (int i = 0; i < _circles.size(); ++i) {
+                    findCoordInFrame(cv::Point2f(_circles[i][0]*_pixToMeters, _circles[i][1]*_pixToMeters), iterator);
+                }
+            }
+
+            // Checks if the circle is located at the origin, the x-axis or the y-axis
+            for (int i = 0; i < _circleChecked.size(); i++) {
+                if(-0.0125 < _circleChecked[i].x && 0.0125 > _circleChecked[i].x && -0.0125 < _circleChecked[i].y && 0.0125 > _circleChecked[i].y){
+                    orego = true;
+                    break;
+                } else if (0.2 < _circleChecked[i].x && 0.225 > _circleChecked[i].x && -0.005 < _circleChecked[i].y && 0.005 > _circleChecked[i].y){
+                    yaxis = true;
+                    break;
+                } else if (-0.0125 < _circleChecked[i].x && 0.0125 > _circleChecked[i].x && 0.2 < _circleChecked[i].y && 0.225 > _circleChecked[i].y){
+                    xaxis = true;
                     break;
                 }
             }
-        } else { // The other times it only checks the circles that are inside the board
-            _circleChecked.clear();
-            int  iterator = 0;
-            for (int i = 0; i < _circles.size(); ++i) {
-                findCoordInFrame(cv::Point2f(_circles[i][0]*_pixToMeters, _circles[i][1]*_pixToMeters), iterator);
+
+            // Breaks the loop if the orientation is correct
+            if(orego){
+                break;
+            } else if(xaxis){
+                newChessCorners(_axis[1], _axis[0], _axis[2]);
+                std::cout << "Koordinatsystemet er nu vendt" << std::endl;
+            } else if(yaxis){
+                newChessCorners(_axis[2], _axis[3], _axis[1]);
+                std::cout << "Koordinatsystemet er nu vendt" << std::endl;
             }
+            checkLoop++;
         }
 
-        // Checks if the circle is located at the origin, the x-axis or the y-axis
-        for (int i = 0; i < _circleChecked.size(); i++) {
-            if(-0.0125 < _circleChecked[i].x && 0.0125 > _circleChecked[i].x && -0.0125 < _circleChecked[i].y && 0.0125 > _circleChecked[i].y){
-                orego = true;
-                break;
-            } else if (0.2 < _circleChecked[i].x && 0.225 > _circleChecked[i].x && -0.005 < _circleChecked[i].y && 0.005 > _circleChecked[i].y){
-                yaxis = true;
-                break;
-            } else if (-0.0125 < _circleChecked[i].x && 0.0125 > _circleChecked[i].x && 0.2 < _circleChecked[i].y && 0.225 > _circleChecked[i].y){
-                xaxis = true;
-                break;
-            }
-        }
-
-        // Breaks the loop if the orientation is correct
-        if(orego){
+        if(startBoard()){
             break;
-        } else if(xaxis){
-            newChessCorners(_axis[1], _axis[0], _axis[2]);
-            std::cout << "Koordinatsystemet er nu vendt" << std::endl;
-        } else if(yaxis){
-            newChessCorners(_axis[2], _axis[3], _axis[1]);
-            std::cout << "Koordinatsystemet er nu vendt" << std::endl;
         }
-        checkLoop++;
-    }
-
-    if(!startBoard()){
-        goto start;
     }
 }
 
