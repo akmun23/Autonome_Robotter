@@ -1,0 +1,12 @@
+# ninja log v5
+8	2705	1713368110171671896	CMakeFiles/main.dir/matrix.cpp.o	52394bd1719aa816
+13	4169	1713421855322774691	CMakeFiles/main.dir/computerPos.cpp.o	4f39c2f7ca7047ef
+9	4497	1713422829144563338	CMakeFiles/main.dir/ComputerVision.cpp.o	9d8efb19fbf1f3f6
+11	8716	1713369184201251467	CMakeFiles/main.dir/FunktionerTilDatabase.cpp.o	52a06c128697975f
+23	5525	1713422830176585501	CMakeFiles/main.dir/robotMove.cpp.o	4d29452a9756d0c4
+48	4277	1713415828193670864	CMakeFiles/main.dir/ValidMoves.cpp.o	8b23344e3c255219
+9	6285	1713422887429455778	CMakeFiles/main.dir/main.cpp.o	f07444b2752adb5c
+8	6597	1713422831248608240	CMakeFiles/main.dir/mainfunctions.cpp.o	151d57d03d33e0b8
+6285	6749	1713422887889460329	main	a55b2cd73290228b
+60	2249	1713368109715617518	CMakeFiles/main.dir/BoardUpdate.cpp.o	dd5b1fcb078ff758
+43	796	1713368588111940282	CMakeFiles/main.dir/Atmega.cpp.o	652b524e0ec13a
