@@ -93,7 +93,13 @@ void Robot::robotStartVision(){
     // Calculates the transformation matrix for the robot to the checker piece
     _RobotToChesspieceTransformation = _robot*_pieceLocation;
 
-    sendmsg('6');
+    int ClosedOrOpen;
+    std::cout << "Is the gripper open or closed? (1 for open, 0 for closed)" << std::endl;
+    std::cin >> ClosedOrOpen;
+
+    if(ClosedOrOpen == 1){
+        sendmsg('6');
+    }
     // Finds the height of a piece on the chessboard
     rtde_control.moveJ({-1, -1.57, -1.57, -1.57, 1.57, _pieceLocation.at(2,2)}, 2, 0.5);
     std::vector<double> target = rtde_receive.getActualTCPPose();

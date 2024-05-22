@@ -397,8 +397,8 @@ int main(int argc, char** argv) {
         QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
         db.setHostName("localhost");
         db.setDatabaseName("CheckersDatabase");
-        db.setUserName("IndsætBrugernavn");  // Change to username
-        db.setPassword("IndsætPassword");  // Change to password
+        db.setUserName("Pascal");  // Change to username
+        db.setPassword("Superbror22!");  // Change to password
         db.open();
 
         QSqlQuery query;
@@ -406,7 +406,7 @@ int main(int argc, char** argv) {
         //Database settings
         bool ResetDB = false; //If the database should be reset set this to true
         bool LoadTempBeforeStart = false; //If there are a full temp table from previous games that should be loaded before the game starts set this to true
-        bool UploadTempToDB = true; //If the temp table should be uploaded to the database after the game ends set this to true
+        bool UploadTempToDB = false; //If the temp table should be uploaded to the database after the game ends set this to true
         resetDB(ResetDB); // Resets the database
         int UniqueBoardIDCounter;
         int CounterForTempTable = 1;
@@ -426,14 +426,14 @@ int main(int argc, char** argv) {
         validMoves validMoves;
         alphaBeta alphaBeta1(&validMoves, 0);
         alphaBeta alphaNotEvo(&validMoves, "");
-        query.exec("SELECT * FROM allTime WHERE ai_id = 74");
-        query.next();
-        alphaBeta alphaEvo(&validMoves, query.value(0).toDouble(), query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble());
+        //query.exec("SELECT * FROM allTime WHERE ai_id = 74");
+        //query.next();
+        //alphaBeta alphaEvo(&validMoves, query.value(0).toDouble(), query.value(1).toDouble(), query.value(2).toDouble(), query.value(3).toDouble(), query.value(4).toDouble(), query.value(5).toDouble(), query.value(6).toDouble(), query.value(7).toDouble(), query.value(8).toDouble(), query.value(9).toDouble(), query.value(10).toDouble());
         int player1Wins = 0;
         int player2Wins = 0;
         int playerDraws = 0;
         auto start = std::chrono::high_resolution_clock::now();
-        for (int ii = 0; ii < 20; ++ii) {
+        for (int ii = 0; ii < 1; ++ii) {
             DatabaseInit(UniqueBoardIDCounter,LoadTempBeforeStart); //Initializes the database
        	    int TestCounterForDatabase = 0;
             std::cout << "Game Started" << std::endl;
@@ -490,7 +490,7 @@ int main(int argc, char** argv) {
                     } else {
                         if (playerTurn == 1 && player == "DB" || playerTurn == 2 && player2 == "DB"){
 
-                            // MoveDBMain(BoardState, playerTurn, boards, redPieces, blackPieces, moveSet, CounterForTempTable, DrawChecker, DatabaseMoveMade, TestCounterForDatabase,validMoves,alphaBeta); // Database AI's move
+                            MoveDBMain(BoardState, playerTurn, boards, redPieces, blackPieces, moveSet, CounterForTempTable, DrawChecker, DatabaseMoveMade, TestCounterForDatabase,validMoves,alphaBeta1); // Database AI's move
 
                         }
                         else if (playerTurn == 1 && player == "Random" || playerTurn == 2 && player2 == "Random"){
@@ -503,18 +503,19 @@ int main(int argc, char** argv) {
                             CounterForTempTable = 0;
 
 
-                            checkerBoard(boards);
+                            //checkerBoard(boards);
+                            /*
                             if(playerTurn == 1){
                                 alphaNotEvo.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
                                 moveSet = alphaNotEvo.getMove();
                             } else {
                                 alphaEvo.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
                                 moveSet = alphaEvo.getMove();
-                            }
+                            }*/
 
                             //checkerBoard(boards);
-                            //alphaBeta.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
-                            //moveSet = alphaBeta.getMove();
+                            alphaBeta1.makeMove(boards, depth, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
+                            moveSet = alphaBeta1.getMove();
 
                         }
                     }
@@ -577,8 +578,8 @@ int main(int argc, char** argv) {
                 //std::cout << "GameEnded" << std::endl;
                 //GameEnd(redPieces,blackPieces,playerTurn);
             }
-        std::cout << "The evolved AI wins: " << player1Wins << std::endl;
-        std::cout << "The initial AI wins: " << player2Wins << std::endl;
+        std::cout << "The Database AI wins: " << player1Wins << std::endl;
+        std::cout << "The MinMax AI wins: " << player2Wins << std::endl;
         std::cout << "Draws: " << playerDraws << std::endl;
 
                 GameEnd(redPieces,blackPieces,playerTurn);
