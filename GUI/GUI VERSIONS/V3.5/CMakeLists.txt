@@ -33,4 +33,4 @@ add_executable(Project_GUI main.cpp
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
-target_link_libraries(Project_GUI PRIVATE ur_rtde::rtde Qt5::Core Qt5::Sql opencv_core opencv_highgui opencv_imgcodecs ${OpenCV_LIBS})
+target_link_libraries(Project_GUI PRIVATE ur_rtde::rtde Qt5::Core Qt5::Sql opencv_highgui ${OpenCV_LIBS})
