@@ -166,8 +166,6 @@ void InserNewMoveToOldBoard(int& BoardID, QString& BoardState){
     }
 }
 
-
-
 void UpdateMoveWinRate(QString& Move, int& BoardID, float& WinOrLoss, int& PlayerId){  // Function to update either Player 1 or Player 2's move win rate
     QSqlDatabase db = QSqlDatabase::database("QMYSQL");
     QSqlQuery query = QSqlQuery(db);
@@ -356,9 +354,6 @@ void insertAlphaBetaToTemp(std::vector<std::vector<std::string>>& tempBoard, std
 
 }
 
-
-
-
 ///////////////////////////////////////////////// Ting til simu //////////////////////////////////////////////////////
 
 void LoadSimVectors(std::vector<int>& Player1SimChoise,std::vector<int>& Player2SimChoise){
@@ -425,8 +420,6 @@ void IncreaseOponentSimu(const int& drawChecker, std::vector<int> &Player2SimCho
 
 }
 
-
-
 void DeleteWrongMove(std::vector<std::vector<std::string>>& tempBoard, std::string& MoveMade, int& tempPlayer){
 
     QSqlDatabase db = QSqlDatabase::database("QMYSQL");                         // Connects to the database
@@ -470,6 +463,3 @@ void DeleteWrongMove(std::vector<std::vector<std::string>>& tempBoard, std::stri
     }
 
 }
-
-
-

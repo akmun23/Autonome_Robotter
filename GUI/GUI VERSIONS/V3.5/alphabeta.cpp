@@ -683,5 +683,3 @@ void alphaBeta::addWinner(){
     query.bindValue(":depth", _depth);
     query.exec();
 }
-
-
