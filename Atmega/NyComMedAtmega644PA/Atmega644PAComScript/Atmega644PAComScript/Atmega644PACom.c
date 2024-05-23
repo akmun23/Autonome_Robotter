@@ -63,7 +63,7 @@ void InitPWM(){
 void InitADC(){
 	
 	ADMUX = (1 << REFS0) | (1 << MUX0);									// AVCC at AREF pin and ADC1 Chosen
-	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);						// Maybe set all 3 ADPS pins so division factor is 128 this would give a F_ADC of aprox 150khz
+	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);	// set all 3 ADPS pins so division factor is 128 this would give a F_ADC of aprox 150khz
 }
 
 
@@ -76,7 +76,7 @@ void CloseGripper(){
 	while (ObjectHit == 0) {					// Loop waiting for bool set true when object is hit
 		ADCSRA |= (1 << ADSC);					// start ADC
 		while ((ADCSRA & (1 << ADIF)) == 0){}	// Waits for a reading from the ADC to be done
-		if(ADC <= 457){							// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
+		if(ADC <= 456){							// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
 			ObjectHit = 1;						// Makes variable true telling the loop that a object has been grasped
 		}
 	}
@@ -110,9 +110,16 @@ ISR(TIMER1_OVF_vect){
 ISR(USART1_RX_vect){
 	rxdata = UDR1;				// The received message is put into a variable to fix issue with reading directly from UDR1 causing it to show old message 	
 	sei();
+	
 	if (rxdata == '6'){
 		CloseGripper();
 	} else if (rxdata == '8'){
 		OpenGripper();
+	}
+	else if (rxdata == '1'){
+		dutycycle = 100;	
+	}
+	else if (rxdata == '2'){
+		dutycycle = 0;
 	}
 }

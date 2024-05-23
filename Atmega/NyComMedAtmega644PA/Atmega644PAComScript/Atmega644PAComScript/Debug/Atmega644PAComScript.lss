@@ -3,31 +3,31 @@ Atmega644PAComScript.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800100  00800100  000002f2  2**0
+  0 .data         00000000  00800100  00800100  0000031a  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         0000027e  00000000  00000000  00000074  2**1
+  1 .text         000002a6  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000005  00800100  00800100  000002f2  2**0
+  2 .bss          00000005  00800100  00800100  0000031a  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  000002f2  2**0
+  3 .comment      00000030  00000000  00000000  0000031a  2**0
                   CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000324  2**2
+  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  0000034c  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 00000058  00000000  00000000  00000364  2**0
+  5 .debug_aranges 00000058  00000000  00000000  0000038c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   000009c2  00000000  00000000  000003bc  2**0
+  6 .debug_info   000009c2  00000000  00000000  000003e4  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000800  00000000  00000000  00000d7e  2**0
+  7 .debug_abbrev 00000800  00000000  00000000  00000da6  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00000410  00000000  00000000  0000157e  2**0
+  8 .debug_line   00000432  00000000  00000000  000015a6  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000000f0  00000000  00000000  00001990  2**2
+  9 .debug_frame  000000f0  00000000  00000000  000019d8  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    000004a3  00000000  00000000  00001a80  2**0
+ 10 .debug_str    000004ad  00000000  00000000  00001ac8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    000001ec  00000000  00000000  00001f23  2**0
+ 11 .debug_loc    000001ec  00000000  00000000  00001f75  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000048  00000000  00000000  0000210f  2**0
+ 12 .debug_ranges 00000048  00000000  00000000  00002161  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -77,7 +77,7 @@ Disassembly of section .text:
   88:	11 e0       	ldi	r17, 0x01	; 1
   8a:	a0 e0       	ldi	r26, 0x00	; 0
   8c:	b1 e0       	ldi	r27, 0x01	; 1
-  8e:	ee e7       	ldi	r30, 0x7E	; 126
+  8e:	e6 ea       	ldi	r30, 0xA6	; 166
   90:	f2 e0       	ldi	r31, 0x02	; 2
   92:	02 c0       	rjmp	.+4      	; 0x98 <__do_copy_data+0x10>
   94:	05 90       	lpm	r0, Z+
@@ -100,7 +100,7 @@ Disassembly of section .text:
   aa:	b2 07       	cpc	r27, r18
   ac:	e1 f7       	brne	.-8      	; 0xa6 <.do_clear_bss_loop>
   ae:	0e 94 7e 00 	call	0xfc	; 0xfc <main>
-  b2:	0c 94 3d 01 	jmp	0x27a	; 0x27a <_exit>
+  b2:	0c 94 51 01 	jmp	0x2a2	; 0x2a2 <_exit>
 
 000000b6 <__bad_interrupt>:
   b6:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
@@ -156,7 +156,7 @@ void InitADC(){
 	ADMUX = (1 << REFS0) | (1 << MUX0);									// AVCC at AREF pin and ADC1 Chosen
   ee:	81 e4       	ldi	r24, 0x41	; 65
   f0:	80 93 7c 00 	sts	0x007C, r24	; 0x80007c <__TEXT_REGION_LENGTH__+0x7f007c>
-	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);						// Maybe set all 3 ADPS pins so division factor is 128 this would give a F_ADC of aprox 150khz
+	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);	// set all 3 ADPS pins so division factor is 128 this would give a F_ADC of aprox 150khz
   f4:	87 e8       	ldi	r24, 0x87	; 135
   f6:	80 93 7a 00 	sts	0x007A, r24	; 0x80007a <__TEXT_REGION_LENGTH__+0x7f007a>
   fa:	08 95       	ret
@@ -188,7 +188,7 @@ int main(void)
  11e:	ff cf       	rjmp	.-2      	; 0x11e <main+0x22>
 
 00000120 <CloseGripper>:
-	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);						// Maybe set all 3 ADPS pins so division factor is 128 this would give a F_ADC of aprox 150khz
+	ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);	// set all 3 ADPS pins so division factor is 128 this would give a F_ADC of aprox 150khz
 }
 
 
@@ -233,10 +233,10 @@ void CloseGripper(){
  152:	80 91 7a 00 	lds	r24, 0x007A	; 0x80007a <__TEXT_REGION_LENGTH__+0x7f007a>
  156:	84 ff       	sbrs	r24, 4
  158:	fc cf       	rjmp	.-8      	; 0x152 <CloseGripper+0x32>
-		if(ADC <= 457){							// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
+		if(ADC <= 456){							// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
  15a:	80 91 78 00 	lds	r24, 0x0078	; 0x800078 <__TEXT_REGION_LENGTH__+0x7f0078>
  15e:	90 91 79 00 	lds	r25, 0x0079	; 0x800079 <__TEXT_REGION_LENGTH__+0x7f0079>
- 162:	8a 3c       	cpi	r24, 0xCA	; 202
+ 162:	89 3c       	cpi	r24, 0xC9	; 201
  164:	91 40       	sbci	r25, 0x01	; 1
  166:	10 f4       	brcc	.+4      	; 0x16c <CloseGripper+0x4c>
 			ObjectHit = 1;						// Makes variable true telling the loop that a object has been grasped
@@ -252,7 +252,7 @@ void CloseGripper(){
  16e:	31 05       	cpc	r19, r1
  170:	59 f3       	breq	.-42     	; 0x148 <CloseGripper+0x28>
 		while ((ADCSRA & (1 << ADIF)) == 0){}	// Waits for a reading from the ADC to be done
-		if(ADC <= 457){							// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
+		if(ADC <= 456){							// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
 			ObjectHit = 1;						// Makes variable true telling the loop that a object has been grasped
 		}
 	}
@@ -386,40 +386,61 @@ ISR(USART1_RX_vect){
  238:	80 93 02 01 	sts	0x0102, r24	; 0x800102 <rxdata>
 	sei();
  23c:	78 94       	sei
+	
 	if (rxdata == '6'){
  23e:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <rxdata>
  242:	86 33       	cpi	r24, 0x36	; 54
  244:	19 f4       	brne	.+6      	; 0x24c <__vector_28+0x3a>
 		CloseGripper();
  246:	0e 94 90 00 	call	0x120	; 0x120 <CloseGripper>
- 24a:	06 c0       	rjmp	.+12     	; 0x258 <__vector_28+0x46>
+ 24a:	1a c0       	rjmp	.+52     	; 0x280 <__vector_28+0x6e>
 	} else if (rxdata == '8'){
  24c:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <rxdata>
  250:	88 33       	cpi	r24, 0x38	; 56
- 252:	11 f4       	brne	.+4      	; 0x258 <__vector_28+0x46>
+ 252:	19 f4       	brne	.+6      	; 0x25a <__vector_28+0x48>
 		OpenGripper();
  254:	0e 94 c1 00 	call	0x182	; 0x182 <OpenGripper>
+ 258:	13 c0       	rjmp	.+38     	; 0x280 <__vector_28+0x6e>
 	}
- 258:	ff 91       	pop	r31
- 25a:	ef 91       	pop	r30
- 25c:	bf 91       	pop	r27
- 25e:	af 91       	pop	r26
- 260:	9f 91       	pop	r25
- 262:	8f 91       	pop	r24
- 264:	7f 91       	pop	r23
- 266:	6f 91       	pop	r22
- 268:	5f 91       	pop	r21
- 26a:	4f 91       	pop	r20
- 26c:	3f 91       	pop	r19
- 26e:	2f 91       	pop	r18
- 270:	0f 90       	pop	r0
- 272:	0f be       	out	0x3f, r0	; 63
- 274:	0f 90       	pop	r0
- 276:	1f 90       	pop	r1
- 278:	18 95       	reti
+	else if (rxdata == '1'){
+ 25a:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <rxdata>
+ 25e:	81 33       	cpi	r24, 0x31	; 49
+ 260:	39 f4       	brne	.+14     	; 0x270 <__vector_28+0x5e>
+		dutycycle = 100;	
+ 262:	84 e6       	ldi	r24, 0x64	; 100
+ 264:	90 e0       	ldi	r25, 0x00	; 0
+ 266:	90 93 01 01 	sts	0x0101, r25	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
+ 26a:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 26e:	08 c0       	rjmp	.+16     	; 0x280 <__vector_28+0x6e>
+	}
+	else if (rxdata == '2'){
+ 270:	80 91 02 01 	lds	r24, 0x0102	; 0x800102 <rxdata>
+ 274:	82 33       	cpi	r24, 0x32	; 50
+ 276:	21 f4       	brne	.+8      	; 0x280 <__vector_28+0x6e>
+		dutycycle = 0;
+ 278:	10 92 01 01 	sts	0x0101, r1	; 0x800101 <__DATA_REGION_ORIGIN__+0x1>
+ 27c:	10 92 00 01 	sts	0x0100, r1	; 0x800100 <__DATA_REGION_ORIGIN__>
+	}
+ 280:	ff 91       	pop	r31
+ 282:	ef 91       	pop	r30
+ 284:	bf 91       	pop	r27
+ 286:	af 91       	pop	r26
+ 288:	9f 91       	pop	r25
+ 28a:	8f 91       	pop	r24
+ 28c:	7f 91       	pop	r23
+ 28e:	6f 91       	pop	r22
+ 290:	5f 91       	pop	r21
+ 292:	4f 91       	pop	r20
+ 294:	3f 91       	pop	r19
+ 296:	2f 91       	pop	r18
+ 298:	0f 90       	pop	r0
+ 29a:	0f be       	out	0x3f, r0	; 63
+ 29c:	0f 90       	pop	r0
+ 29e:	1f 90       	pop	r1
+ 2a0:	18 95       	reti
 
-0000027a <_exit>:
- 27a:	f8 94       	cli
+000002a2 <_exit>:
+ 2a2:	f8 94       	cli
 
-0000027c <__stop_program>:
- 27c:	ff cf       	rjmp	.-2      	; 0x27c <__stop_program>
+000002a4 <__stop_program>:
+ 2a4:	ff cf       	rjmp	.-2      	; 0x2a4 <__stop_program>
