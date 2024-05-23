@@ -4,7 +4,6 @@
 #include <QCoreApplication>
 #include <QtSql>
 #include <QSqlDatabase>
-#include <iostream>
 #include <string>
 
 // Boards and Moves
@@ -14,8 +13,6 @@ void UpdateMoveWinRate(QString& Move, int& BoardID, float& WinOrLoss, int& Playe
 
 //Player Moves
 std::string MovePlayer(std::string& BoardState,int& PlayerTurn);
-
-
 
 //Temp
 void RefreshTempTable();

@@ -12,16 +12,16 @@
 class alphaBeta : public validMoves
 {
     // For database
-    double _piece = 7.5742126627791135;
-    double _king = 15.452885793319332;
-    double _lock = 3.510642298522243;
-    double _lockKing = 3.217031955937848;
-    double _forward = 0.9469326185608599;
-    double _TwoEmpty = 24.339960777642677;
-    double _OneJump = 37.55305763341628;
-    double _OneEmpty = 4.465623172402512;
-    double _TwoJump = 139.11336679273032;
-    double _depth = 1.281201654689201;
+    double _piece = 9.559397480568023;
+    double _king = 14.66551921526645;
+    double _lock = 2.886680350048823;
+    double _lockKing = 3.4905191066448387;
+    double _forward = 0.8713181519315153;
+    double _TwoEmpty = 22.023951943802267;
+    double _OneJump = 24.64160311651794;
+    double _OneEmpty = 5.227387139291636;
+    double _TwoJump = 141.6052036767301;
+    double _depth = 1.2327709215647928;
     int _id;
 
     // For AI

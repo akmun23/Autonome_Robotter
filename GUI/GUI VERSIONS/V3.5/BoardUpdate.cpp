@@ -1,5 +1,6 @@
 #include "boardUpdate.h"
 
+// Used to create an initial board if vision isn't used
 std::vector<std::vector<std::string>> startUp(){
     std::vector<std::vector<std::string>> boards = {
         {"  ", "B ", "  ", "B ", "  ", "B ", "  ", "B "},

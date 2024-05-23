@@ -1,5 +1,4 @@
 #include "vision.h"
-#include <cmath>
 
 Vision::Vision(){}
 

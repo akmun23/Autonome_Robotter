@@ -2,7 +2,6 @@
 #ifndef VALIDMOVES_H
 #define VALIDMOVES_H
 
-#include "boardUpdate.h"
 #include <string>
 #include <vector>
 #include <iostream>
