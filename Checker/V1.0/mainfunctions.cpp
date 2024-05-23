@@ -52,14 +52,16 @@ void loadBoardToString(std::vector<std::vector<std::string>> boards, std::string
 void MoveDBMain(std::string& BoardState, int& playerTurn, std::vector<std::vector<std::string>>& boards, int& redPieces, int& blackPieces, std::vector<std::string>& moveSet, int& CounterForTempTable, int& DrawChecker, bool& DatabaseMoveMade, int& TestCounterForDatabase, validMoves& validm, alphaBeta alphab){
     std::string DBmove = MovePlayer(BoardState, playerTurn); // Database best move on current board
     if (DBmove == "No moves"){
-        MoveRandom(moveSet, DatabaseMoveMade, validm);
+        alphab.makeMove(boards, 7, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
+        moveSet = alphab.getMove();
     } else {
         moveSet = {DBmove.substr(0,2), DBmove.substr(2,2)};
         if (validm.DB_move(moveSet[0], moveSet[1])){
 
         }
         else{
-            MoveRandom(moveSet, DatabaseMoveMade, validm);
+            alphab.makeMove(boards, 7, playerTurn, blackPieces, redPieces, INT_MIN, INT_MAX, {}, CounterForTempTable); //AI's move
+            moveSet = alphab.getMove();
         }
         TestCounterForDatabase++;
         DatabaseMoveMade = true;

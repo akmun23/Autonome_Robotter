@@ -3,7 +3,7 @@
 // library headers
 #include <stdio.h>
 #include <string.h>
-#include <iostream>
+
 // Linux headers
 #include <fcntl.h> // Contains file controls like O_RDWR
 #include <errno.h> // Error integer and strerror() function

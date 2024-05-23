@@ -43,11 +43,6 @@ public:
     Matrix operator+(Matrix m);
 
     Matrix operator*(Matrix m);
-
-    std::shared_ptr<Matrix> add(std::shared_ptr<Matrix> matrix);
-
-    std::shared_ptr<Matrix> multiply(std::shared_ptr<Matrix> matrix);
-
 };
 
 #endif // MATRIX_H

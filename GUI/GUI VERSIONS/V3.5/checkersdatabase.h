@@ -4,7 +4,6 @@
 #include <QCoreApplication>
 #include <QtSql>
 #include <QSqlDatabase>
-#include <iostream>
 #include <string>
 
 // Boards and Moves
@@ -15,8 +14,6 @@ void UpdateMoveWinRate(QString& Move, int& BoardID, float& WinOrLoss, int& Playe
 //Player Moves
 std::string MovePlayer(std::string& BoardState,int& PlayerTurn);
 
-
-
 //Temp
 void RefreshTempTable();
 bool CheckDuplicateMoves(std::string& BoardState, std::string& MoveToCheck, int& PlayerId);
@@ -24,7 +21,7 @@ bool CheckDuplicateMoves(std::string& BoardState, std::string& MoveToCheck, int&
 // Inserting to database
 void InsertBoardToDatabase(QString& BoardState);
 void InsertNewMoveToNewBoard(int& Move, int& BoardID);
-void InserNewMoveToOldBoard(int& BoardID, int& TempBoardID);
+void InserNewMoveToOldBoard(int& BoardID, QString &BoardState);
 void InsertToTemp(std::string& BoardState, std::string& Move, int& Counter, int PlayerId);
 void insertAlphaBetaToTemp(std::vector<std::vector<std::string>>& tempBoard, std::string& MoveMade, int& tempPlayer, int& CounterForTempTable);
 void InsertMove(int board_id, QString Move, int PlayerID, double WinOrLoss);

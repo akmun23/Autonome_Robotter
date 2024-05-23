@@ -1,6 +1,6 @@
 #include "alphabeta.h"
 
-// The constructor for the alphaBeta class with no defined values
+
 alphaBeta::alphaBeta(validMoves* vm):_vm(vm){
     // Multiply all values by a random number between 0.7 and 1.3
     std::random_device rd;  // Obtain a random number from hardware
@@ -18,6 +18,7 @@ alphaBeta::alphaBeta(validMoves* vm):_vm(vm){
     _depth *= distr(eng);
 }
 
+// The constructor for the alphaBeta class with no defined values
 alphaBeta::alphaBeta(validMoves* vm, int depth):_depthAI(depth), _vm(vm){}
 
 // The constructor for the alphaBeta class with defined values
@@ -572,6 +573,11 @@ int alphaBeta::findMove(std::vector<std::vector<std::string>> boards, int depth,
     }
 }
 
+void alphaBeta::makeMove(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, int alpha, int beta, std::string playerMove,int& CounterForTempTable){
+    findMove(boards, depth, playerTurn, blackPieces, redPieces, alpha, beta, playerMove, CounterForTempTable);
+    _vm -> DB_move(_playerStart, _playerMove);
+}
+
 // Returns the id of the alphaBeta object
 int alphaBeta::getId() {
     return _id;
@@ -677,9 +683,3 @@ void alphaBeta::addWinner(){
     query.bindValue(":depth", _depth);
     query.exec();
 }
-
-void alphaBeta::makeMove(std::vector<std::vector<std::string>> boards, int depth, int playerTurn, int blackPieces, int redPieces, int alpha, int beta, std::string playerMove,int& CounterForTempTable){
-    findMove(boards, depth, playerTurn, blackPieces, redPieces, alpha, beta, playerMove, CounterForTempTable);
-    _vm -> DB_move(_playerStart, _playerMove);
-}
-
