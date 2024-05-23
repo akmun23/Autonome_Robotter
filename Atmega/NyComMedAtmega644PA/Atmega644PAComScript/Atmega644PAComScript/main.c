@@ -71,12 +71,12 @@ void CloseGripper(){
 	PORTC = (0 << PORTC3);						// Makes sure the motor is going the correct way
 	DDRC = (0 << PORTC3);
 	dutycycle = 60;								// Enables the motor at approximately 60% duty cycle 
-	_delay_ms(300);								// Short delay before first reading since starting the motor requires more power than running
+	_delay_ms(200);								// Short delay before first reading since starting the motor requires more power than running
 	int ObjectHit = 0;							// variable for checking when object is hit
 	while (ObjectHit == 0) {					// Loop waiting for bool set true when object is hit
 		ADCSRA |= (1 << ADSC);					// start ADC
 		while ((ADCSRA & (1 << ADIF)) == 0){}	// Waits for a reading from the ADC to be done
-		if(ADC <= 461){							// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
+		if(ADC <= 457){							// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
 			ObjectHit = 1;						// Makes variable true telling the loop that a object has been grasped
 		}
 	}
@@ -88,12 +88,12 @@ void OpenGripper(){
 	PORTC = (1 << PORTC3);						// Makes sure the motor is going the correct way
 	DDRC = (1 << PORTC3);
 	dutycycle = 100;							// Enables the motor at max speed
-	_delay_ms(300);								// Short delay before first reading since starting the motor requires more power than running
+	_delay_ms(200);								// Short delay before first reading since starting the motor requires more power than running
 	int ObjectHit = 0;							// variable for checking when object is hit
 	while (ObjectHit == 0) {					// Loop waiting for bool set true when object is hit
 		ADCSRA |= (1 << ADSC);					// start ADC
 		while ((ADCSRA & (1 << ADIF)) == 0){}	// Waits for a reading from the ADC to be done
-		if(ADC >= 570){							// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
+		if(ADC >= 574){							// Compares the signal and checks if it is lower than picked value for power consumption when resistance if met
 			ObjectHit = 1;						// Setting the variable to 1 telling the loop that the gripper is fully open
 		}
 	}
